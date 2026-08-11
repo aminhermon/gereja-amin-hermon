@@ -1,0 +1,52 @@
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="navbar scrolled" id="navbar" aria-label="Main navigation">
+    <div class="navbar__inner">
+      <a href="/" class="navbar__logo" aria-label="<%= general.churchName %> - Home">
+      </a>
+      <div class="navbar__menu" id="nav-menu">
+        <a href="/" class="navbar__link">Beranda</a>
+        <a href="/visit.html" class="navbar__link">Baru di Sini?</a>
+        <a href="/about.html" class="navbar__link">Tentang Gereja</a>
+
+        <a href="/pelayanan.html" class="navbar__link">Pelayanan</a>
+
+        <!-- KomSek Dropdown -->
+        <div class="navbar__dropdown" id="komsek-dropdown">
+          <button class="navbar__link navbar__dropdown-toggle" type="button">
+            KomSek
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="navbar__dropdown-menu navbar__dropdown-menu--mega">
+            <div class="navbar__mega-col">
+              <span class="navbar__mega-heading">Komisi</span>
+              <% if (typeof komsek !== 'undefined') { %>
+              <% komsek.komisi.forEach(function(k) { %>
+              <a href="/komsek/<%= k.slug %>" class="navbar__dropdown-item"><%= k.nama %></a>
+              <% }); %>
+              <% } %>
+            </div>
+            <div class="navbar__mega-col">
+              <span class="navbar__mega-heading">Sektor</span>
+              <% if (typeof komsek !== 'undefined') { %>
+              <% komsek.sektor.forEach(function(s) { %>
+              <a href="/komsek/<%= s.slug %>" class="navbar__dropdown-item"><%= s.nama %></a>
+              <% }); %>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <a href="/media.html" class="navbar__link">Media</a>
+        <a href="/contact.html" class="navbar__link">Hubungi Kami</a>
+        <form action="/search" method="GET" class="navbar__search">
+          <input type="text" name="q" placeholder="Cari..." aria-label="Search" required>
+          <button type="submit" aria-label="Submit Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+        </form>
+      </div>
+      <button class="navbar__hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>

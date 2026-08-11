@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
+  <title>Hasil Pencarian: <%= query %> — <%= general.churchName %></title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <style>
+    .search-results-section {
+      padding: 5rem 0;
+      background-color: var(--white);
+    }
+    .search-header {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+    .search-header h2 {
+      font-size: 2rem;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+    .search-header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+    .search-query {
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .search-list {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .search-item {
+      background: #f9f9f9;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      display: block;
+    }
+    .search-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+    .search-item__type {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+    .search-item__title {
+      font-size: 1.25rem;
+      color: var(--navy);
+      margin: 0 0 0.5rem 0;
+      font-family: var(--font-heading);
+    }
+    .search-item__desc {
+      font-size: 0.95rem;
+      color: #555;
+      margin: 0;
+      line-height: 1.5;
+    }
+    .search-empty {
+      text-align: center;
+      padding: 4rem 1rem;
+      background: #f9f9f9;
+      border-radius: 8px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .search-empty h3 {
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 1rem;
+    }
+    .search-empty p {
+      color: #666;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--sub" id="hero-search" style="min-height: 40vh;">
+    <div class="hero__bg" style="background: var(--navy);"></div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content" style="padding-top: 100px;">
+      <div class="hero__eyebrow">Pencarian Website</div>
+      <h1>Pencarian</h1>
+    </div>
+  </section>
+
+  <!-- ========== SEARCH RESULTS ========== -->
+  <section class="search-results-section">
+    <div class="container">
+      <div class="search-header">
+        <% if (query) { %>
+          <h2>Hasil untuk <span class="search-query">"<%= query %>"</span></h2>
+          <p>Ditemukan <%= results.length %> hasil yang cocok.</p>
+        <% } else { %>
+          <h2>Pencarian Website</h2>
+          <p>Silakan masukkan kata kunci pada form pencarian di atas.</p>
+        <% } %>
+      </div>
+
+      <% if (query && results.length > 0) { %>
+        <div class="search-list">
+          <% results.forEach(function(item) { %>
+            <a href="<%= item.url %>" class="search-item">
+              <span class="search-item__type"><%= item.type %></span>
+              <h3 class="search-item__title"><%= item.title %></h3>
+              <p class="search-item__desc"><%= item.desc %></p>
+            </a>
+          <% }); %>
+        </div>
+      <% } else if (query) { %>
+        <div class="search-empty">
+          <h3>Tidak ada hasil ditemukan</h3>
+          <p>Maaf, kami tidak dapat menemukan apa pun yang cocok dengan "<strong><%= query %></strong>". Coba gunakan kata kunci lain.</p>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <script src="js/main.min.js?v=3" defer></script>
+</body>
+</html>

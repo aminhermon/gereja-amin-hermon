@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Profil, sejarah, visi misi, dan pemimpin <%= general.churchName %>.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/about.html">
+  <title>Tentang Gereja — <%= general.churchName %></title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Tentang Gereja — <%= general.churchName %>">
+  <meta property="og:description" content="Profil, sejarah, visi misi, dan pemimpin <%= general.churchName %>.">
+  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/about.html">
+  <meta property="og:image" content="<%= general.siteUrl || 'https://aminhermon.org' %>/<%= about.hero.bgImage %>">
+  <meta property="og:site_name" content="<%= general.churchName %>">
+  <meta property="og:locale" content="id_ID">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tentang Gereja — <%= general.churchName %>">
+  <meta name="twitter:description" content="Profil, sejarah, visi misi, dan pemimpin <%= general.churchName %>.">
+  <meta name="twitter:image" content="<%= general.siteUrl || 'https://aminhermon.org' %>/<%= about.hero.bgImage %>">
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "Tentang <%= general.churchName %>",
+    "description": "<%= about.sejarah.content.split('\\n')[0] %>",
+    "url": "<%= general.siteUrl || 'https://aminhermon.org' %>/about.html",
+    "mainEntity": {
+      "@type": "Church",
+      "name": "<%= general.churchName %>",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Bekasi",
+        "addressRegion": "Jawa Barat",
+        "addressCountry": "ID"
+      }
+    }
+  }
+  </script>
+
+  <!-- Preload: Hero Image -->
+  <link rel="preload" as="image" href="<%= about.hero.bgImage %>" fetchpriority="high">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--sub" id="hero-about">
+    <div class="hero__bg"><img src="<%= about.hero.bgImage %>" alt="Tentang Gereja" loading="eager"></div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <div class="hero__eyebrow">Tentang Gereja</div>
+      <h1><%- about.hero.titleHTML %></h1>
+      <p class="hero__subtitle"><%= about.hero.subtitle %></p>
+    </div>
+  </section>
+
+  <!-- ========== SEJARAH ========== -->
+  <section class="section" id="sejarah">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2><%= about.sejarah.title %></h2>
+        <span class="gold-line"></span>
+      </div>
+      <div class="" data-aos="fade-up" style="max-width: 800px; margin: 0 auto;">
+        <% about.sejarah.content.split('\n\n').forEach(function(p) { %>
+          <p style="font-size: 1.05rem; line-height: 1.9; color: var(--text-light); text-align: center; margin-bottom: 1rem;"><%= p %></p>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== VISI & MISI ========== -->
+  <section class="section section--off-white" id="visi-misi">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Visi & <span class="text-gold">Misi</span></h2>
+        <span class="gold-line"></span>
+      </div>
+      <div class="vm-grid" data-aos="fade-up">
+        <div class="vm-card">
+          <div class="vm-card__label">Visi</div>
+          <h3>Terang Kristus bagi Setiap Keluarga</h3>
+          <p><%= about.visiMisi.visi %></p>
+        </div>
+        <div class="vm-card">
+          <div class="vm-card__label">Misi</div>
+          <h3>Mewujudkan Panggilan Ilahi</h3>
+          <ul>
+            <% about.visiMisi.misiList.forEach(function(m) { %>
+              <li><%= m %></li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PROFIL PEMIMPIN ========== -->
+  <section class="section" id="pemimpin">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Struktur <span class="text-gold">Pemimpin Gereja</span></h2>
+        <span class="gold-line"></span>
+        <p>Para hamba Tuhan yang dipercayakan untuk menggembalakan dan memimpin jemaat.</p>
+      </div>
+
+      <!-- Pendeta -->
+      <h3 class="sub-section-title" data-aos="fade-up">Pendeta</h3>
+      <div class="leaders-grid leaders-grid--2" data-aos="fade-up">
+        <% about.pemimpin.pendeta.forEach(function(p) { %>
+        <div class="leader-card leader-card--featured leader-card--clickable"
+             data-img="<%= p.image || '' %>"
+             data-name="<%= p.name %>"
+             data-role="<%= p.role %>">
+          <div class="leader-card__img" style="background: linear-gradient(135deg, var(--navy), var(--navy-light)); display: flex; align-items: center; justify-content: center;">
+            <% if (p.image) { %>
+              <img src="/<%= p.image %>" alt="<%= p.name %>">
+            <% } else { %>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <% } %>
+          </div>
+          <div class="leader-card__info">
+            <h4><%= p.name %></h4>
+            <span><%= p.role %></span>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+      <!-- Pengurus Harian -->
+      <h3 class="sub-section-title" data-aos="fade-up">Pengurus Harian</h3>
+      <!-- Baris 1: Ketua (3 kartu) -->
+      <div class="pengurus-row pengurus-row--3" data-aos="fade-up">
+        <% about.pemimpin.pengurus.slice(0, 3).forEach(function(pg) { %>
+        <div class="leader-card leader-card--sm leader-card--clickable"
+             data-img="<%= pg.image ? '/' + pg.image : '' %>"
+             data-name="<%= pg.name %>"
+             data-role="<%= pg.role %>">
+          <div class="leader-card__img">
+            <% if (pg.image) { %>
+              <img src="/<%= pg.image %>" alt="<%= pg.name %>">
+            <% } else { %>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <% } %>
+          </div>
+          <div class="leader-card__info">
+            <h4><%= pg.name %></h4>
+            <span><%= pg.role %></span>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+      <!-- Baris 2: Sekretaris (2 kartu) -->
+      <div class="pengurus-row pengurus-row--2" data-aos="fade-up">
+        <% about.pemimpin.pengurus.slice(3, 5).forEach(function(pg) { %>
+        <div class="leader-card leader-card--sm leader-card--clickable"
+             data-img="<%= pg.image ? '/' + pg.image : '' %>"
+             data-name="<%= pg.name %>"
+             data-role="<%= pg.role %>">
+          <div class="leader-card__img">
+            <% if (pg.image) { %>
+              <img src="/<%= pg.image %>" alt="<%= pg.name %>">
+            <% } else { %>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <% } %>
+          </div>
+          <div class="leader-card__info">
+            <h4><%= pg.name %></h4>
+            <span><%= pg.role %></span>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+      <!-- Baris 3: Bendahara (2 kartu) -->
+      <div class="pengurus-row pengurus-row--2" data-aos="fade-up">
+        <% about.pemimpin.pengurus.slice(5, 7).forEach(function(pg) { %>
+        <div class="leader-card leader-card--sm leader-card--clickable"
+             data-img="<%= pg.image ? '/' + pg.image : '' %>"
+             data-name="<%= pg.name %>"
+             data-role="<%= pg.role %>">
+          <div class="leader-card__img">
+            <% if (pg.image) { %>
+              <img src="/<%= pg.image %>" alt="<%= pg.name %>">
+            <% } else { %>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <% } %>
+          </div>
+          <div class="leader-card__info">
+            <h4><%= pg.name %></h4>
+            <span><%= pg.role %></span>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+      <!-- Majelis Jemaat -->
+      <h3 class="sub-section-title" data-aos="fade-up">Majelis Jemaat</h3>
+      <div class="majelis-photo-grid" data-aos="fade-up">
+        <% about.pemimpin.majelis.forEach(function(m, i) { %>
+        <div class="leader-card leader-card--sm leader-card--clickable"
+             data-img="<%= m.image ? '/' + m.image : '' %>"
+             data-name="<%= m.name %>"
+             data-role="<%= m.role || 'Majelis' %>">
+          <div class="leader-card__img">
+            <% if (m.image) { %>
+              <img src="/<%= m.image %>" alt="<%= m.name %>">
+            <% } else { %>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <% } %>
+          </div>
+          <div class="leader-card__info">
+            <h4><%= m.name %></h4>
+            <span><%= m.role || 'Majelis' %></span>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Photo Modal -->
+  <div class="photo-modal" id="photoModal">
+    <div class="photo-modal__overlay" id="photoModalOverlay"></div>
+    <div class="photo-modal__card">
+      <button class="photo-modal__close" id="photoModalClose">&times;</button>
+      <div class="photo-modal__img-wrapper">
+        <img id="photoModalImg" src="" alt="Enlarged Photo">
+      </div>
+      <div class="photo-modal__info">
+        <h3 id="photoModalName"></h3>
+        <p id="photoModalRole"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Event delegation for all clickable leader cards
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.leader-card--clickable').forEach(function(card) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          var img = this.getAttribute('data-img');
+          var name = this.getAttribute('data-name');
+          var role = this.getAttribute('data-role');
+          document.getElementById('photoModalImg').src = img || '';
+          document.getElementById('photoModalImg').style.display = img ? 'block' : 'none';
+          document.getElementById('photoModalName').textContent = name;
+          document.getElementById('photoModalRole').textContent = role;
+          document.getElementById('photoModal').classList.add('active');
+        });
+      });
+
+      document.getElementById('photoModalOverlay').addEventListener('click', function() {
+        document.getElementById('photoModal').classList.remove('active');
+      });
+      document.getElementById('photoModalClose').addEventListener('click', function() {
+        document.getElementById('photoModal').classList.remove('active');
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          document.getElementById('photoModal').classList.remove('active');
+        }
+      });
+    });
+  </script>
+
+  <%- include('partials/footer') %>
+  <script src="js/main.min.js?v=3" defer></script>
+</body>
+</html>
+
+
+
+

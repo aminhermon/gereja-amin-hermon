@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="<%= general.churchName %> — Komunitas yang bertumbuh dalam iman, kasih, dan pengharapan.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/">
+  <title><%= general.churchName %> — Rumah Kasih, Rumah Bagi Semua</title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="<%= general.churchName %> — Rumah Kasih, Rumah Bagi Semua">
+  <meta property="og:description" content="Komunitas yang bertumbuh dalam iman, kasih, dan pengharapan. Kami menanti kehadiran Anda setiap hari Minggu.">
+  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/">
+  <meta property="og:image" content="<%= general.siteUrl || 'https://aminhermon.org' %>/<%= home.hero.bgImage %>">
+  <meta property="og:site_name" content="<%= general.churchName %>">
+  <meta property="og:locale" content="id_ID">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= general.churchName %> — Rumah Kasih, Rumah Bagi Semua">
+  <meta name="twitter:description" content="Komunitas yang bertumbuh dalam iman, kasih, dan pengharapan.">
+  <meta name="twitter:image" content="<%= general.siteUrl || 'https://aminhermon.org' %>/<%= home.hero.bgImage %>">
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Church",
+    "name": "<%= general.churchName %>",
+    "description": "Komunitas yang bertumbuh dalam iman, kasih, dan pengharapan. Kami menanti kehadiran Anda setiap hari Minggu.",
+    "url": "<%= general.siteUrl || 'https://aminhermon.org' %>",
+    "logo": "<%= general.siteUrl || 'https://aminhermon.org' %>/<%= general.logoPath %>",
+    "image": "<%= general.siteUrl || 'https://aminhermon.org' %>/<%= home.hero.bgImage %>",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Bekasi",
+      "addressRegion": "Jawa Barat",
+      "addressCountry": "ID"
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <!-- Preload: Hero Image -->
+  <link rel="preload" as="image" href="<%= home.hero.bgImage %>" fetchpriority="high">
+
+  <!-- Preload: Fonts (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+  <%- include('partials/skeleton') %>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
+    <div class="navbar__inner">
+      <a href="/" class="navbar__logo" aria-label="<%= general.churchName %> - Home">
+      </a>
+      <div class="navbar__menu" id="nav-menu">
+        <a href="/" class="navbar__link active">Beranda</a>
+        <a href="/visit.html" class="navbar__link">Baru di Sini?</a>
+        <a href="/about.html" class="navbar__link">Tentang Gereja</a>
+        <a href="/pelayanan.html" class="navbar__link">Pelayanan</a>
+
+        <!-- KomSek Dropdown -->
+        <div class="navbar__dropdown" id="komsek-dropdown">
+          <button class="navbar__link navbar__dropdown-toggle" type="button">
+            KomSek
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="navbar__dropdown-menu navbar__dropdown-menu--mega">
+            <div class="navbar__mega-col">
+              <span class="navbar__mega-heading">Komisi</span>
+              <% komsek.komisi.forEach(function(k) { %>
+              <a href="/komsek/<%= k.slug %>" class="navbar__dropdown-item"><%= k.nama %></a>
+              <% }); %>
+            </div>
+            <div class="navbar__mega-col">
+              <span class="navbar__mega-heading">Sektor</span>
+              <% komsek.sektor.forEach(function(s) { %>
+              <a href="/komsek/<%= s.slug %>" class="navbar__dropdown-item"><%= s.nama %></a>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+
+        <a href="/media.html" class="navbar__link">Media</a>
+        <a href="/contact.html" class="navbar__link">Hubungi Kami</a>
+        <form action="/search" method="GET" class="navbar__search">
+          <input type="text" name="q" placeholder="Cari..." aria-label="Search" required>
+          <button type="submit" aria-label="Submit Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+        </form>
+      </div>
+      <button class="navbar__hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========== HERO SECTION (Full Screen) ========== -->
+  <section class="hero hero--full" id="hero">
+    <div class="hero__bg">
+      <video autoplay muted loop playsinline poster="<%= home.hero.bgImage %>" id="hero-video">
+        <source src="assets/videos/hero-video.mp4" type="video/mp4">
+        <img src="<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager">
+      </video>
+    </div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <h1><%- home.hero.titleHTML %></h1>
+      <p class="hero__subtitle"><%= home.hero.subtitle %></p>
+      <div class="hero__actions">
+        <a href="<%= home.hero.ctaLink %>" class="btn btn--gold btn--lg" id="cta-visit">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <%= home.hero.ctaText %>
+        </a>
+      </div>
+    </div>
+    <div class="hero__scroll-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </section>
+
+  <!-- ========== RENUNGAN HARIAN (OTOMATIS) ========== -->
+  <section class="section section--off-white" id="renungan-otomatis" style="padding: 4rem 0;">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Ayat <span class="text-gold">Hari Ini</span></h2>
+        <span class="gold-line"></span>
+      </div>
+      <div class="renungan-otomatis-card" data-aos="fade-up" data-aos-delay="100" style="max-width: 800px; margin: 0 auto; background: var(--white); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 3rem; text-align: center; border-top: 4px solid var(--gold); position: relative;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--gold)" opacity="0.2" style="position: absolute; top: 20px; left: 20px;"><path d="M14.017 21v-7.391c0-5.714 4.82-8.609 8.354-9.609l.942 2.604c-3.136 1.054-6.386 3.636-6.386 7.429h5.688V21h-8.598zm-11.419 0v-7.391c0-5.714 4.82-8.609 8.354-9.609l.942 2.604c-3.136 1.054-6.386 3.636-6.386 7.429h5.688V21H2.598z"/></svg>
+        <p id="daily-verse-text" style="font-size: 1.25rem; font-style: italic; color: var(--navy); line-height: 1.8; margin-bottom: 1.5rem;">Memuat firman Tuhan...</p>
+        <h4 id="daily-verse-ref" style="font-family: var(--font-heading); color: var(--gold); font-size: 1.1rem; margin: 0;">-</h4>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DASHBOARD STATISTIK JEMAAT ========== -->
+  <section class="section section--navy" id="stats">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Data <span class="text-gold">Jemaat</span></h2>
+        <span class="gold-line"></span>
+        <p>Keluarga besar Gereja AMIN Hermon dalam angka.</p>
+      </div>
+      <div class="stats-grid" data-aos="fade-up">
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="stat-card__number" data-target="<%= home.stats.totalJemaat %>">0</div>
+          <div class="stat-card__label">Total Jemaat</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="stat-card__number" data-target="<%= home.stats.lakiLaki %>">0</div>
+          <div class="stat-card__label">Laki-laki</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="stat-card__number" data-target="<%= home.stats.perempuan %>">0</div>
+          <div class="stat-card__label">Perempuan</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          </div>
+          <div class="stat-card__number" data-target="<%= home.stats.anakAnak %>">0</div>
+          <div class="stat-card__label">Anak-anak</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== NEWS & EVENTS (Lundev Carousel) ========== -->
+  <section class="carousel" id="news">
+    <!-- Main slides (fullscreen) -->
+    <div class="carousel__list">
+      <% home.news.forEach(function(item, idx) { %>
+      <div class="carousel__item" data-idx="<%= idx %>">
+        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="lazy">
+        <div class="carousel__content">
+          <span class="carousel__date"><%= item.date %></span>
+          <div class="carousel__title"><%= item.title %></div>
+          <div class="carousel__desc"><%= item.desc %></div>
+          <div class="carousel__actions">
+            <button class="btn btn--gold" onclick="openNewsDetail(<%= idx %>)">
+              Selengkapnya
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+
+    <!-- Thumbnails (bottom) -->
+    <div class="carousel__thumbs">
+      <% home.news.forEach(function(item) { %>
+      <div class="carousel__thumb">
+        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="lazy">
+        <div class="carousel__thumb-label"><%= item.title %></div>
+      </div>
+      <% }); %>
+    </div>
+
+    <!-- Arrows (left & right) -->
+    <div class="carousel__arrows">
+      <button class="carousel__arrow carousel__arrow--prev" id="carouselPrev" aria-label="Previous">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="carousel__arrow carousel__arrow--next" id="carouselNext" aria-label="Next">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+    </div>
+
+    <!-- Time progress bar -->
+    <div class="carousel__progress"></div>
+  </section>
+
+  <!-- ========== NEWS DETAIL MODAL ========== -->
+  <div class="news-modal" id="newsModal">
+    <div class="news-modal__backdrop" onclick="closeNewsDetail()"></div>
+    <div class="news-modal__content">
+      <button class="news-modal__close" onclick="closeNewsDetail()">&times;</button>
+      <div class="news-modal__img">
+        <img id="newsModalImg" src="" alt="">
+      </div>
+      <div class="news-modal__body">
+        <span class="news-modal__date" id="newsModalDate"></span>
+        <h2 class="news-modal__title" id="newsModalTitle"></h2>
+        <p class="news-modal__desc" id="newsModalDesc"></p>
+        <a href="/media.html" class="btn btn--gold" style="margin-top: 1rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Lihat Galeri Foto
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+
+  <%- include('partials/footer') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="js/main.min.js?v=3" defer></script>
+  <script>
+    // News data for modal
+    const newsData = <%- JSON.stringify(home.news) %>;
+
+    function openNewsDetail(idx) {
+      const item = newsData[idx];
+      if (!item) return;
+      document.getElementById('newsModalImg').src = '/' + item.image;
+      document.getElementById('newsModalDate').textContent = item.date;
+      document.getElementById('newsModalTitle').textContent = item.title;
+      document.getElementById('newsModalDesc').textContent = item.desc;
+      document.getElementById('newsModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeNewsDetail() {
+      document.getElementById('newsModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeNewsDetail();
+    });
+  </script>
+</body>
+</html>
+
+
+
+

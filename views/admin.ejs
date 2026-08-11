@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMS Admin — Gereja AMIN Hermon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1B2A4A; --navy-light: #243660; --gold: #C8A951; --gold-light: #f5ecd4;
+      --bg: #F4F5F7; --white: #fff; --text: #2D2D2D; --text-muted: #6B7280;
+      --border: #E5E7EB; --success: #10B981; --danger: #EF4444; --info: #3B82F6;
+      --sidebar-w: 240px; --radius: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
+
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-w); background: var(--navy); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-brand { padding: 1.2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 10px; }
+    .sidebar-brand span { font-size: .7rem; background: var(--gold); color: var(--navy); padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+    .sidebar-brand h2 { font-size: 1.1rem; color: var(--gold); }
+    .sidebar-nav { list-style: none; flex: 1; overflow-y: auto; padding: .5rem 0; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 10px; padding: .75rem 1.5rem; color: rgba(255,255,255,.6); text-decoration: none; border-left: 3px solid transparent; transition: all .2s; font-size: .85rem; }
+    .sidebar-nav li a:hover { background: rgba(255,255,255,.04); color: #fff; }
+    .sidebar-nav li a.active { background: rgba(255,255,255,.08); color: #fff; border-left-color: var(--gold); }
+    .sidebar-nav li a .emoji { width: 20px; text-align: center; }
+    .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.08); }
+    .sidebar-footer a { color: var(--gold); text-decoration: none; font-size: .8rem; display: flex; align-items: center; gap: 6px; }
+
+    /* Main */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: var(--white); padding: .8rem 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .topbar h1 { font-size: 1.1rem; font-weight: 700; }
+    .topbar-badge { background: var(--success); color: #fff; padding: 4px 12px; border-radius: 12px; font-size: .75rem; font-weight: 600; }
+    .content { padding: 1.5rem 2rem; overflow-y: auto; flex: 1; }
+
+    /* Cards */
+    .card { background: var(--white); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1px solid var(--border); }
+    .card-title { margin: 0 0 1.2rem; color: var(--navy); font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; padding-bottom: .6rem; border-bottom: 2px solid var(--gold); }
+    .card-subtitle { font-size: .8rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+    /* Forms */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: .3rem; font-size: .8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
+    .form-group input[type="text"], .form-group input[type="number"], .form-group textarea, .form-group select {
+      width: 100%; padding: .55rem .75rem; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: .85rem; transition: border .2s;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px var(--gold-light); }
+    .form-group input[type="file"] { font-size: .8rem; margin-top: .3rem; }
+    .form-group textarea { resize: vertical; }
+    .form-group .help-text { font-size: .75rem; color: var(--text-muted); margin-top: .2rem; }
+    img.preview { max-height: 50px; border-radius: 4px; margin-top: 4px; display: block; border: 1px solid var(--border); }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: .5rem 1.2rem; border-radius: var(--radius); border: none; cursor: pointer; font-weight: 600; font-size: .8rem; transition: all .2s; }
+    .btn--gold { background: var(--gold); color: #fff; }
+    .btn--gold:hover { background: #b8993f; }
+    .btn--danger { background: var(--danger); color: #fff; }
+    .btn--danger:hover { background: #dc2626; }
+    .btn--outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn--outline:hover { background: var(--bg); }
+    .btn--sm { padding: .3rem .7rem; font-size: .75rem; }
+
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
+    @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+    /* Items */
+    .item-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
+    .item-card h4 { color: var(--navy); font-size: .85rem; margin-bottom: .5rem; }
+    .photo-grid { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .photo-item { position: relative; border-radius: 4px; overflow: hidden; }
+    .photo-item img { width: 100px; height: 75px; object-fit: cover; display: block; }
+    .photo-item .del { position: absolute; top: 2px; right: 2px; }
+    .faq-row { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .5rem; }
+    .warta-row { display: flex; align-items: center; justify-content: space-between; padding: .6rem; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: .5rem; background: var(--bg); }
+    .warta-row span { font-size: .85rem; }
+
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+
+    /* Tab content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Toast notification */
+    .toast { position: fixed; top: 1rem; right: 1rem; background: var(--success); color: #fff; padding: .6rem 1.2rem; border-radius: var(--radius); font-size: .85rem; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,.15); animation: slideIn .3s; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>⛪ CMS Admin</h2>
+      <span>v2.0</span>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="/admin?tab=beranda" class="<%= tab === 'beranda' ? 'active' : '' %>"><span class="emoji">🏠</span> Beranda</a></li>
+      <li><a href="/admin?tab=visit" class="<%= tab === 'visit' ? 'active' : '' %>"><span class="emoji">🆕</span> Baru di Sini?</a></li>
+      <li><a href="/admin?tab=about" class="<%= tab === 'about' ? 'active' : '' %>"><span class="emoji">⛪</span> Tentang Gereja</a></li>
+      <li><a href="/admin?tab=pelayanan" class="<%= tab === 'pelayanan' ? 'active' : '' %>"><span class="emoji">📋</span> Pelayanan</a></li>
+      <li><a href="/admin?tab=kalender" class="<%= tab === 'kalender' ? 'active' : '' %>"><span class="emoji">📅</span> Kalender Kegiatan</a></li>
+      <li><a href="/admin?tab=media" class="<%= tab === 'media' ? 'active' : '' %>"><span class="emoji">📸</span> Media & Galeri</a></li>
+      <li><a href="/admin?tab=contact" class="<%= tab === 'contact' ? 'active' : '' %>"><span class="emoji">📞</span> Hubungi Kami</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="/" target="_blank">🌐 Lihat Website</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1>
+        <% if (tab === 'beranda') { %>🏠 Kelola Beranda
+        <% } else if (tab === 'visit') { %>🆕 Kelola Baru di Sini?
+        <% } else if (tab === 'about') { %>⛪ Kelola Tentang Gereja
+        <% } else if (tab === 'pelayanan') { %>📋 Kelola Pelayanan
+        <% } else if (tab === 'kalender') { %>📅 Kelola Kalender Kegiatan
+        <% } else if (tab === 'media') { %>📸 Kelola Media & Galeri
+        <% } else if (tab === 'contact') { %>📞 Kelola Hubungi Kami
+        <% } %>
+      </h1>
+      <span class="topbar-badge">● Online</span>
+    </div>
+
+    <div class="content">
+
+      <!-- ============================== TAB: BERANDA ============================== -->
+      <div class="tab-content <%= tab === 'beranda' ? 'active' : '' %>">
+
+        <!-- Pengaturan Umum -->
+        <div class="card">
+          <h2 class="card-title">⚙️ Pengaturan Umum</h2>
+          <form action="/admin/general" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Nama Gereja</label>
+                <input type="text" name="churchName" value="<%= db.general.churchName %>" required>
+              </div>
+              <div class="form-group">
+                <label>Logo</label>
+                <% if (db.general.logoPath) { %><img src="/<%= db.general.logoPath %>" class="preview"><% } %>
+                <input type="file" name="logo" accept="image/*">
+                <span class="help-text">Kosongkan jika tidak ingin mengubah</span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+        <!-- Hero Beranda -->
+        <div class="card">
+          <h2 class="card-title">🖼️ Hero Banner</h2>
+          <form action="/admin/home/hero" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Judul (HTML)</label>
+                <textarea name="titleHTML" rows="2"><%= db.home.hero.titleHTML %></textarea>
+              </div>
+              <div class="form-group">
+                <label>Sub-judul</label>
+                <textarea name="subtitle" rows="2"><%= db.home.hero.subtitle %></textarea>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Teks Tombol CTA</label>
+                <input type="text" name="ctaText" value="<%= db.home.hero.ctaText %>">
+              </div>
+              <div class="form-group">
+                <label>Link Tombol CTA</label>
+                <input type="text" name="ctaLink" value="<%= db.home.hero.ctaLink %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Gambar Latar</label>
+              <img src="/<%= db.home.hero.bgImage %>" class="preview">
+              <input type="file" name="bgImage" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn--gold">💾 Simpan Hero</button>
+          </form>
+        </div>
+
+        <!-- Statistik -->
+        <div class="card">
+          <h2 class="card-title">📊 Statistik Jemaat</h2>
+          <form action="/admin/home/stats" method="POST">
+            <div class="grid-4">
+              <div class="form-group">
+                <label>Total Jemaat</label>
+                <input type="number" name="totalJemaat" value="<%= db.home.stats.totalJemaat %>">
+              </div>
+              <div class="form-group">
+                <label>Laki-laki</label>
+                <input type="number" name="lakiLaki" value="<%= db.home.stats.lakiLaki %>">
+              </div>
+              <div class="form-group">
+                <label>Perempuan</label>
+                <input type="number" name="perempuan" value="<%= db.home.stats.perempuan %>">
+              </div>
+              <div class="form-group">
+                <label>Anak-anak</label>
+                <input type="number" name="anakAnak" value="<%= db.home.stats.anakAnak %>">
+              </div>
+            </div>
+            <button type="submit" class="btn btn--gold">💾 Simpan Statistik</button>
+          </form>
+        </div>
+
+        <!-- Berita & Kegiatan -->
+        <div class="card">
+          <h2 class="card-title">📰 Berita & Kegiatan (Slider)</h2>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:1rem; margin-bottom:1rem;">
+            <% db.home.news.forEach(function(item) { %>
+            <div class="item-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;">
+                <h4><%= item.title %></h4>
+                <form action="/admin/home/news/delete/<%= item.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus berita ini?')">
+                  <button type="submit" class="btn btn--danger btn--sm">🗑</button>
+                </form>
+              </div>
+              <form action="/admin/home/news/<%= item.id %>" method="POST" enctype="multipart/form-data">
+                <div class="form-group"><label>Tanggal</label><input type="text" name="date" value="<%= item.date %>"></div>
+                <div class="form-group"><label>Judul</label><input type="text" name="title" value="<%= item.title %>"></div>
+                <div class="form-group"><label>Deskripsi</label><textarea name="desc" rows="2"><%= item.desc %></textarea></div>
+                <div class="form-group"><label>Gambar</label><img src="/<%= item.image %>" class="preview"><input type="file" name="image" accept="image/*"></div>
+                <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
+              </form>
+            </div>
+            <% }); %>
+          </div>
+          <hr class="divider">
+          <h4 style="color:var(--navy); margin-bottom:.8rem;">➕ Tambah Berita Baru</h4>
+          <form action="/admin/home/news/add" method="POST" enctype="multipart/form-data">
+            <div class="grid-3">
+              <div class="form-group"><label>Tanggal</label><input type="text" name="date" placeholder="1 Januari 2026" required></div>
+              <div class="form-group"><label>Judul</label><input type="text" name="title" placeholder="Judul Berita" required></div>
+              <div class="form-group"><label>Gambar</label><input type="file" name="image" accept="image/*"></div>
+            </div>
+            <div class="form-group"><label>Deskripsi</label><textarea name="desc" rows="2" placeholder="Deskripsi singkat..." required></textarea></div>
+            <button type="submit" class="btn btn--gold">➕ Tambah Berita</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============================== TAB: BARU DI SINI ============================== -->
+      <div class="tab-content <%= tab === 'visit' ? 'active' : '' %>">
+
+        <!-- Hero -->
+        <div class="card">
+          <h2 class="card-title">🖼️ Hero Banner</h2>
+          <form action="/admin/visit/hero" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.visit.hero.titleHTML %></textarea></div>
+              <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.visit.hero.subtitle %></textarea></div>
+            </div>
+            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.visit.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+        <!-- Sambutan -->
+        <div class="card">
+          <h2 class="card-title">👋 Teks Sambutan</h2>
+          <form action="/admin/visit/sambutan" method="POST">
+            <div class="form-group"><label>Sambutan untuk pengunjung baru</label><textarea name="sambutan" rows="4"><%= db.visit.sambutan %></textarea></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+        <!-- Jadwal Ibadah -->
+        <div class="card">
+          <h2 class="card-title">⏰ Jadwal Ibadah</h2>
+          <form action="/admin/visit/jadwal" method="POST">
+            <% db.visit.jadwalIbadah.forEach(function(j, i) { %>
+            <div class="item-card" style="margin-bottom:.5rem;">
+              <div class="grid-4">
+                <div class="form-group"><label>Nama Ibadah</label><input type="text" name="nama" value="<%= j.nama %>"></div>
+                <div class="form-group"><label>Hari</label><input type="text" name="hari" value="<%= j.hari %>"></div>
+                <div class="form-group"><label>Jam</label><input type="text" name="jam" value="<%= j.jam %>"></div>
+                <div class="form-group"><label>Keterangan</label><input type="text" name="keterangan" value="<%= j.keterangan %>"></div>
+              </div>
+            </div>
+            <% }); %>
+            <button type="submit" class="btn btn--gold">💾 Simpan Jadwal</button>
+          </form>
+        </div>
+
+        <!-- Lokasi -->
+        <div class="card">
+          <h2 class="card-title">📍 Lokasi Gereja</h2>
+          <form action="/admin/visit/lokasi" method="POST">
+            <div class="grid-2">
+              <div class="form-group"><label>Judul Seksi</label><input type="text" name="judul" value="<%= db.visit.lokasi.judul %>"></div>
+              <div class="form-group"><label>Alamat</label><input type="text" name="alamat" value="<%= db.visit.lokasi.alamat %>"></div>
+            </div>
+            <div class="form-group"><label>Deskripsi</label><textarea name="deskripsi" rows="2"><%= db.visit.lokasi.deskripsi %></textarea></div>
+            <div class="form-group"><label>Google Maps Query</label><input type="text" name="mapsQuery" value="<%= db.visit.lokasi.mapsQuery %>"><span class="help-text">Contoh: Gereja+AMIN+Hermon</span></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+        <!-- Sakramen -->
+        <div class="card">
+          <h2 class="card-title">✝️ Sakramen</h2>
+          <form action="/admin/visit/sakramen" method="POST">
+            <% db.visit.sakramen.forEach(function(s) { %>
+            <div class="item-card" style="margin-bottom:.5rem;">
+              <div class="grid-3">
+                <div class="form-group"><label>Nama</label><input type="text" name="nama" value="<%= s.nama %>"></div>
+                <div class="form-group"><label>Ikon Emoji</label><input type="text" name="icon" value="<%= s.icon %>"></div>
+                <div class="form-group"><label>Deskripsi</label><input type="text" name="desc" value="<%= s.desc %>"></div>
+              </div>
+            </div>
+            <% }); %>
+            <button type="submit" class="btn btn--gold">💾 Simpan Sakramen</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============================== TAB: TENTANG GEREJA ============================== -->
+      <div class="tab-content <%= tab === 'about' ? 'active' : '' %>">
+
+        <!-- Hero -->
+        <div class="card">
+          <h2 class="card-title">🖼️ Hero Banner</h2>
+          <form action="/admin/about/hero" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.about.hero.titleHTML %></textarea></div>
+              <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.about.hero.subtitle %></textarea></div>
+            </div>
+            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.about.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+        <!-- Sejarah -->
+        <div class="card">
+          <h2 class="card-title">📜 Sejarah Gereja</h2>
+          <form action="/admin/about/sejarah" method="POST">
+            <div class="form-group"><label>Judul</label><input type="text" name="title" value="<%= db.about.sejarah.title %>"></div>
+            <div class="form-group"><label>Konten</label><textarea name="content" rows="6"><%= db.about.sejarah.content %></textarea><span class="help-text">Gunakan \n untuk paragraf baru</span></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+        <!-- Visi Misi -->
+        <div class="card">
+          <h2 class="card-title">🎯 Visi & Misi</h2>
+          <form action="/admin/about/visimisi" method="POST">
+            <div class="form-group"><label>Visi</label><textarea name="visi" rows="3"><%= db.about.visiMisi.visi %></textarea></div>
+            <h4 style="margin-bottom:.5rem; color:var(--navy);">Daftar Misi</h4>
+            <% db.about.visiMisi.misiList.forEach(function(m, i) { %>
+            <div class="form-group"><label>Misi <%= i+1 %></label><input type="text" name="misi" value="<%= m %>"></div>
+            <% }); %>
+            <div class="form-group"><label>Misi Baru (opsional)</label><input type="text" name="misi" placeholder="Tambah misi baru..."></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan Visi & Misi</button>
+          </form>
+        </div>
+
+        <!-- Pendeta -->
+        <div class="card">
+          <h2 class="card-title">👨‍⚖️ Pendeta</h2>
+          <div class="grid-2">
+            <% db.about.pemimpin.pendeta.forEach(function(p, i) { %>
+            <div class="item-card">
+              <form action="/admin/about/pendeta/<%= i %>" method="POST" enctype="multipart/form-data">
+                <div class="form-group"><label>Nama</label><input type="text" name="name" value="<%= p.name %>"></div>
+                <div class="form-group"><label>Jabatan</label><input type="text" name="role" value="<%= p.role %>"></div>
+                <div class="form-group"><label>Biografi</label><textarea name="bio" rows="2"><%= p.bio || '' %></textarea></div>
+                <div class="form-group"><label>Foto</label><% if (p.image) { %><img src="/<%= p.image %>" class="preview"><% } %><input type="file" name="image" accept="image/*"></div>
+                <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
+              </form>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- Pengurus Harian (BPH) -->
+        <div class="card">
+          <h2 class="card-title">👥 Pengurus Harian (BPH)</h2>
+          <p class="card-subtitle">Upload foto dan edit data untuk setiap pengurus harian.</p>
+          <% db.about.pemimpin.pengurus.forEach(function(pg, i) { %>
+          <div class="item-card" style="margin-bottom:.8rem;">
+            <form action="/admin/about/pengurus/<%= i %>" method="POST" enctype="multipart/form-data">
+              <div style="display:flex; gap:1rem; align-items:center;">
+                <div style="flex-shrink:0; width:60px; height:60px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">
+                  <% if (pg.image) { %>
+                    <img src="/<%= pg.image %>" style="width:100%; height:100%; object-fit:cover;">
+                  <% } else { %>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <% } %>
+                </div>
+                <div style="flex:1;">
+                  <div class="grid-3">
+                    <div class="form-group"><label>Nama</label><input type="text" name="name" value="<%= pg.name %>"></div>
+                    <div class="form-group"><label>Jabatan</label><input type="text" name="role" value="<%= pg.role %>"></div>
+                    <div class="form-group"><label>Foto</label><input type="file" name="image" accept="image/*"></div>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn--gold btn--sm" style="margin-top:.5rem;">💾 Simpan</button>
+            </form>
+          </div>
+          <% }); %>
+        </div>
+
+        <!-- Majelis Jemaat -->
+        <div class="card">
+          <h2 class="card-title">🏛️ Majelis Jemaat (<%= db.about.pemimpin.majelis.length %> orang)</h2>
+          <p class="card-subtitle">Upload foto dan edit nama untuk setiap majelis jemaat.</p>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:.8rem;">
+            <% db.about.pemimpin.majelis.forEach(function(m, i) { %>
+            <div class="item-card">
+              <form action="/admin/about/majelis/<%= i %>" method="POST" enctype="multipart/form-data">
+                <div style="display:flex; gap:.8rem; align-items:center; margin-bottom:.5rem;">
+                  <div style="flex-shrink:0; width:50px; height:50px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">
+                    <% if (m.image) { %>
+                      <img src="/<%= m.image %>" style="width:100%; height:100%; object-fit:cover;">
+                    <% } else { %>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <% } %>
+                  </div>
+                  <div style="flex:1; display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1; margin-bottom:0;"><label>Nama Majelis <%= i+1 %></label><input type="text" name="name" value="<%= m.name %>"></div>
+                    <div class="form-group" style="flex:1; margin-bottom:0;"><label>Label / Jabatan</label><input type="text" name="role" value="<%= m.role || 'Majelis' %>"></div>
+                  </div>
+                </div>
+                <div class="form-group"><label>Foto</label><input type="file" name="image" accept="image/*"></div>
+                <button type="submit" class="btn btn--gold btn--sm">💾</button>
+              </form>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== TAB: PELAYANAN & WARTA ============================== -->
+      <div class="tab-content <%= tab === 'pelayanan' ? 'active' : '' %>">
+
+        <!-- Jadwal Pelayan -->
+        <div class="card">
+          <h2 class="card-title">📋 Jadwal Pelayan Ibadah</h2>
+          <form action="/admin/pelayanan/jadwal" method="POST">
+            <div class="form-group"><label>Tanggal Minggu Ini</label><input type="text" name="mingguIni" value="<%= db.pelayanan.jadwalPelayan.mingguIni %>"></div>
+            <div class="grid-2">
+              <div>
+                <h4 style="color:var(--navy); margin-bottom:.5rem;"><%= db.pelayanan.jadwalPelayan.ibadah1.nama %></h4>
+                <% 
+                  ['pengkhotbah','liturgos','doaKonsistori','pemusik','prokantor','penerimaJemaat','petugasKolekte','kp2'].forEach(function(f) { 
+                    let label = f.charAt(0).toUpperCase() + f.slice(1).replace(/([A-Z])/g, ' $1');
+                    let values = Array.isArray(db.pelayanan.jadwalPelayan.ibadah1[f]) ? db.pelayanan.jadwalPelayan.ibadah1[f] : [db.pelayanan.jadwalPelayan.ibadah1[f]];
+                    let count = 1;
+                    if (f === 'prokantor') count = 3;
+                    if (f === 'penerimaJemaat') count = 2;
+                    if (f === 'petugasKolekte') count = 3;
+                %>
+                <div class="form-group" style="margin-bottom:.8rem;">
+                  <label><%= label %></label>
+                  <% for(let j=0; j<count; j++) { %>
+                    <input type="text" name="ibadah1_<%= f %>" value="<%= values[j] || '' %>" style="margin-bottom:0.3rem;" placeholder="<%= count > 1 ? 'Nama ' + (j+1) : '' %>">
+                  <% } %>
+                </div>
+                <% }); %>
+              </div>
+              <div>
+                <h4 style="color:var(--navy); margin-bottom:.5rem;"><%= db.pelayanan.jadwalPelayan.ibadah2.nama %></h4>
+                <% 
+                  ['pengkhotbah','liturgos','doaKonsistori','pemusik','prokantor','penerimaJemaat','petugasKolekte','kp2'].forEach(function(f) { 
+                    let label = f.charAt(0).toUpperCase() + f.slice(1).replace(/([A-Z])/g, ' $1');
+                    let values = Array.isArray(db.pelayanan.jadwalPelayan.ibadah2[f]) ? db.pelayanan.jadwalPelayan.ibadah2[f] : [db.pelayanan.jadwalPelayan.ibadah2[f]];
+                    let count = 1;
+                    if (f === 'prokantor') count = 3;
+                    if (f === 'penerimaJemaat') count = 2;
+                    if (f === 'petugasKolekte') count = 3;
+                %>
+                <div class="form-group" style="margin-bottom:.8rem;">
+                  <label><%= label %></label>
+                  <% for(let j=0; j<count; j++) { %>
+                    <input type="text" name="ibadah2_<%= f %>" value="<%= values[j] || '' %>" style="margin-bottom:0.3rem;" placeholder="<%= count > 1 ? 'Nama ' + (j+1) : '' %>">
+                  <% } %>
+                </div>
+                <% }); %>
+              </div>
+            </div>
+            <button type="submit" class="btn btn--gold">💾 Simpan Jadwal</button>
+          </form>
+        </div>
+        <!-- Hero Pelayanan -->
+        <div class="card">
+          <h2 class="card-title">🖼️ Hero Banner Halaman</h2>
+          <form action="/admin/pelayanan/hero" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.pelayanan.hero.titleHTML %></textarea></div>
+              <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.pelayanan.hero.subtitle %></textarea></div>
+            </div>
+            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.pelayanan.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============================== TAB: MEDIA ============================== -->
+      <div class="tab-content <%= tab === 'media' ? 'active' : '' %>">
+
+        <!-- Upload Warta -->
+        <div class="card">
+          <h2 class="card-title">📄 Warta Jemaat</h2>
+          <form action="/admin/media/warta" method="POST" enctype="multipart/form-data" style="margin-bottom:1rem;">
+            <div class="grid-3">
+              <div class="form-group"><label>Judul</label><input type="text" name="judul" placeholder="Warta Jemaat - Minggu, ..." required></div>
+              <div class="form-group"><label>Tanggal</label><input type="text" name="tanggal" placeholder="6 Juli 2026" required></div>
+              <div class="form-group"><label>File PDF</label><input type="file" name="file" accept=".pdf" required></div>
+            </div>
+            <button type="submit" class="btn btn--gold">➕ Upload Warta</button>
+          </form>
+          <hr class="divider">
+          <h4 style="color:var(--navy); margin-bottom:.5rem;">Daftar Warta (<%= db.pelayanan.warta ? db.pelayanan.warta.length : 0 %>)</h4>
+          <% if(db.pelayanan.warta) { db.pelayanan.warta.forEach(function(w) { %>
+          <div class="warta-row">
+            <span><strong><%= w.judul %></strong> — <%= w.tanggal %></span>
+            <form action="/admin/media/warta/delete/<%= w.id %>" method="POST" onsubmit="return confirm('Hapus warta ini?')"><button type="submit" class="btn btn--danger btn--sm">🗑</button></form>
+          </div>
+          <% }); } %>
+        </div>
+
+        <!-- Renungan Harian -->
+        <div class="card">
+          <h2 class="card-title">📖 Renungan Harian</h2>
+          <form action="/admin/media/renungan" method="POST" style="margin-bottom:1rem;">
+            <div class="grid-3">
+              <div class="form-group"><label>Judul</label><input type="text" name="judul" placeholder="Judul Renungan" required></div>
+              <div class="form-group"><label>Tanggal (YYYY-MM-DD)</label><input type="date" name="tanggal" required></div>
+              <div class="form-group"><label>Ayat</label><input type="text" name="ayat" placeholder="Yohanes 3:16" required></div>
+            </div>
+            <div class="form-group"><label>Isi Renungan</label><textarea name="isi" rows="3" required placeholder="Tuliskan renungan..."></textarea></div>
+            <button type="submit" class="btn btn--gold">➕ Tambah Renungan</button>
+          </form>
+          <hr class="divider">
+          <h4 style="color:var(--navy); margin-bottom:.5rem;">Daftar Renungan (<%= db.mediaGaleri.renungan ? db.mediaGaleri.renungan.length : 0 %>)</h4>
+          <% if(db.mediaGaleri.renungan) { db.mediaGaleri.renungan.sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).forEach(function(r) { %>
+          <div class="warta-row">
+            <span><strong><%= r.judul %></strong> (<%= r.tanggal %>) - <%= r.ayat %></span>
+            <form action="/admin/media/renungan/delete/<%= r.id %>" method="POST" onsubmit="return confirm('Hapus renungan ini?')"><button type="submit" class="btn btn--danger btn--sm">🗑</button></form>
+          </div>
+          <% }); } %>
+        </div>
+
+        <!-- Video Khotbah -->
+        <div class="card">
+          <h2 class="card-title">🎥 Video Khotbah</h2>
+          <form action="/admin/media/video" method="POST" style="margin-bottom:1rem;">
+            <div class="grid-2">
+              <div class="form-group"><label>Judul Khotbah</label><input type="text" name="judul" placeholder="Kasih yang Mengubahkan" required></div>
+              <div class="form-group"><label>Pembicara</label><input type="text" name="pembicara" placeholder="Pdt. Samuel Harapan" required></div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group"><label>Tanggal (YYYY-MM-DD)</label><input type="date" name="tanggal" required></div>
+              <div class="form-group"><label>Embed URL (YouTube)</label><input type="text" name="embedUrl" placeholder="https://www.youtube.com/embed/..." required></div>
+            </div>
+            <button type="submit" class="btn btn--gold">➕ Tambah Video</button>
+          </form>
+          <hr class="divider">
+          <h4 style="color:var(--navy); margin-bottom:.5rem;">Daftar Video (<%= db.mediaGaleri.videos ? db.mediaGaleri.videos.length : 0 %>)</h4>
+          <% if(db.mediaGaleri.videos) { db.mediaGaleri.videos.sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).forEach(function(v) { %>
+          <div class="warta-row">
+            <span><strong><%= v.judul %></strong> oleh <%= v.pembicara %> (<%= v.tanggal %>)</span>
+            <form action="/admin/media/video/delete/<%= v.id %>" method="POST" onsubmit="return confirm('Hapus video ini?')"><button type="submit" class="btn btn--danger btn--sm">🗑</button></form>
+          </div>
+          <% }); } %>
+        </div>
+
+        <!-- Upload Foto -->
+        <div class="card">
+          <h2 class="card-title">📸 Upload Foto Galeri</h2>
+          <form action="/admin/media/photo" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group"><label>Caption / Keterangan</label><input type="text" name="caption" placeholder="Ibadah Minggu Pagi" required></div>
+              <div class="form-group"><label>File Foto</label><input type="file" name="photo" accept="image/*" required></div>
+            </div>
+            <button type="submit" class="btn btn--gold">➕ Upload Foto</button>
+          </form>
+        </div>
+
+        <!-- Galeri Saat Ini -->
+        <div class="card">
+          <h2 class="card-title">🖼️ Galeri Saat Ini (<%= db.mediaGaleri.photos.length %> foto)</h2>
+          <div class="photo-grid">
+            <% db.mediaGaleri.photos.forEach(function(p) { %>
+            <div class="photo-item">
+              <img src="/<%= p.src %>" alt="<%= p.caption %>" title="<%= p.caption %>">
+              <form action="/admin/media/photo/delete/<%= p.id %>" method="POST" class="del" onsubmit="return confirm('Hapus foto ini?')">
+                <button type="submit" class="btn btn--danger btn--sm">✕</button>
+              </form>
+            </div>
+            <% }); %>
+          </div>
+          <% if (db.mediaGaleri.photos.length === 0) { %>
+          <p style="color:var(--text-muted); font-style:italic;">Belum ada foto yang diunggah.</p>
+          <% } %>
+        </div>
+
+        <!-- Hero Media -->
+        <div class="card">
+          <h2 class="card-title">🖼️ Hero Banner Halaman</h2>
+          <form action="/admin/media/hero" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.mediaGaleri.hero.titleHTML %></textarea></div>
+              <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.mediaGaleri.hero.subtitle %></textarea></div>
+            </div>
+            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.mediaGaleri.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============================== TAB: HUBUNGI KAMI & FAQ ============================== -->
+      <div class="tab-content <%= tab === 'contact' ? 'active' : '' %>">
+
+        <!-- Hero -->
+        <div class="card">
+          <h2 class="card-title">🖼️ Hero Banner</h2>
+          <form action="/admin/contact/hero" method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+              <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.contactFaq.hero.titleHTML %></textarea></div>
+              <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.contactFaq.hero.subtitle %></textarea></div>
+            </div>
+            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.contactFaq.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="card">
+          <h2 class="card-title">💬 WhatsApp</h2>
+          <form action="/admin/contact/whatsapp" method="POST">
+            <div class="grid-3">
+              <div class="form-group"><label>Nomor WhatsApp</label><input type="text" name="number" value="<%= db.contactFaq.whatsapp.number %>"><span class="help-text">Format: 6281234567890</span></div>
+              <div class="form-group"><label>Label Tombol</label><input type="text" name="label" value="<%= db.contactFaq.whatsapp.label %>"></div>
+              <div class="form-group"><label>Pesan Default</label><input type="text" name="message" value="<%= db.contactFaq.whatsapp.message %>"></div>
+            </div>
+            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- ============================== TAB: KALENDER ============================== -->
+      <div class="tab-content <%= tab === 'kalender' ? 'active' : '' %>">
+        <div class="card">
+          <h2 class="card-title">📅 Tambah Kegiatan Baru</h2>
+          <form action="/admin/kalender/add" method="POST" style="margin-bottom:1rem;">
+            <div class="grid-3">
+              <div class="form-group"><label>Judul Kegiatan</label><input type="text" name="judul" placeholder="Ibadah Raya Mingguan" required></div>
+              <div class="form-group"><label>Tanggal (YYYY-MM-DD)</label><input type="date" name="tanggal" required></div>
+              <div class="form-group">
+                <label>Kategori (Penting untuk KomSek)</label>
+                <select name="kategori" required>
+                  <option value="ibadah">Ibadah Umum</option>
+                  <option value="kegiatan">Kegiatan Umum</option>
+                  <option value="anak">Komisi Anak</option>
+                  <option value="pemuda">Komisi Pemuda</option>
+                  <option value="perempuan">Komisi Perempuan</option>
+                  <option value="bapak">Komisi Bapak</option>
+                  <option value="pembangunan">Komisi Pembangunan</option>
+                  <option value="pelayanan kasih">Komisi Pelayanan Kasih</option>
+                  <option value="musik">Komisi Musik & Ibadah</option>
+                  <option value="hubgermas">Komisi HubGermas</option>
+                  <option value="maranatha">Sektor Maranatha</option>
+                  <option value="berkat">Sektor Berkat</option>
+                  <option value="imanuel">Sektor Imanuel</option>
+                  <option value="sion">Sektor Sion</option>
+                  <option value="yordan">Sektor Yordan</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group"><label>Deskripsi Singkat</label><input type="text" name="desc" placeholder="Ibadah di gedung gereja..." required></div>
+            <button type="submit" class="btn btn--gold">➕ Tambah Kegiatan</button>
+          </form>
+
+          <hr class="divider">
+          <h4 style="color:var(--navy); margin-bottom:.5rem;">Daftar Kegiatan Kalender (<%= db.kalender ? db.kalender.length : 0 %>)</h4>
+          <% if(db.kalender) { db.kalender.sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).forEach(function(k) { %>
+          <div class="warta-row">
+            <span><strong><%= k.judul %></strong> (<%= k.tanggal %>) - <span style="background:rgba(200,169,81,0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;"><%= k.kategori %></span></span>
+            <form action="/admin/kalender/delete/<%= k.id %>" method="POST" onsubmit="return confirm('Hapus kegiatan ini?')"><button type="submit" class="btn btn--danger btn--sm">🗑</button></form>
+          </div>
+          <% }); } %>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

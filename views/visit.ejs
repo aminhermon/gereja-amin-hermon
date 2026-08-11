@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pertama kali ke <%= general.churchName %>? Kami siap menyambut Anda.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/visit.html">
+  <title>Baru di Sini? — <%= general.churchName %></title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Baru di Sini? — <%= general.churchName %>">
+  <meta property="og:description" content="Pertama kali ke <%= general.churchName %>? Kami siap menyambut Anda.">
+  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/visit.html">
+  <meta property="og:site_name" content="<%= general.churchName %>">
+  <meta property="og:locale" content="id_ID">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Baru di Sini? — <%= general.churchName %>">
+  <meta name="twitter:description" content="Pertama kali ke <%= general.churchName %>? Kami siap menyambut Anda.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--sub" id="hero-visit">
+    <div class="hero__bg"><img src="<%= visit.hero.bgImage %>" alt="Selamat Datang" loading="eager"></div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <div class="hero__eyebrow">Plan Your Visit</div>
+      <h1><%- visit.hero.titleHTML %></h1>
+      <p class="hero__subtitle"><%= visit.hero.subtitle %></p>
+    </div>
+  </section>
+
+  <!-- ========== SAMBUTAN HANGAT ========== -->
+  <section class="section" id="sambutan">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Selamat Datang di <span class="text-gold">Gereja Kami</span></h2>
+        <span class="gold-line"></span>
+      </div>
+      <div class="" data-aos="fade-up" style="max-width: 800px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; line-height: 1.9; color: var(--text-light); text-align: center;">
+          <%= visit.sambutan %>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== JADWAL IBADAH ========== -->
+  <section class="section section--off-white" id="jadwal">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Jadwal <span class="text-gold">Ibadah Minggu</span></h2>
+        <span class="gold-line"></span>
+        <p>Bergabunglah bersama kami setiap hari Minggu.</p>
+      </div>
+      <div class="jadwal-grid" data-aos="fade-up">
+        <% visit.jadwalIbadah.forEach(function(jadwal) { %>
+        <div class="jadwal-card">
+          <div class="jadwal-card__time"><%= jadwal.jam %></div>
+          <h3 class="jadwal-card__name"><%= jadwal.nama %></h3>
+          <p class="jadwal-card__day"><%= jadwal.hari %></p>
+          <p class="jadwal-card__desc"><%= jadwal.keterangan %></p>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== LOKASI ========== -->
+  <section class="section" id="lokasi">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2><%= visit.lokasi.judul %></h2>
+        <span class="gold-line"></span>
+        <p><%= visit.lokasi.deskripsi %></p>
+      </div>
+      <div class="" data-aos="fade-up" style="text-align: center;">
+        <div class="map-container">
+          <iframe 
+            src="https://www.google.com/maps/embed/v1/search?q=<%= visit.lokasi.mapsQuery %>&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            title="Lokasi Gereja di Google Maps"></iframe>
+        </div>
+        <p style="margin-top: 1rem; color: var(--text-light);"><%= visit.lokasi.alamat %></p>
+        <a href="https://www.google.com/maps/search/<%= visit.lokasi.mapsQuery %>" target="_blank" rel="noopener" class="btn btn--gold" style="margin-top: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Buka di Google Maps
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SAKRAMEN ========== -->
+  <section class="section section--off-white" id="sakramen">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Sakramen & <span class="text-gold">Katekisasi</span></h2>
+        <span class="gold-line"></span>
+        <p>Informasi mengenai baptisan dan sidi di gereja kami.</p>
+      </div>
+      <div class="sakramen-grid" data-aos="fade-up">
+        <% visit.sakramen.forEach(function(s) { %>
+        <div class="sakramen-card">
+          <div class="sakramen-card__icon"><%= s.icon %></div>
+          <h3><%= s.nama %></h3>
+          <p><%= s.desc %></p>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+  <script src="js/main.min.js?v=3" defer></script>
+</body>
+</html>
+
+
+
+

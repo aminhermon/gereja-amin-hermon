@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="<%= unit.nama %> — <%= unit.desc %>">
+  <title><%= unit.nama %> — <%= general.churchName %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/css/style.min.css?v=10">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--mini komsek-hero" id="hero-komsek">
+    <div class="hero__bg">
+      <img src="/<%= unit.foto %>" alt="<%= unit.nama %>" loading="eager">
+    </div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <span class="komsek-hero__badge"><%= unit.slug.startsWith('komisi') ? 'Komisi' : 'Sektor' %></span>
+      <h1><%= unit.nama %></h1>
+      <p class="hero__subtitle"><%= unit.desc %></p>
+    </div>
+  </section>
+
+  <!-- ========== PROFILE SECTION ========== -->
+  <section class="section section--navy" id="komsek-profile">
+    <div class="container">
+      <div class="komsek-profile">
+        <div class="komsek-profile__img">
+          <img src="/<%= unit.foto %>" alt="<%= unit.nama %>" loading="lazy">
+        </div>
+        <div class="komsek-profile__text">
+          <h2>Tentang <span class="text-gold"><%= unit.nama %></span></h2>
+          <span class="gold-line"></span>
+          <p><%= unit.desc %></p>
+          <div class="komsek-profile__stats">
+            <div class="komsek-profile__stat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span><%= unit.articles.length %> Artikel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== JADWAL KEGIATAN MENDATANG ========== -->
+  <section class="section section--off-white" id="komsek-jadwal">
+    <div class="container">
+      <div class="section-header">
+        <h2>Jadwal <span class="text-gold">Mendatang</span></h2>
+        <span class="gold-line"></span>
+        <p>Kegiatan dan ibadah <%= unit.nama %> yang akan datang.</p>
+      </div>
+
+      <div class="cal-upcoming__grid">
+        <% 
+          var mainName = unit.nama.toLowerCase().replace('komisi ', '').replace('sektor ', '');
+          var upcomingEvents = kalender.filter(function(ev) {
+            var searchTxt = (ev.judul + ' ' + ev.kategori + ' ' + ev.desc).toLowerCase();
+            return searchTxt.includes(mainName) && new Date(ev.tanggal) >= new Date(new Date().toISOString().split('T')[0]);
+          }).sort(function(a,b) { return new Date(a.tanggal) - new Date(b.tanggal); });
+        %>
+
+        <% if (upcomingEvents.length > 0) { %>
+          <% upcomingEvents.forEach(function(ev) { %>
+          <div class="cal-upcoming__card" style="background: rgba(15,29,53,0.95); border: 1px solid rgba(200,169,81,0.2);">
+            <div class="cal-upcoming__date">
+              <span class="cal-upcoming__day"><%= new Date(ev.tanggal).getDate() %></span>
+              <span class="cal-upcoming__month"><%= ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'][new Date(ev.tanggal).getMonth()] %></span>
+            </div>
+            <div class="cal-upcoming__info">
+              <span class="cal-upcoming__badge"><%= ev.kategori %></span>
+              <h4 style="color: var(--white); margin: 5px 0;"><%= ev.judul %></h4>
+              <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin:0;"><%= ev.desc %></p>
+            </div>
+          </div>
+          <% }); %>
+        <% } else { %>
+          <div class="komsek-empty" style="grid-column: 1 / -1; margin-top: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <h3 style="margin-top: 15px; color: var(--navy-dark);">Belum Ada Jadwal</h3>
+            <p style="color: var(--text-light);">Saat ini belum ada jadwal kegiatan atau ibadah terdekat untuk <%= unit.nama %>.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ARTICLES SECTION ========== -->
+  <section class="section section--dark" id="komsek-articles">
+    <div class="container">
+      <div class="section-header">
+        <h2>Foto & <span class="text-gold">Kegiatan</span></h2>
+        <span class="gold-line"></span>
+        <p>Dokumentasi kegiatan dan artikel dari <%= unit.nama %>.</p>
+      </div>
+
+      <% if (unit.articles.length > 0) { %>
+      <div class="komsek-articles__grid">
+        <% unit.articles.forEach(function(article) { %>
+        <div class="komsek-article-card">
+          <div class="komsek-article-card__img">
+            <img src="/<%= article.foto %>" alt="<%= article.judul %>" loading="lazy">
+            <div class="komsek-article-card__overlay">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+          </div>
+          <div class="komsek-article-card__body">
+            <span class="komsek-article-card__date">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <%= article.tanggal %>
+            </span>
+            <h3 class="komsek-article-card__title"><%= article.judul %></h3>
+            <p class="komsek-article-card__desc"><%= article.ringkasan %></p>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+      <% } else { %>
+      <div class="komsek-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <h3>Belum Ada Artikel</h3>
+        <p>Artikel dan dokumentasi kegiatan <%= unit.nama %> akan ditampilkan di sini.</p>
+      </div>
+      <% } %>
+
+    </div>
+  </section>
+
+  <!-- ========== OTHER KOMSEK ========== -->
+  <section class="section section--navy" id="komsek-others">
+    <div class="container">
+      <div class="section-header">
+        <h2>Jelajahi <span class="text-gold">Lainnya</span></h2>
+        <span class="gold-line"></span>
+      </div>
+      <div class="komsek-others__grid">
+        <% var allUnits = [...komsek.komisi, ...komsek.sektor].filter(function(u) { return u.slug !== unit.slug; }); %>
+        <% allUnits.slice(0, 6).forEach(function(u) { %>
+        <a href="/komsek/<%= u.slug %>" class="komsek-others__card">
+          <div class="komsek-others__card-img">
+            <img src="/<%= u.foto %>" alt="<%= u.nama %>" loading="lazy">
+          </div>
+          <div class="komsek-others__card-info">
+            <span class="komsek-others__card-type"><%= u.slug.startsWith('komisi') ? 'Komisi' : 'Sektor' %></span>
+            <h4><%= u.nama %></h4>
+          </div>
+        </a>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <script src="/js/main.min.js?v=3" defer></script>
+
+</body>
+</html>
+
+
+
+

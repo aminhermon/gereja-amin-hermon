@@ -1,0 +1,31 @@
+{
+  "name": "gereja-amin-hermon",
+  "version": "1.0.0",
+  "description": "Website Gereja Amin Hermon",
+  "main": "app.js",
+  "scripts": {
+    "build": "node build.js",
+    "postinstall": "node build.js",
+    "start": "node app.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "clean-css": "^5.3.3",
+    "compression": "^1.8.1",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "terser": "^5.49.0"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.35.3"
+  }
+}

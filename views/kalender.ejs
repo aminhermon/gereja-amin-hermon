@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kalender Kegiatan <%= general.churchName %> — Jadwal ibadah, acara, dan kegiatan gereja.">
+  <title>Kalender Kegiatan — <%= general.churchName %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--mini" id="hero-kalender">
+    <div class="hero__bg">
+      <img src="assets/images/church-hero-new.jpg" alt="Kalender Kegiatan" loading="eager">
+    </div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <h1>Kalender <span class="text-gold">Kegiatan</span></h1>
+      <p class="hero__subtitle">Jadwal ibadah, acara, dan kegiatan Gereja AMIN Hermon.</p>
+    </div>
+  </section>
+
+  <!-- ========== CALENDAR SECTION ========== -->
+  <section class="section section--navy" id="kalender-section">
+    <div class="container">
+
+      <!-- Calendar Navigation -->
+      <div class="cal-nav">
+        <button class="cal-nav__btn" id="calPrev" aria-label="Bulan sebelumnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 class="cal-nav__title" id="calTitle"></h2>
+        <button class="cal-nav__btn" id="calNext" aria-label="Bulan berikutnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg>
+        </button>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="cal-grid">
+        <div class="cal-grid__header">
+          <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+        </div>
+        <div class="cal-grid__body" id="calBody"></div>
+      </div>
+
+      <!-- Event Detail Panel -->
+      <div class="cal-events" id="calEvents">
+        <h3 class="cal-events__title" id="calEventsTitle">Pilih tanggal untuk melihat kegiatan</h3>
+        <div class="cal-events__list" id="calEventsList"></div>
+      </div>
+
+      <!-- Upcoming Events List -->
+      <div class="cal-upcoming">
+        <div class="section-header">
+          <h2>Kegiatan <span class="text-gold">Mendatang</span></h2>
+          <span class="gold-line"></span>
+        </div>
+        <div class="cal-upcoming__grid">
+          <% kalender.sort(function(a,b){ return new Date(a.tanggal) - new Date(b.tanggal); }).forEach(function(ev) { %>
+          <% if (new Date(ev.tanggal) >= new Date(new Date().toISOString().split('T')[0])) { %>
+          <div class="cal-upcoming__card">
+            <div class="cal-upcoming__date">
+              <span class="cal-upcoming__day"><%= new Date(ev.tanggal).getDate() %></span>
+              <span class="cal-upcoming__month"><%= ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'][new Date(ev.tanggal).getMonth()] %></span>
+            </div>
+            <div class="cal-upcoming__info">
+              <span class="cal-upcoming__badge"><%= ev.kategori %></span>
+              <h4><%= ev.judul %></h4>
+              <p><%= ev.desc %></p>
+            </div>
+          </div>
+          <% } %>
+          <% }); %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <script src="js/main.min.js?v=3" defer></script>
+  <script>
+    // Calendar data from server
+    const calendarEvents = <%- JSON.stringify(kalender) %>;
+
+    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    let currentYear, currentMonth;
+
+    function initCalendar() {
+      const now = new Date();
+      currentYear = now.getFullYear();
+      currentMonth = now.getMonth();
+      renderCalendar();
+
+      document.getElementById('calPrev').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        renderCalendar();
+      });
+      document.getElementById('calNext').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        renderCalendar();
+      });
+    }
+
+    function renderCalendar() {
+      document.getElementById('calTitle').textContent = MONTHS_ID[currentMonth] + ' ' + currentYear;
+      const body = document.getElementById('calBody');
+      body.innerHTML = '';
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const today = new Date();
+
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-cell cal-cell--empty';
+        body.appendChild(empty);
+      }
+
+      // Day cells
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        const dayEvents = calendarEvents.filter(e => e.tanggal === dateStr);
+        const isToday = (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === d);
+
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell' + (isToday ? ' cal-cell--today' : '') + (dayEvents.length ? ' cal-cell--has-event' : '');
+        cell.innerHTML = '<span class="cal-cell__num">' + d + '</span>' +
+          (dayEvents.length ? '<span class="cal-cell__dot"></span>' : '');
+
+        if (dayEvents.length) {
+          cell.addEventListener('click', () => showEvents(dateStr, dayEvents));
+        }
+
+        body.appendChild(cell);
+      }
+    }
+
+    function showEvents(dateStr, events) {
+      const d = new Date(dateStr);
+      const title = d.getDate() + ' ' + MONTHS_ID[d.getMonth()] + ' ' + d.getFullYear();
+      document.getElementById('calEventsTitle').textContent = 'Kegiatan — ' + title;
+
+      const list = document.getElementById('calEventsList');
+      list.innerHTML = events.map(ev =>
+        '<div class="cal-event-card">' +
+          '<span class="cal-event-card__badge">' + ev.kategori + '</span>' +
+          '<h4>' + ev.judul + '</h4>' +
+          '<p>' + ev.desc + '</p>' +
+        '</div>'
+      ).join('');
+
+      document.getElementById('calEvents').classList.add('active');
+
+      // Highlight selected cells
+      document.querySelectorAll('.cal-cell--selected').forEach(c => c.classList.remove('cal-cell--selected'));
+      document.querySelectorAll('.cal-cell--has-event').forEach(c => {
+        // Find the cell for this date
+        const num = parseInt(c.querySelector('.cal-cell__num').textContent);
+        const ds = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(num).padStart(2, '0');
+        if (ds === dateStr) c.classList.add('cal-cell--selected');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initCalendar);
+  </script>
+
+</body>
+</html>
+
+
+
+

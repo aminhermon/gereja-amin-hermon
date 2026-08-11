@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Galeri foto, renungan harian, dan video khotbah <%= general.churchName %>.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/media.html">
+  <title>Media — <%= general.churchName %></title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Media — <%= general.churchName %>">
+  <meta property="og:description" content="Galeri foto, renungan harian, dan video khotbah <%= general.churchName %>.">
+  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/media.html">
+  <meta property="og:site_name" content="<%= general.churchName %>">
+  <meta property="og:locale" content="id_ID">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Media — <%= general.churchName %>">
+  <meta name="twitter:description" content="Galeri foto, renungan harian, dan video khotbah <%= general.churchName %>.">
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Media <%= general.churchName %>",
+    "description": "Galeri foto, renungan harian, dan video khotbah <%= general.churchName %>.",
+    "url": "<%= general.siteUrl || 'https://aminhermon.org' %>/media.html"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--sub" id="hero-media">
+    <div class="hero__bg"><img src="<%= mediaGaleri.hero.bgImage %>" alt="Galeri Media" loading="eager"></div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <div class="hero__eyebrow">Dokumentasi</div>
+      <h1><%- mediaGaleri.hero.titleHTML %></h1>
+      <p class="hero__subtitle"><%= mediaGaleri.hero.subtitle %></p>
+    </div>
+  </section>
+
+  <!-- ========== RENUNGAN HARIAN ========== -->
+  <section class="section section--navy" id="renungan">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Renungan <span class="text-gold">Harian</span></h2>
+        <span class="gold-line"></span>
+        <p>Santapan rohani untuk menumbuhkan iman Anda setiap hari.</p>
+      </div>
+
+      <div class="renungan-grid" data-aos="fade-up" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <% if (mediaGaleri.renungan && mediaGaleri.renungan.length > 0) { %>
+          <% mediaGaleri.renungan.forEach(function(r) { %>
+          <div class="renungan-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(200,169,81,0.15); border-radius: var(--radius-xl); padding: 2rem; position: relative;">
+            <div style="color: var(--gold); margin-bottom: 1rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </div>
+            <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 0.5rem;"><%= new Date(r.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            <h3 style="color: var(--white); font-size: 1.3rem; margin-bottom: 0.5rem; font-family: var(--font-heading);"><%= r.judul %></h3>
+            <span style="display: inline-block; background: rgba(200,169,81,0.1); color: var(--gold); padding: 4px 12px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;"><%= r.ayat %></span>
+            <p style="color: rgba(255,255,255,0.8); line-height: 1.7; font-size: 0.95rem;"><%= r.isi %></p>
+          </div>
+          <% }); %>
+        <% } else { %>
+          <p style="color: var(--text-light); text-align: center; grid-column: 1 / -1;">Belum ada renungan harian yang tersedia.</p>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== VIDEO KHOTBAH ========== -->
+  <section class="section section--dark" id="video">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Video <span class="text-gold">Khotbah</span></h2>
+        <span class="gold-line"></span>
+        <p>Saksikan kembali khotbah dan pesan firman Tuhan.</p>
+      </div>
+
+      <div class="video-grid" data-aos="fade-up" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+        <% if (mediaGaleri.videos && mediaGaleri.videos.length > 0) { %>
+          <% mediaGaleri.videos.forEach(function(v) { %>
+          <div class="video-card" style="background: rgba(15,29,53,0.8); border: 1px solid rgba(200,169,81,0.2); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column;">
+            <div class="video-card__embed" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
+              <iframe src="<%= v.embedUrl %>" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-card__info" style="padding: 1.5rem;">
+              <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 0.5rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-top: -2px; margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <%= new Date(v.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+              </span>
+              <h3 style="color: var(--white); font-size: 1.15rem; margin-bottom: 0.5rem; line-height: 1.4;"><%= v.judul %></h3>
+              <p style="color: var(--gold); font-size: 0.9rem; font-weight: 500; margin: 0;">Pembicara: <%= v.pembicara %></p>
+            </div>
+          </div>
+          <% }); %>
+        <% } else { %>
+          <p style="color: var(--text-light); text-align: center; grid-column: 1 / -1;">Belum ada video khotbah yang tersedia.</p>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== GALERI FOTO ========== -->
+  <section class="section" id="galeri">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Foto <span class="text-gold">Kegiatan</span></h2>
+        <span class="gold-line"></span>
+        <p>Klik foto untuk memperbesar.</p>
+      </div>
+
+      <div class="gallery-grid" data-aos="fade-up">
+        <% mediaGaleri.photos.forEach(function(photo, idx) { %>
+        <div class="gallery-item" data-idx="<%= idx %>">
+          <img src="/<%= photo.src %>" alt="<%= photo.caption %>" loading="lazy">
+          <div class="gallery-item__overlay">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            <span><%= photo.caption %></span>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+      <% if (mediaGaleri.photos.length === 0) { %>
+      <div class="empty-state" data-aos="fade-up">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <p>Belum ada foto yang diunggah. Foto kegiatan gereja akan tampil di sini.</p>
+      </div>
+      <% } %>
+    </div>
+  </section>
+  <!-- ========== WARTA JEMAAT ========== -->
+  <section class="section section--off-white" id="warta">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Warta <span class="text-gold">Jemaat</span></h2>
+        <span class="gold-line"></span>
+        <p>Unduh warta jemaat mingguan dalam format PDF.</p>
+      </div>
+      <div class="warta-list" data-aos="fade-up">
+        <% pelayanan.warta.forEach(function(w) { %>
+        <div class="warta-item">
+          <div class="warta-item__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="warta-item__info">
+            <h4><%= w.judul %></h4>
+            <span><%= w.tanggal %></span>
+          </div>
+          <% if (w.file) { %>
+          <a href="/<%= w.file %>" target="_blank" class="btn btn--gold btn--sm" download>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Unduh PDF
+          </a>
+          <% } else { %>
+          <span class="warta-item__pending">Segera tersedia</span>
+          <% } %>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== LIGHTBOX ========== -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox__backdrop"></div>
+    <button class="lightbox__close" aria-label="Close">&times;</button>
+    <div class="lightbox__content">
+      <img id="lightbox-img" src="" alt="">
+      <p class="lightbox__caption" id="lightbox-caption"></p>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+  <script src="js/main.min.js?v=3" defer></script>
+</body>
+</html>
+
+
+
+

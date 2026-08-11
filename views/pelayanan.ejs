@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Jadwal pelayan ibadah, warta jemaat, dan kalender kegiatan <%= general.churchName %>.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/pelayanan.html">
+  <title>Pelayanan — <%= general.churchName %></title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pelayanan — <%= general.churchName %>">
+  <meta property="og:description" content="Jadwal pelayan ibadah, warta jemaat, dan kalender kegiatan <%= general.churchName %>.">
+  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/pelayanan.html">
+  <meta property="og:site_name" content="<%= general.churchName %>">
+  <meta property="og:locale" content="id_ID">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Pelayanan — <%= general.churchName %>">
+  <meta name="twitter:description" content="Jadwal pelayan ibadah, warta jemaat, dan kalender kegiatan <%= general.churchName %>.">
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Pelayanan <%= general.churchName %>",
+    "description": "Jadwal pelayan ibadah, warta jemaat, dan kalender kegiatan <%= general.churchName %>.",
+    "url": "<%= general.siteUrl || 'https://aminhermon.org' %>/pelayanan.html"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--sub" id="hero-pelayanan">
+    <div class="hero__bg"><img src="<%= pelayanan.hero.bgImage %>" alt="Pelayanan" loading="eager"></div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <div class="hero__eyebrow">Pelayanan</div>
+      <h1><%- pelayanan.hero.titleHTML %></h1>
+      <p class="hero__subtitle"><%= pelayanan.hero.subtitle %></p>
+    </div>
+  </section>
+
+  <!-- ========== JADWAL IBADAH MINGGU ========== -->
+  <section class="section section--navy" id="jadwal-ibadah">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Jadwal <span class="text-gold">Ibadah Minggu</span></h2>
+        <span class="gold-line"></span>
+        <p>Bergabunglah bersama kami setiap hari Minggu.</p>
+      </div>
+      <div class="jadwal-grid" data-aos="fade-up">
+        <% visit.jadwalIbadah.forEach(function(jadwal) { %>
+        <div class="jadwal-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+          <div class="jadwal-card__time"><%= jadwal.jam %></div>
+          <h3 class="jadwal-card__name"><%= jadwal.nama %></h3>
+          <p class="jadwal-card__day"><%= jadwal.hari %></p>
+          <p class="jadwal-card__desc"><%= jadwal.keterangan %></p>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== JADWAL PELAYAN IBADAH ========== -->
+  <section class="section" id="jadwal-pelayan">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Jadwal <span class="text-gold">Pelayan Ibadah</span></h2>
+        <span class="gold-line"></span>
+        <p>Minggu, <%= pelayanan.jadwalPelayan.mingguIni %></p>
+      </div>
+
+      <div class="jadwal-table-wrapper" data-aos="fade-up">
+        <table class="jadwal-table">
+          <thead>
+            <tr>
+              <th>Tugas Pelayanan</th>
+              <th><%= pelayanan.jadwalPelayan.ibadah1.nama %><br><small><%= pelayanan.jadwalPelayan.ibadah1.jam %></small></th>
+              <th><%= pelayanan.jadwalPelayan.ibadah2.nama %><br><small><%= pelayanan.jadwalPelayan.ibadah2.jam %></small></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pengkhotbah</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.pengkhotbah) ? pelayanan.jadwalPelayan.ibadah1.pengkhotbah.join('<br>') : pelayanan.jadwalPelayan.ibadah1.pengkhotbah %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.pengkhotbah) ? pelayanan.jadwalPelayan.ibadah2.pengkhotbah.join('<br>') : pelayanan.jadwalPelayan.ibadah2.pengkhotbah %></td>
+            </tr>
+            <tr>
+              <td>Liturgos</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.liturgos) ? pelayanan.jadwalPelayan.ibadah1.liturgos.join('<br>') : pelayanan.jadwalPelayan.ibadah1.liturgos %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.liturgos) ? pelayanan.jadwalPelayan.ibadah2.liturgos.join('<br>') : pelayanan.jadwalPelayan.ibadah2.liturgos %></td>
+            </tr>
+            <tr>
+              <td>Doa Konsistori</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.doaKonsistori) ? pelayanan.jadwalPelayan.ibadah1.doaKonsistori.join('<br>') : pelayanan.jadwalPelayan.ibadah1.doaKonsistori %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.doaKonsistori) ? pelayanan.jadwalPelayan.ibadah2.doaKonsistori.join('<br>') : pelayanan.jadwalPelayan.ibadah2.doaKonsistori %></td>
+            </tr>
+            <tr>
+              <td>Pemusik</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.pemusik) ? pelayanan.jadwalPelayan.ibadah1.pemusik.join('<br>') : pelayanan.jadwalPelayan.ibadah1.pemusik %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.pemusik) ? pelayanan.jadwalPelayan.ibadah2.pemusik.join('<br>') : pelayanan.jadwalPelayan.ibadah2.pemusik %></td>
+            </tr>
+            <tr>
+              <td>Prokantor</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.prokantor) ? pelayanan.jadwalPelayan.ibadah1.prokantor.join('<br>') : pelayanan.jadwalPelayan.ibadah1.prokantor %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.prokantor) ? pelayanan.jadwalPelayan.ibadah2.prokantor.join('<br>') : pelayanan.jadwalPelayan.ibadah2.prokantor %></td>
+            </tr>
+            <tr>
+              <td>Penerima Jemaat</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.penerimaJemaat) ? pelayanan.jadwalPelayan.ibadah1.penerimaJemaat.join('<br>') : pelayanan.jadwalPelayan.ibadah1.penerimaJemaat %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.penerimaJemaat) ? pelayanan.jadwalPelayan.ibadah2.penerimaJemaat.join('<br>') : pelayanan.jadwalPelayan.ibadah2.penerimaJemaat %></td>
+            </tr>
+            <tr>
+              <td>Petugas Kolekte</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.petugasKolekte) ? pelayanan.jadwalPelayan.ibadah1.petugasKolekte.join('<br>') : pelayanan.jadwalPelayan.ibadah1.petugasKolekte %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.petugasKolekte) ? pelayanan.jadwalPelayan.ibadah2.petugasKolekte.join('<br>') : pelayanan.jadwalPelayan.ibadah2.petugasKolekte %></td>
+            </tr>
+            <tr>
+              <td>KP2</td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah1.kp2) ? pelayanan.jadwalPelayan.ibadah1.kp2.join('<br>') : pelayanan.jadwalPelayan.ibadah1.kp2 %></td>
+              <td><%- Array.isArray(pelayanan.jadwalPelayan.ibadah2.kp2) ? pelayanan.jadwalPelayan.ibadah2.kp2.join('<br>') : pelayanan.jadwalPelayan.ibadah2.kp2 %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ========== CALENDAR SECTION ========== -->
+  <section class="section section--navy" id="kalender-section">
+    <div class="container">
+
+      <!-- Calendar Navigation -->
+      <div class="cal-nav">
+        <button class="cal-nav__btn" id="calPrev" aria-label="Bulan sebelumnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 class="cal-nav__title" id="calTitle"></h2>
+        <button class="cal-nav__btn" id="calNext" aria-label="Bulan berikutnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg>
+        </button>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="cal-grid">
+        <div class="cal-grid__header">
+          <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+        </div>
+        <div class="cal-grid__body" id="calBody"></div>
+      </div>
+
+      <!-- Event Detail Panel -->
+      <div class="cal-events" id="calEvents">
+        <h3 class="cal-events__title" id="calEventsTitle">Pilih tanggal untuk melihat kegiatan</h3>
+        <div class="cal-events__list" id="calEventsList"></div>
+      </div>
+
+      <!-- Upcoming Events List -->
+      <div class="cal-upcoming">
+        <div class="section-header">
+          <h2>Kegiatan <span class="text-gold">Mendatang</span></h2>
+          <span class="gold-line"></span>
+        </div>
+        <div class="cal-upcoming__grid">
+          <% kalender.sort(function(a,b){ return new Date(a.tanggal) - new Date(b.tanggal); }).forEach(function(ev) { %>
+          <% if (new Date(ev.tanggal) >= new Date(new Date().toISOString().split('T')[0])) { %>
+          <div class="cal-upcoming__card">
+            <div class="cal-upcoming__date">
+              <span class="cal-upcoming__day"><%= new Date(ev.tanggal).getDate() %></span>
+              <span class="cal-upcoming__month"><%= ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'][new Date(ev.tanggal).getMonth()] %></span>
+            </div>
+            <div class="cal-upcoming__info">
+              <span class="cal-upcoming__badge"><%= ev.kategori %></span>
+              <h4><%= ev.judul %></h4>
+              <p><%= ev.desc %></p>
+            </div>
+          </div>
+          <% } %>
+          <% }); %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+  <script src="js/main.min.js?v=3" defer></script>
+  
+  <script>
+    // Calendar data from server
+    const calendarEvents = <%- JSON.stringify(kalender) %>;
+
+    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    let currentYear, currentMonth;
+
+    function initCalendarPage() {
+      const now = new Date();
+      currentYear = now.getFullYear();
+      currentMonth = now.getMonth();
+      renderCalendar();
+
+      document.getElementById('calPrev').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        renderCalendar();
+      });
+      document.getElementById('calNext').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        renderCalendar();
+      });
+    }
+
+    function renderCalendar() {
+      document.getElementById('calTitle').textContent = MONTHS_ID[currentMonth] + ' ' + currentYear;
+      const body = document.getElementById('calBody');
+      body.innerHTML = '';
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const today = new Date();
+
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-cell cal-cell--empty';
+        body.appendChild(empty);
+      }
+
+      // Day cells
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        const dayEvents = calendarEvents.filter(e => e.tanggal === dateStr);
+        const isToday = (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === d);
+
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell' + (isToday ? ' cal-cell--today' : '') + (dayEvents.length ? ' cal-cell--has-event' : '');
+        cell.innerHTML = '<span class="cal-cell__num">' + d + '</span>' +
+          (dayEvents.length ? '<span class="cal-cell__dot"></span>' : '');
+
+        if (dayEvents.length) {
+          cell.addEventListener('click', () => showEvents(dateStr, dayEvents));
+        }
+
+        body.appendChild(cell);
+      }
+    }
+
+    function showEvents(dateStr, events) {
+      const d = new Date(dateStr);
+      const title = d.getDate() + ' ' + MONTHS_ID[d.getMonth()] + ' ' + d.getFullYear();
+      document.getElementById('calEventsTitle').textContent = 'Kegiatan — ' + title;
+
+      const list = document.getElementById('calEventsList');
+      list.innerHTML = events.map(ev =>
+        '<div class="cal-event-card">' +
+          '<span class="cal-event-card__badge">' + ev.kategori + '</span>' +
+          '<h4>' + ev.judul + '</h4>' +
+          '<p>' + ev.desc + '</p>' +
+        '</div>'
+      ).join('');
+
+      document.getElementById('calEvents').classList.add('active');
+
+      // Highlight selected cells
+      document.querySelectorAll('.cal-cell--selected').forEach(c => c.classList.remove('cal-cell--selected'));
+      document.querySelectorAll('.cal-cell--has-event').forEach(c => {
+        // Find the cell for this date
+        const num = parseInt(c.querySelector('.cal-cell__num').textContent);
+        const ds = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(num).padStart(2, '0');
+        if (ds === dateStr) c.classList.add('cal-cell--selected');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initCalendarPage);
+  </script>
+</body>
+</html>
+
+
+
+
