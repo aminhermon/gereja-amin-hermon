@@ -2422,6 +2422,11 @@ p {
     padding: var(--space-2xl) var(--space-md);
   }
 
+  .hero__logo {
+    width: 105px;
+    margin-bottom: 1rem;
+  }
+
   .schedule-card,
   .expect-card {
     padding: var(--space-xl);
