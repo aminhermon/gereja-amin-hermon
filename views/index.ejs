@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="css/style.min.css?v=12">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -61,6 +61,8 @@
   <nav class="navbar" id="navbar" aria-label="Main navigation">
     <div class="navbar__inner">
       <a href="/" class="navbar__logo" aria-label="<%= general.churchName %> - Home">
+        <img src="/assets/images/logo-gereja-amin-3d.png?v=2" alt="Logo Gereja AMIN" class="navbar__logo-img">
+        <span class="navbar__logo-name">Gereja AMIN</span>
       </a>
       <div class="navbar__menu" id="nav-menu">
         <a href="/" class="navbar__link active">Beranda</a>
@@ -115,7 +117,6 @@
     </div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
-      <img src="/assets/images/logo-gereja-amin-3d.png?v=2" alt="Logo Gereja AMIN" class="hero__logo">
       <h1><%- home.hero.titleHTML %></h1>
       <p class="hero__subtitle"><%= home.hero.subtitle %></p>
       <div class="hero__actions">
