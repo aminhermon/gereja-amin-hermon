@@ -249,19 +249,7 @@ p {
 }
 
 .navbar__logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  z-index: 1001;
-  flex-shrink: 0;
-  padding: 4px 0;
-  transition: all var(--transition-base);
-}
-
-.navbar__logo:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  display: none;
 }
 
 .navbar__logo-img {
