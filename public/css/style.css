@@ -651,16 +651,23 @@ p {
 }
 
 .hero__logo {
-  width: 140px;
+  width: 125px;
   height: auto;
-  margin-bottom: 1.5rem;
-  filter: drop-shadow(0 4px 20px rgba(200,169,81,0.4));
+  margin: 0 auto 1.25rem auto;
+  display: block;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 15px rgba(200, 169, 81, 0.35));
   animation: heroLogoPulse 3s ease-in-out infinite;
 }
 
 @keyframes heroLogoPulse {
-  0%, 100% { filter: drop-shadow(0 4px 20px rgba(200,169,81,0.4)); transform: scale(1); }
-  50% { filter: drop-shadow(0 6px 30px rgba(200,169,81,0.7)); transform: scale(1.03); }
+  0%, 100% { 
+    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 15px rgba(200, 169, 81, 0.35));
+    transform: scale(1); 
+  }
+  50% { 
+    filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 25px rgba(200, 169, 81, 0.6));
+    transform: scale(1.03); 
+  }
 }
 
 .hero__eyebrow {
