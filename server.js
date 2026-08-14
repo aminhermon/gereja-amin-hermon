@@ -38,14 +38,17 @@ const adminLimiter = rateLimit({
   message: 'Terlalu banyak percobaan. Silakan coba lagi dalam 15 menit.'
 });
 
+// Trust reverse proxy (Hostinger Passenger/Apache)
+app.set('trust proxy', 1);
+
 // Session for admin authentication
 app.use(session({
-  secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
+  secret: process.env.SESSION_SECRET || 'aminhermon-secret-key-2026',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: false,
     maxAge: 2 * 60 * 60 * 1000  // 2 hours
   }
 }));
