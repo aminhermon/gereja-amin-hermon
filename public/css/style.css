@@ -664,6 +664,19 @@ p {
   padding: var(--space-4xl) var(--space-xl);
 }
 
+.hero__logo {
+  width: 140px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 20px rgba(200,169,81,0.4));
+  animation: heroLogoPulse 3s ease-in-out infinite;
+}
+
+@keyframes heroLogoPulse {
+  0%, 100% { filter: drop-shadow(0 4px 20px rgba(200,169,81,0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 6px 30px rgba(200,169,81,0.7)); transform: scale(1.03); }
+}
+
 .hero__eyebrow {
   font-family: var(--font-body);
   font-size: 0.85rem;
