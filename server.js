@@ -3,9 +3,94 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const compression = require('compression');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const session = require('express-session');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ==================== SECURITY ====================
+
+// Helmet: HTTP security headers (XSS, clickjacking, MIME-sniffing, etc.)
+app.use(helmet({
+  contentSecurityPolicy: false,       // Disabled to allow inline styles/scripts in EJS
+  crossOriginEmbedderPolicy: false,   // Allow YouTube embeds
+}));
+
+// Rate Limiting: Public routes (100 req per 15 min per IP)
+const publicLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Terlalu banyak permintaan dari IP ini. Silakan coba lagi nanti.'
+});
+app.use(publicLimiter);
+
+// Rate Limiting: Admin routes (20 req per 15 min — anti brute-force)
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Terlalu banyak percobaan. Silakan coba lagi dalam 15 menit.'
+});
+
+// Session for admin authentication
+app.use(session({
+  secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 2 * 60 * 60 * 1000  // 2 hours
+  }
+}));
+
+// Admin password hash (default: aminhermon2026)
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_HASH || crypto.createHash('sha256').update('aminhermon2026').digest('hex');
+
+// Authentication middleware
+function requireAuth(req, res, next) {
+  if (req.session && req.session.isAdmin) {
+    return next();
+  }
+  res.redirect('/admin/login');
+}
+
+// Input sanitization helper — strips dangerous HTML tags
+function sanitize(str) {
+  if (typeof str !== 'string') return str;
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/javascript\s*:/gi, '');
+}
+
+// Sanitize all incoming body fields recursively
+function sanitizeBody(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  for (const key of Object.keys(obj)) {
+    if (typeof obj[key] === 'string') {
+      obj[key] = sanitize(obj[key]);
+    } else if (Array.isArray(obj[key])) {
+      obj[key] = obj[key].map(v => typeof v === 'string' ? sanitize(v) : v);
+    }
+  }
+  return obj;
+}
+
+// Apply sanitization to all POST requests
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.body) {
+    req.body = sanitizeBody(req.body);
+  }
+  next();
+});
 
 // ==================== PERFORMANCE ====================
 
@@ -15,8 +100,9 @@ app.use(compression({ level: 6, threshold: 1024 }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// Body parser with size limits (anti payload attack)
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(express.json({ limit: '1mb' }));
 
 // ==================== IMAGE OPTIMIZATION ====================
 app.use(async (req, res, next) => {
@@ -45,6 +131,12 @@ app.use(async (req, res, next) => {
       srcPath = path.join(__dirname, req.path);
     } else {
       srcPath = path.join(__dirname, 'public', req.path);
+    }
+
+    // Path traversal protection
+    const resolvedPath = path.resolve(srcPath);
+    if (!resolvedPath.startsWith(path.resolve(__dirname))) {
+      return res.status(403).send('Akses ditolak');
     }
 
     if (!fs.existsSync(srcPath)) return next();
@@ -99,12 +191,34 @@ if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
   fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
 }
 
-// Multer storage
+// Multer storage with file validation
+const ALLOWED_FILE_TYPES = /\.(jpg|jpeg|png|gif|webp|pdf)$/i;
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'
+];
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+  filename: (req, file, cb) => {
+    // Sanitize original filename to prevent path injection
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, Date.now() + '_' + safeName);
+  }
 });
-const upload = multer({ storage });
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // Max 10 MB
+  fileFilter: (req, file, cb) => {
+    const extValid = ALLOWED_FILE_TYPES.test(path.extname(file.originalname));
+    const mimeValid = ALLOWED_MIME_TYPES.includes(file.mimetype);
+    if (extValid && mimeValid) {
+      cb(null, true);
+    } else {
+      cb(new Error('Tipe file tidak diizinkan. Hanya JPG, PNG, GIF, WebP, dan PDF yang diterima.'));
+    }
+  }
+});
 
 // DB helpers
 const dbPath = path.join(__dirname, 'data', 'db.json');
@@ -240,15 +354,38 @@ app.get('/robots.txt', (req, res) => {
 
 // ==================== ADMIN ROUTES ====================
 
+// Admin login page
+app.get('/admin/login', (req, res) => {
+  if (req.session && req.session.isAdmin) return res.redirect('/admin');
+  res.render('admin-login', { error: null });
+});
+
+// Admin login handler
+app.post('/admin/login', adminLimiter, (req, res) => {
+  const inputHash = crypto.createHash('sha256').update(req.body.password || '').digest('hex');
+  if (inputHash === ADMIN_PASSWORD_HASH) {
+    req.session.isAdmin = true;
+    return res.redirect('/admin');
+  }
+  res.render('admin-login', { error: 'Password salah. Silakan coba lagi.' });
+});
+
+// Admin logout
+app.get('/admin/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/admin/login');
+  });
+});
+
 // ---------- Admin Dashboard (tabbed) ----------
-app.get('/admin', (req, res) => {
+app.get('/admin', requireAuth, (req, res) => {
   res.render('admin', { db: getDB(), tab: req.query.tab || 'beranda' });
 });
 
 // ===== TAB: BERANDA =====
 
 // General settings (name)
-app.post('/admin/general', upload.single('logo'), (req, res) => {
+app.post('/admin/general', requireAuth, upload.single('logo'), (req, res) => {
   const db = getDB();
   db.general.churchName = req.body.churchName;
   if (req.file) db.general.logoPath = 'uploads/' + req.file.filename;
@@ -257,7 +394,7 @@ app.post('/admin/general', upload.single('logo'), (req, res) => {
 });
 
 // Home hero
-app.post('/admin/home/hero', upload.single('bgImage'), (req, res) => {
+app.post('/admin/home/hero', requireAuth, upload.single('bgImage'), (req, res) => {
   const db = getDB();
   db.home.hero.titleHTML = req.body.titleHTML;
   db.home.hero.subtitle = req.body.subtitle;
@@ -269,7 +406,7 @@ app.post('/admin/home/hero', upload.single('bgImage'), (req, res) => {
 });
 
 // Home stats
-app.post('/admin/home/stats', (req, res) => {
+app.post('/admin/home/stats', requireAuth, (req, res) => {
   const db = getDB();
   db.home.stats.totalJemaat = parseInt(req.body.totalJemaat) || 0;
   db.home.stats.lakiLaki = parseInt(req.body.lakiLaki) || 0;
@@ -280,7 +417,7 @@ app.post('/admin/home/stats', (req, res) => {
 });
 
 // News/events - update
-app.post('/admin/home/news/:id', upload.single('image'), (req, res) => {
+app.post('/admin/home/news/:id', requireAuth, upload.single('image'), (req, res) => {
   const db = getDB();
   const idx = db.home.news.findIndex(n => n.id === req.params.id);
   if (idx > -1) {
@@ -294,7 +431,7 @@ app.post('/admin/home/news/:id', upload.single('image'), (req, res) => {
 });
 
 // News/events - add new
-app.post('/admin/home/news/add', upload.single('image'), (req, res) => {
+app.post('/admin/home/news/add', requireAuth, upload.single('image'), (req, res) => {
   const db = getDB();
   const newItem = {
     id: String(Date.now()),
@@ -310,7 +447,7 @@ app.post('/admin/home/news/add', upload.single('image'), (req, res) => {
 });
 
 // News/events - delete
-app.post('/admin/home/news/delete/:id', (req, res) => {
+app.post('/admin/home/news/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
   db.home.news = db.home.news.filter(n => n.id !== req.params.id);
   saveDB(db);
@@ -320,7 +457,7 @@ app.post('/admin/home/news/delete/:id', (req, res) => {
 // ===== TAB: BARU DI SINI =====
 
 // Visit hero
-app.post('/admin/visit/hero', upload.single('bgImage'), (req, res) => {
+app.post('/admin/visit/hero', requireAuth, upload.single('bgImage'), (req, res) => {
   const db = getDB();
   db.visit.hero.titleHTML = req.body.titleHTML;
   db.visit.hero.subtitle = req.body.subtitle;
@@ -330,7 +467,7 @@ app.post('/admin/visit/hero', upload.single('bgImage'), (req, res) => {
 });
 
 // Visit sambutan
-app.post('/admin/visit/sambutan', (req, res) => {
+app.post('/admin/visit/sambutan', requireAuth, (req, res) => {
   const db = getDB();
   db.visit.sambutan = req.body.sambutan;
   saveDB(db);
@@ -338,7 +475,7 @@ app.post('/admin/visit/sambutan', (req, res) => {
 });
 
 // Visit jadwal ibadah
-app.post('/admin/visit/jadwal', (req, res) => {
+app.post('/admin/visit/jadwal', requireAuth, (req, res) => {
   const db = getDB();
   const names = Array.isArray(req.body.nama) ? req.body.nama : [req.body.nama];
   const haris = Array.isArray(req.body.hari) ? req.body.hari : [req.body.hari];
@@ -352,7 +489,7 @@ app.post('/admin/visit/jadwal', (req, res) => {
 });
 
 // Visit lokasi
-app.post('/admin/visit/lokasi', (req, res) => {
+app.post('/admin/visit/lokasi', requireAuth, (req, res) => {
   const db = getDB();
   db.visit.lokasi.judul = req.body.judul;
   db.visit.lokasi.deskripsi = req.body.deskripsi;
@@ -363,7 +500,7 @@ app.post('/admin/visit/lokasi', (req, res) => {
 });
 
 // Visit sakramen
-app.post('/admin/visit/sakramen', (req, res) => {
+app.post('/admin/visit/sakramen', requireAuth, (req, res) => {
   const db = getDB();
   const names = Array.isArray(req.body.nama) ? req.body.nama : [req.body.nama];
   const icons = Array.isArray(req.body.icon) ? req.body.icon : [req.body.icon];
@@ -378,7 +515,7 @@ app.post('/admin/visit/sakramen', (req, res) => {
 // ===== TAB: TENTANG GEREJA =====
 
 // About hero
-app.post('/admin/about/hero', upload.single('bgImage'), (req, res) => {
+app.post('/admin/about/hero', requireAuth, upload.single('bgImage'), (req, res) => {
   const db = getDB();
   db.about.hero.titleHTML = req.body.titleHTML;
   db.about.hero.subtitle = req.body.subtitle;
@@ -388,7 +525,7 @@ app.post('/admin/about/hero', upload.single('bgImage'), (req, res) => {
 });
 
 // About sejarah
-app.post('/admin/about/sejarah', (req, res) => {
+app.post('/admin/about/sejarah', requireAuth, (req, res) => {
   const db = getDB();
   db.about.sejarah.title = req.body.title;
   db.about.sejarah.content = req.body.content;
@@ -397,7 +534,7 @@ app.post('/admin/about/sejarah', (req, res) => {
 });
 
 // About visi & misi
-app.post('/admin/about/visimisi', (req, res) => {
+app.post('/admin/about/visimisi', requireAuth, (req, res) => {
   const db = getDB();
   db.about.visiMisi.visi = req.body.visi;
   const misiItems = Array.isArray(req.body.misi) ? req.body.misi : [req.body.misi];
@@ -407,7 +544,7 @@ app.post('/admin/about/visimisi', (req, res) => {
 });
 
 // About pendeta - update
-app.post('/admin/about/pendeta/:idx', upload.single('image'), (req, res) => {
+app.post('/admin/about/pendeta/:idx', requireAuth, upload.single('image'), (req, res) => {
   const db = getDB();
   const idx = parseInt(req.params.idx);
   if (db.about.pemimpin.pendeta[idx]) {
@@ -421,7 +558,7 @@ app.post('/admin/about/pendeta/:idx', upload.single('image'), (req, res) => {
 });
 
 // About pengurus - individual update with photo
-app.post('/admin/about/pengurus/:idx', upload.single('image'), (req, res) => {
+app.post('/admin/about/pengurus/:idx', requireAuth, upload.single('image'), (req, res) => {
   const db = getDB();
   const idx = parseInt(req.params.idx);
   if (db.about.pemimpin.pengurus[idx]) {
@@ -434,7 +571,7 @@ app.post('/admin/about/pengurus/:idx', upload.single('image'), (req, res) => {
 });
 
 // About majelis - individual update with photo
-app.post('/admin/about/majelis/:idx', upload.single('image'), (req, res) => {
+app.post('/admin/about/majelis/:idx', requireAuth, upload.single('image'), (req, res) => {
   const db = getDB();
   const idx = parseInt(req.params.idx);
   if (db.about.pemimpin.majelis[idx]) {
@@ -449,7 +586,7 @@ app.post('/admin/about/majelis/:idx', upload.single('image'), (req, res) => {
 // ===== TAB: PELAYANAN & WARTA =====
 
 // Pelayanan hero
-app.post('/admin/pelayanan/hero', upload.single('bgImage'), (req, res) => {
+app.post('/admin/pelayanan/hero', requireAuth, upload.single('bgImage'), (req, res) => {
   const db = getDB();
   db.pelayanan.hero.titleHTML = req.body.titleHTML;
   db.pelayanan.hero.subtitle = req.body.subtitle;
@@ -459,7 +596,7 @@ app.post('/admin/pelayanan/hero', upload.single('bgImage'), (req, res) => {
 });
 
 // Pelayanan - jadwal pelayan
-app.post('/admin/pelayanan/jadwal', (req, res) => {
+app.post('/admin/pelayanan/jadwal', requireAuth, (req, res) => {
   const db = getDB();
   db.pelayanan.jadwalPelayan.mingguIni = req.body.mingguIni;
   const fields = ['pengkhotbah','liturgos','doaKonsistori','pemusik','prokantor','penerimaJemaat','petugasKolekte','kp2'];
@@ -474,7 +611,7 @@ app.post('/admin/pelayanan/jadwal', (req, res) => {
 // ===== TAB: MEDIA =====
 
 // Media hero
-app.post('/admin/media/hero', upload.single('bgImage'), (req, res) => {
+app.post('/admin/media/hero', requireAuth, upload.single('bgImage'), (req, res) => {
   const db = getDB();
   db.mediaGaleri.hero.titleHTML = req.body.titleHTML;
   db.mediaGaleri.hero.subtitle = req.body.subtitle;
@@ -484,7 +621,7 @@ app.post('/admin/media/hero', upload.single('bgImage'), (req, res) => {
 });
 
 // Gallery photo upload
-app.post('/admin/media/photo', upload.single('photo'), (req, res) => {
+app.post('/admin/media/photo', requireAuth, upload.single('photo'), (req, res) => {
   const db = getDB();
   if (req.file) {
     const newPhoto = {
@@ -499,7 +636,7 @@ app.post('/admin/media/photo', upload.single('photo'), (req, res) => {
 });
 
 // Delete gallery photo
-app.post('/admin/media/photo/delete/:id', (req, res) => {
+app.post('/admin/media/photo/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
   db.mediaGaleri.photos = db.mediaGaleri.photos.filter(p => p.id !== req.params.id);
   saveDB(db);
@@ -507,7 +644,7 @@ app.post('/admin/media/photo/delete/:id', (req, res) => {
 });
 
 // Warta upload
-app.post('/admin/media/warta', upload.single('file'), (req, res) => {
+app.post('/admin/media/warta', requireAuth, upload.single('file'), (req, res) => {
   const db = getDB();
   const newWarta = {
     id: String(Date.now()),
@@ -521,7 +658,7 @@ app.post('/admin/media/warta', upload.single('file'), (req, res) => {
 });
 
 // Warta delete
-app.post('/admin/media/warta/delete/:id', (req, res) => {
+app.post('/admin/media/warta/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
   db.pelayanan.warta = db.pelayanan.warta.filter(w => w.id !== req.params.id);
   saveDB(db);
@@ -529,7 +666,7 @@ app.post('/admin/media/warta/delete/:id', (req, res) => {
 });
 
 // Renungan add
-app.post('/admin/media/renungan', (req, res) => {
+app.post('/admin/media/renungan', requireAuth, (req, res) => {
   const db = getDB();
   if (!db.mediaGaleri.renungan) db.mediaGaleri.renungan = [];
   db.mediaGaleri.renungan.push({
@@ -544,7 +681,7 @@ app.post('/admin/media/renungan', (req, res) => {
 });
 
 // Renungan delete
-app.post('/admin/media/renungan/delete/:id', (req, res) => {
+app.post('/admin/media/renungan/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
   if (db.mediaGaleri.renungan) {
     db.mediaGaleri.renungan = db.mediaGaleri.renungan.filter(r => r.id !== req.params.id);
@@ -554,7 +691,7 @@ app.post('/admin/media/renungan/delete/:id', (req, res) => {
 });
 
 // Video add
-app.post('/admin/media/video', (req, res) => {
+app.post('/admin/media/video', requireAuth, (req, res) => {
   const db = getDB();
   if (!db.mediaGaleri.videos) db.mediaGaleri.videos = [];
   db.mediaGaleri.videos.push({
@@ -569,7 +706,7 @@ app.post('/admin/media/video', (req, res) => {
 });
 
 // Video delete
-app.post('/admin/media/video/delete/:id', (req, res) => {
+app.post('/admin/media/video/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
   if (db.mediaGaleri.videos) {
     db.mediaGaleri.videos = db.mediaGaleri.videos.filter(v => v.id !== req.params.id);
@@ -581,7 +718,7 @@ app.post('/admin/media/video/delete/:id', (req, res) => {
 // ===== TAB: HUBUNGI KAMI =====
 
 // Contact hero
-app.post('/admin/contact/hero', upload.single('bgImage'), (req, res) => {
+app.post('/admin/contact/hero', requireAuth, upload.single('bgImage'), (req, res) => {
   const db = getDB();
   db.contactFaq.hero.titleHTML = req.body.titleHTML;
   db.contactFaq.hero.subtitle = req.body.subtitle;
@@ -591,7 +728,7 @@ app.post('/admin/contact/hero', upload.single('bgImage'), (req, res) => {
 });
 
 // Contact WhatsApp
-app.post('/admin/contact/whatsapp', (req, res) => {
+app.post('/admin/contact/whatsapp', requireAuth, (req, res) => {
   const db = getDB();
   db.contactFaq.whatsapp.number = req.body.number;
   db.contactFaq.whatsapp.message = req.body.message;
@@ -603,7 +740,7 @@ app.post('/admin/contact/whatsapp', (req, res) => {
 // ===== TAB: KALENDER =====
 
 // Kalender add
-app.post('/admin/kalender/add', (req, res) => {
+app.post('/admin/kalender/add', requireAuth, (req, res) => {
   const db = getDB();
   if (!db.kalender) db.kalender = [];
   db.kalender.push({
@@ -618,13 +755,34 @@ app.post('/admin/kalender/add', (req, res) => {
 });
 
 // Kalender delete
-app.post('/admin/kalender/delete/:id', (req, res) => {
+app.post('/admin/kalender/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
   if (db.kalender) {
     db.kalender = db.kalender.filter(k => k.id !== req.params.id);
   }
   saveDB(db);
   res.redirect('/admin?tab=kalender');
+});
+
+// ==================== ERROR HANDLING ====================
+
+// Multer file validation error handler
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).send('File terlalu besar. Maksimal 10 MB.');
+    }
+    return res.status(400).send('Error upload: ' + err.message);
+  }
+  if (err && err.message && err.message.includes('Tipe file tidak diizinkan')) {
+    return res.status(400).send(err.message);
+  }
+  next(err);
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).render('index', { ...getDB(), pageNotFound: true });
 });
 
 // Export app for Phusion Passenger (Hostinger)
