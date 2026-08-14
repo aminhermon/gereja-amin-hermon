@@ -646,14 +646,29 @@ p {
   position: relative;
   z-index: 3;
   text-align: center;
-  max-width: 800px;
+  max-width: 850px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: var(--space-4xl) var(--space-xl);
+}
+
+.hero__logo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto 1.25rem auto;
 }
 
 .hero__logo {
   width: 125px;
+  max-width: 100%;
   height: auto;
-  margin: 0 auto 1.25rem auto;
+  margin: 0 auto;
   display: block;
   filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 15px rgba(200, 169, 81, 0.35));
   animation: heroLogoPulse 3s ease-in-out infinite;
