@@ -50,17 +50,26 @@
     .form-group input[type="file"] { font-size: .8rem; margin-top: .3rem; }
     .form-group textarea { resize: vertical; }
     .form-group .help-text { font-size: .75rem; color: var(--text-muted); margin-top: .2rem; }
-    img.preview { max-height: 50px; border-radius: 4px; margin-top: 4px; display: block; border: 1px solid var(--border); }
+    img.preview { max-height: 50px; border-radius: 4px; display: block; border: 1px solid var(--border); }
+    
+    .img-preview-box { display: flex; align-items: center; gap: 10px; margin-top: 6px; padding: 6px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); width: fit-content; max-width: 100%; }
+    .img-preview-box img { max-height: 48px; max-width: 90px; object-fit: contain; border-radius: 4px; background: #fff; }
+    .img-preview-box .file-info { font-size: .75rem; color: var(--text-muted); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* Buttons */
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: .5rem 1.2rem; border-radius: var(--radius); border: none; cursor: pointer; font-weight: 600; font-size: .8rem; transition: all .2s; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: .5rem 1.2rem; border-radius: var(--radius); border: none; cursor: pointer; font-weight: 600; font-size: .8rem; transition: all .2s; text-decoration: none; }
     .btn--gold { background: var(--gold); color: #fff; }
     .btn--gold:hover { background: #b8993f; }
     .btn--danger { background: var(--danger); color: #fff; }
     .btn--danger:hover { background: #dc2626; }
+    .btn--warning { background: #F59E0B; color: #fff; }
+    .btn--warning:hover { background: #D97706; }
     .btn--outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
     .btn--outline:hover { background: var(--bg); }
+    .btn--outline-danger { background: transparent; border: 1px solid #FCA5A5; color: var(--danger); }
+    .btn--outline-danger:hover { background: #FEE2E2; }
     .btn--sm { padding: .3rem .7rem; font-size: .75rem; }
+    .btn--xs { padding: .2rem .5rem; font-size: .7rem; border-radius: 4px; }
 
     /* Grids */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
@@ -71,13 +80,35 @@
     /* Items */
     .item-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
     .item-card h4 { color: var(--navy); font-size: .85rem; margin-bottom: .5rem; }
-    .photo-grid { display: flex; flex-wrap: wrap; gap: .5rem; }
-    .photo-item { position: relative; border-radius: 4px; overflow: hidden; }
-    .photo-item img { width: 100px; height: 75px; object-fit: cover; display: block; }
-    .photo-item .del { position: absolute; top: 2px; right: 2px; }
+    .photo-grid { display: flex; flex-wrap: wrap; gap: .8rem; }
+    .photo-item { position: relative; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .photo-item img { width: 120px; height: 90px; object-fit: cover; display: block; }
+    .photo-item .photo-cap { font-size: .7rem; padding: 4px 6px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); }
+    .photo-item .del { position: absolute; top: 4px; right: 4px; z-index: 2; }
     .faq-row { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .5rem; }
     .warta-row { display: flex; align-items: center; justify-content: space-between; padding: .6rem; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: .5rem; background: var(--bg); }
     .warta-row span { font-size: .85rem; }
+
+    /* File Manager */
+    .fm-stats-bar { display: flex; gap: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+    .fm-stat-box { flex: 1; min-width: 140px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; }
+    .fm-stat-box h3 { font-size: 1.4rem; color: var(--navy); font-weight: 700; margin-bottom: 2px; }
+    .fm-stat-box span { font-size: .75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    .fm-upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; background: #FAFAFA; margin-bottom: 1.5rem; transition: border-color .2s; }
+    .fm-upload-zone:hover { border-color: var(--gold); background: #FFFDF8; }
+
+    .fm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+    .fm-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+    .fm-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: var(--gold); }
+    .fm-card__preview { height: 130px; background: #f5f5f7; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+    .fm-card__preview img { width: 100%; height: 100%; object-fit: cover; }
+    .fm-card__preview .file-icon { font-size: 2.5rem; }
+    .fm-card__body { padding: .75rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .fm-card__name { font-size: .8rem; font-weight: 600; color: var(--navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px; }
+    .fm-card__meta { font-size: .7rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .fm-card__actions { display: flex; gap: 6px; }
+    .fm-card__actions a, .fm-card__actions button { flex: 1; justify-content: center; text-align: center; }
 
     hr.divider { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
 
@@ -106,6 +137,7 @@
       <li><a href="/admin?tab=kalender" class="<%= tab === 'kalender' ? 'active' : '' %>"><span class="emoji">📅</span> Kalender Kegiatan</a></li>
       <li><a href="/admin?tab=media" class="<%= tab === 'media' ? 'active' : '' %>"><span class="emoji">📸</span> Media & Galeri</a></li>
       <li><a href="/admin?tab=contact" class="<%= tab === 'contact' ? 'active' : '' %>"><span class="emoji">📞</span> Hubungi Kami</a></li>
+      <li><a href="/admin?tab=files" class="<%= tab === 'files' ? 'active' : '' %>" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 6px; padding-top: 0.9rem;"><span class="emoji">📁</span> Kelola File (<%= typeof files !== 'undefined' ? files.length : 0 %>)</a></li>
     </ul>
     <div class="sidebar-footer">
       <a href="/" target="_blank">🌐 Lihat Website</a>
@@ -123,6 +155,7 @@
         <% } else if (tab === 'kalender') { %>📅 Kelola Kalender Kegiatan
         <% } else if (tab === 'media') { %>📸 Kelola Media & Galeri
         <% } else if (tab === 'contact') { %>📞 Kelola Hubungi Kami
+        <% } else if (tab === 'files') { %>📁 Kelola File (Uploads & Media)
         <% } %>
       </h1>
       <span class="topbar-badge">● Online</span>
@@ -143,14 +176,27 @@
                 <input type="text" name="churchName" value="<%= db.general.churchName %>" required>
               </div>
               <div class="form-group">
-                <label>Logo</label>
-                <% if (db.general.logoPath) { %><img src="/<%= db.general.logoPath %>" class="preview"><% } %>
+                <label>Logo Website</label>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                  <% if (db.general.logoPath) { %>
+                    <div class="img-preview-box">
+                      <img src="/<%= db.general.logoPath %>" alt="Logo">
+                      <span class="file-info"><%= db.general.logoPath %></span>
+                    </div>
+                  <% } %>
+                </div>
                 <input type="file" name="logo" accept="image/*">
-                <span class="help-text">Kosongkan jika tidak ingin mengubah</span>
+                <span class="help-text">Pilih file baru untuk mengganti logo</span>
               </div>
             </div>
-            <button type="submit" class="btn btn--gold">💾 Simpan</button>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button type="submit" class="btn btn--gold">💾 Simpan Pengaturan</button>
+              <% if (db.general.logoPath && db.general.logoPath.startsWith('uploads/')) { %>
+              <button type="button" class="btn btn--outline-danger btn--sm" onclick="if(confirm('Hapus logo kustom dan kembalikan ke logo default 3D?')) document.getElementById('formResetLogo').submit();">🗑️ Hapus File Logo</button>
+              <% } %>
+            </div>
           </form>
+          <form id="formResetLogo" action="/admin/delete-file/logo" method="POST" style="display:none;"></form>
         </div>
 
         <!-- Hero Beranda -->
@@ -178,12 +224,21 @@
               </div>
             </div>
             <div class="form-group">
-              <label>Gambar Latar</label>
-              <img src="/<%= db.home.hero.bgImage %>" class="preview">
+              <label>Gambar Latar Hero</label>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                <div class="img-preview-box">
+                  <img src="/<%= db.home.hero.bgImage %>" alt="Hero BG">
+                  <span class="file-info"><%= db.home.hero.bgImage %></span>
+                </div>
+                <% if (db.home.hero.bgImage && db.home.hero.bgImage.startsWith('uploads/')) { %>
+                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroHome').submit();">🗑️ Hapus & Reset</button>
+                <% } %>
+              </div>
               <input type="file" name="bgImage" accept="image/*">
             </div>
             <button type="submit" class="btn btn--gold">💾 Simpan Hero</button>
           </form>
+          <form id="formResetHeroHome" action="/admin/delete-file/hero/home" method="POST" style="display:none;"></form>
         </div>
 
         <!-- Statistik -->
@@ -215,22 +270,32 @@
         <!-- Berita & Kegiatan -->
         <div class="card">
           <h2 class="card-title">📰 Berita & Kegiatan (Slider)</h2>
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:1rem; margin-bottom:1rem;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:1rem; margin-bottom:1rem;">
             <% db.home.news.forEach(function(item) { %>
             <div class="item-card">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;">
                 <h4><%= item.title %></h4>
-                <form action="/admin/home/news/delete/<%= item.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus berita ini?')">
-                  <button type="submit" class="btn btn--danger btn--sm">🗑</button>
+                <form action="/admin/home/news/delete/<%= item.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus berita dan file gambarnya?')">
+                  <button type="submit" class="btn btn--danger btn--sm" title="Hapus berita dan file">🗑 Hapus</button>
                 </form>
               </div>
               <form action="/admin/home/news/<%= item.id %>" method="POST" enctype="multipart/form-data">
                 <div class="form-group"><label>Tanggal</label><input type="text" name="date" value="<%= item.date %>"></div>
                 <div class="form-group"><label>Judul</label><input type="text" name="title" value="<%= item.title %>"></div>
                 <div class="form-group"><label>Deskripsi</label><textarea name="desc" rows="2"><%= item.desc %></textarea></div>
-                <div class="form-group"><label>Gambar</label><img src="/<%= item.image %>" class="preview"><input type="file" name="image" accept="image/*"></div>
+                <div class="form-group">
+                  <label>Gambar</label>
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                    <img src="/<%= item.image %>" class="preview">
+                    <% if (item.image && item.image.startsWith('uploads/')) { %>
+                    <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file gambar ini dan reset ke gambar default?')) document.getElementById('formDelImgNews_<%= item.id %>').submit();">🗑️ Hapus Foto</button>
+                    <% } %>
+                  </div>
+                  <input type="file" name="image" accept="image/*">
+                </div>
                 <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
               </form>
+              <form id="formDelImgNews_<%= item.id %>" action="/admin/home/news/delete-image/<%= item.id %>" method="POST" style="display:none;"></form>
             </div>
             <% }); %>
           </div>
@@ -259,9 +324,22 @@
               <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.visit.hero.titleHTML %></textarea></div>
               <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.visit.hero.subtitle %></textarea></div>
             </div>
-            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.visit.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <div class="form-group">
+              <label>Gambar Latar Hero</label>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                <div class="img-preview-box">
+                  <img src="/<%= db.visit.hero.bgImage %>" alt="Hero BG">
+                  <span class="file-info"><%= db.visit.hero.bgImage %></span>
+                </div>
+                <% if (db.visit.hero.bgImage && db.visit.hero.bgImage.startsWith('uploads/')) { %>
+                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroVisit').submit();">🗑️ Hapus & Reset</button>
+                <% } %>
+              </div>
+              <input type="file" name="bgImage" accept="image/*">
+            </div>
             <button type="submit" class="btn btn--gold">💾 Simpan</button>
           </form>
+          <form id="formResetHeroVisit" action="/admin/delete-file/hero/visit" method="POST" style="display:none;"></form>
         </div>
 
         <!-- Sambutan -->
@@ -334,9 +412,22 @@
               <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.about.hero.titleHTML %></textarea></div>
               <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.about.hero.subtitle %></textarea></div>
             </div>
-            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.about.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <div class="form-group">
+              <label>Gambar Latar Hero</label>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                <div class="img-preview-box">
+                  <img src="/<%= db.about.hero.bgImage %>" alt="Hero BG">
+                  <span class="file-info"><%= db.about.hero.bgImage %></span>
+                </div>
+                <% if (db.about.hero.bgImage && db.about.hero.bgImage.startsWith('uploads/')) { %>
+                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroAbout').submit();">🗑️ Hapus & Reset</button>
+                <% } %>
+              </div>
+              <input type="file" name="bgImage" accept="image/*">
+            </div>
             <button type="submit" class="btn btn--gold">💾 Simpan</button>
           </form>
+          <form id="formResetHeroAbout" action="/admin/delete-file/hero/about" method="POST" style="display:none;"></form>
         </div>
 
         <!-- Sejarah -->
@@ -373,9 +464,21 @@
                 <div class="form-group"><label>Nama</label><input type="text" name="name" value="<%= p.name %>"></div>
                 <div class="form-group"><label>Jabatan</label><input type="text" name="role" value="<%= p.role %>"></div>
                 <div class="form-group"><label>Biografi</label><textarea name="bio" rows="2"><%= p.bio || '' %></textarea></div>
-                <div class="form-group"><label>Foto</label><% if (p.image) { %><img src="/<%= p.image %>" class="preview"><% } %><input type="file" name="image" accept="image/*"></div>
+                <div class="form-group">
+                  <label>Foto</label>
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                    <% if (p.image) { %>
+                      <img src="/<%= p.image %>" class="preview">
+                      <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus foto <%= p.name %>?')) document.getElementById('formDelPendeta_<%= i %>').submit();">🗑️ Hapus Foto</button>
+                    <% } else { %>
+                      <span style="font-size:0.75rem; color:var(--text-muted);">Belum ada foto</span>
+                    <% } %>
+                  </div>
+                  <input type="file" name="image" accept="image/*">
+                </div>
                 <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
               </form>
+              <form id="formDelPendeta_<%= i %>" action="/admin/delete-file/pendeta/<%= i %>" method="POST" style="display:none;"></form>
             </div>
             <% }); %>
           </div>
@@ -388,24 +491,30 @@
           <% db.about.pemimpin.pengurus.forEach(function(pg, i) { %>
           <div class="item-card" style="margin-bottom:.8rem;">
             <form action="/admin/about/pengurus/<%= i %>" method="POST" enctype="multipart/form-data">
-              <div style="display:flex; gap:1rem; align-items:center;">
-                <div style="flex-shrink:0; width:60px; height:60px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">
+              <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+                <div style="flex-shrink:0; width:65px; height:65px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border: 1px solid var(--border);">
                   <% if (pg.image) { %>
                     <img src="/<%= pg.image %>" style="width:100%; height:100%; object-fit:cover;">
                   <% } else { %>
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                   <% } %>
                 </div>
-                <div style="flex:1;">
+                <div style="flex:1; min-width:260px;">
                   <div class="grid-3">
                     <div class="form-group"><label>Nama</label><input type="text" name="name" value="<%= pg.name %>"></div>
                     <div class="form-group"><label>Jabatan</label><input type="text" name="role" value="<%= pg.role %>"></div>
-                    <div class="form-group"><label>Foto</label><input type="file" name="image" accept="image/*"></div>
+                    <div class="form-group"><label>Ganti Foto</label><input type="file" name="image" accept="image/*"></div>
                   </div>
                 </div>
               </div>
-              <button type="submit" class="btn btn--gold btn--sm" style="margin-top:.5rem;">💾 Simpan</button>
+              <div style="display:flex; gap:8px; margin-top:.5rem;">
+                <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
+                <% if (pg.image) { %>
+                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus foto <%= pg.name %>?')) document.getElementById('formDelPengurus_<%= i %>').submit();">🗑️ Hapus Foto</button>
+                <% } %>
+              </div>
             </form>
+            <form id="formDelPengurus_<%= i %>" action="/admin/delete-file/pengurus/<%= i %>" method="POST" style="display:none;"></form>
           </div>
           <% }); %>
         </div>
@@ -414,26 +523,32 @@
         <div class="card">
           <h2 class="card-title">🏛️ Majelis Jemaat (<%= db.about.pemimpin.majelis.length %> orang)</h2>
           <p class="card-subtitle">Upload foto dan edit nama untuk setiap majelis jemaat.</p>
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:.8rem;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:.8rem;">
             <% db.about.pemimpin.majelis.forEach(function(m, i) { %>
             <div class="item-card">
               <form action="/admin/about/majelis/<%= i %>" method="POST" enctype="multipart/form-data">
                 <div style="display:flex; gap:.8rem; align-items:center; margin-bottom:.5rem;">
-                  <div style="flex-shrink:0; width:50px; height:50px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">
+                  <div style="flex-shrink:0; width:52px; height:52px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border: 1px solid var(--border);">
                     <% if (m.image) { %>
                       <img src="/<%= m.image %>" style="width:100%; height:100%; object-fit:cover;">
                     <% } else { %>
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     <% } %>
                   </div>
-                  <div style="flex:1; display:flex; gap:10px;">
-                    <div class="form-group" style="flex:1; margin-bottom:0;"><label>Nama Majelis <%= i+1 %></label><input type="text" name="name" value="<%= m.name %>"></div>
-                    <div class="form-group" style="flex:1; margin-bottom:0;"><label>Label / Jabatan</label><input type="text" name="role" value="<%= m.role || 'Majelis' %>"></div>
+                  <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+                    <input type="text" name="name" value="<%= m.name %>" placeholder="Nama Majelis" style="padding:4px 6px; font-size:0.8rem;">
+                    <input type="text" name="role" value="<%= m.role || 'Majelis' %>" placeholder="Jabatan" style="padding:4px 6px; font-size:0.75rem;">
                   </div>
                 </div>
-                <div class="form-group"><label>Foto</label><input type="file" name="image" accept="image/*"></div>
-                <button type="submit" class="btn btn--gold btn--sm">💾</button>
+                <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Foto</label><input type="file" name="image" accept="image/*"></div>
+                <div style="display:flex; gap:6px;">
+                  <button type="submit" class="btn btn--gold btn--xs" style="flex:1; justify-content:center;">💾 Simpan</button>
+                  <% if (m.image) { %>
+                  <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus foto majelis <%= m.name %>?')) document.getElementById('formDelMajelis_<%= i %>').submit();" title="Hapus Foto">🗑️</button>
+                  <% } %>
+                </div>
               </form>
+              <form id="formDelMajelis_<%= i %>" action="/admin/delete-file/majelis/<%= i %>" method="POST" style="display:none;"></form>
             </div>
             <% }); %>
           </div>
@@ -491,6 +606,7 @@
             <button type="submit" class="btn btn--gold">💾 Simpan Jadwal</button>
           </form>
         </div>
+
         <!-- Hero Pelayanan -->
         <div class="card">
           <h2 class="card-title">🖼️ Hero Banner Halaman</h2>
@@ -499,9 +615,22 @@
               <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.pelayanan.hero.titleHTML %></textarea></div>
               <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.pelayanan.hero.subtitle %></textarea></div>
             </div>
-            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.pelayanan.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <div class="form-group">
+              <label>Gambar Latar Hero</label>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                <div class="img-preview-box">
+                  <img src="/<%= db.pelayanan.hero.bgImage %>" alt="Hero BG">
+                  <span class="file-info"><%= db.pelayanan.hero.bgImage %></span>
+                </div>
+                <% if (db.pelayanan.hero.bgImage && db.pelayanan.hero.bgImage.startsWith('uploads/')) { %>
+                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroPelayanan').submit();">🗑️ Hapus & Reset</button>
+                <% } %>
+              </div>
+              <input type="file" name="bgImage" accept="image/*">
+            </div>
             <button type="submit" class="btn btn--gold">💾 Simpan</button>
           </form>
+          <form id="formResetHeroPelayanan" action="/admin/delete-file/hero/pelayanan" method="POST" style="display:none;"></form>
         </div>
       </div>
 
@@ -510,11 +639,11 @@
 
         <!-- Upload Warta -->
         <div class="card">
-          <h2 class="card-title">📄 Warta Jemaat</h2>
+          <h2 class="card-title">📄 Warta Jemaat (PDF)</h2>
           <form action="/admin/media/warta" method="POST" enctype="multipart/form-data" style="margin-bottom:1rem;">
             <div class="grid-3">
-              <div class="form-group"><label>Judul</label><input type="text" name="judul" placeholder="Warta Jemaat - Minggu, ..." required></div>
-              <div class="form-group"><label>Tanggal</label><input type="text" name="tanggal" placeholder="6 Juli 2026" required></div>
+              <div class="form-group"><label>Judul Warta</label><input type="text" name="judul" placeholder="Warta Jemaat - Minggu, ..." required></div>
+              <div class="form-group"><label>Tanggal Terbit</label><input type="text" name="tanggal" placeholder="6 Juli 2026" required></div>
               <div class="form-group"><label>File PDF</label><input type="file" name="file" accept=".pdf" required></div>
             </div>
             <button type="submit" class="btn btn--gold">➕ Upload Warta</button>
@@ -523,8 +652,10 @@
           <h4 style="color:var(--navy); margin-bottom:.5rem;">Daftar Warta (<%= db.pelayanan.warta ? db.pelayanan.warta.length : 0 %>)</h4>
           <% if(db.pelayanan.warta) { db.pelayanan.warta.forEach(function(w) { %>
           <div class="warta-row">
-            <span><strong><%= w.judul %></strong> — <%= w.tanggal %></span>
-            <form action="/admin/media/warta/delete/<%= w.id %>" method="POST" onsubmit="return confirm('Hapus warta ini?')"><button type="submit" class="btn btn--danger btn--sm">🗑</button></form>
+            <span><strong><%= w.judul %></strong> — <%= w.tanggal %> <% if (w.file) { %><a href="/<%= w.file %>" target="_blank" style="color:var(--gold); font-size:0.75rem; margin-left:8px;">[Lihat PDF]</a><% } %></span>
+            <form action="/admin/media/warta/delete/<%= w.id %>" method="POST" onsubmit="return confirm('Hapus warta ini beserta file PDF fisiknya?')">
+              <button type="submit" class="btn btn--danger btn--sm" title="Hapus Warta & File">🗑 Hapus</button>
+            </form>
           </div>
           <% }); } %>
         </div>
@@ -594,8 +725,9 @@
             <% db.mediaGaleri.photos.forEach(function(p) { %>
             <div class="photo-item">
               <img src="/<%= p.src %>" alt="<%= p.caption %>" title="<%= p.caption %>">
-              <form action="/admin/media/photo/delete/<%= p.id %>" method="POST" class="del" onsubmit="return confirm('Hapus foto ini?')">
-                <button type="submit" class="btn btn--danger btn--sm">✕</button>
+              <div class="photo-cap"><%= p.caption || 'Foto Galeri' %></div>
+              <form action="/admin/media/photo/delete/<%= p.id %>" method="POST" class="del" onsubmit="return confirm('Hapus foto ini beserta file fisiknya?')">
+                <button type="submit" class="btn btn--danger btn--xs" title="Hapus foto dan file">✕</button>
               </form>
             </div>
             <% }); %>
@@ -613,9 +745,22 @@
               <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.mediaGaleri.hero.titleHTML %></textarea></div>
               <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.mediaGaleri.hero.subtitle %></textarea></div>
             </div>
-            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.mediaGaleri.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <div class="form-group">
+              <label>Gambar Latar Hero</label>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                <div class="img-preview-box">
+                  <img src="/<%= db.mediaGaleri.hero.bgImage %>" alt="Hero BG">
+                  <span class="file-info"><%= db.mediaGaleri.hero.bgImage %></span>
+                </div>
+                <% if (db.mediaGaleri.hero.bgImage && db.mediaGaleri.hero.bgImage.startsWith('uploads/')) { %>
+                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroMedia').submit();">🗑️ Hapus & Reset</button>
+                <% } %>
+              </div>
+              <input type="file" name="bgImage" accept="image/*">
+            </div>
             <button type="submit" class="btn btn--gold">💾 Simpan</button>
           </form>
+          <form id="formResetHeroMedia" action="/admin/delete-file/hero/media" method="POST" style="display:none;"></form>
         </div>
       </div>
 
@@ -630,9 +775,22 @@
               <div class="form-group"><label>Judul (HTML)</label><textarea name="titleHTML" rows="2"><%= db.contactFaq.hero.titleHTML %></textarea></div>
               <div class="form-group"><label>Sub-judul</label><textarea name="subtitle" rows="2"><%= db.contactFaq.hero.subtitle %></textarea></div>
             </div>
-            <div class="form-group"><label>Gambar Latar</label><img src="/<%= db.contactFaq.hero.bgImage %>" class="preview"><input type="file" name="bgImage" accept="image/*"></div>
+            <div class="form-group">
+              <label>Gambar Latar Hero</label>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                <div class="img-preview-box">
+                  <img src="/<%= db.contactFaq.hero.bgImage %>" alt="Hero BG">
+                  <span class="file-info"><%= db.contactFaq.hero.bgImage %></span>
+                </div>
+                <% if (db.contactFaq.hero.bgImage && db.contactFaq.hero.bgImage.startsWith('uploads/')) { %>
+                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroContact').submit();">🗑️ Hapus & Reset</button>
+                <% } %>
+              </div>
+              <input type="file" name="bgImage" accept="image/*">
+            </div>
             <button type="submit" class="btn btn--gold">💾 Simpan</button>
           </form>
+          <form id="formResetHeroContact" action="/admin/delete-file/hero/contact" method="POST" style="display:none;"></form>
         </div>
 
         <!-- WhatsApp -->
@@ -694,8 +852,123 @@
         </div>
       </div>
 
+      <!-- ============================== TAB: FILE MANAGER ============================== -->
+      <div class="tab-content <%= tab === 'files' ? 'active' : '' %>">
+        <div class="card">
+          <h2 class="card-title">📁 Manajemen File & Media (Uploads)</h2>
+          <p class="card-subtitle">Kelola dan hapus semua file yang diunggah ke server (gambar, foto galeri, logo, background, warta PDF).</p>
+
+          <% 
+            let totalFiles = (typeof files !== 'undefined') ? files.length : 0;
+            let totalBytes = (typeof files !== 'undefined') ? files.reduce((acc, f) => acc + (f.size || 0), 0) : 0;
+            let totalFormatted = totalBytes >= 1024 * 1024 
+              ? (totalBytes / (1024 * 1024)).toFixed(2) + ' MB' 
+              : (totalBytes / 1024).toFixed(1) + ' KB';
+            let imgCount = (typeof files !== 'undefined') ? files.filter(f => f.isImage).length : 0;
+            let pdfCount = (typeof files !== 'undefined') ? files.filter(f => f.isPdf).length : 0;
+          %>
+
+          <!-- Stats Bar -->
+          <div class="fm-stats-bar">
+            <div class="fm-stat-box">
+              <h3><%= totalFiles %></h3>
+              <span>Total File</span>
+            </div>
+            <div class="fm-stat-box">
+              <h3><%= totalFormatted %></h3>
+              <span>Total Ukuran</span>
+            </div>
+            <div class="fm-stat-box">
+              <h3><%= imgCount %></h3>
+              <span>Gambar / Foto</span>
+            </div>
+            <div class="fm-stat-box">
+              <h3><%= pdfCount %></h3>
+              <span>Dokumen PDF</span>
+            </div>
+          </div>
+
+          <!-- Upload Form -->
+          <div class="fm-upload-zone">
+            <form action="/admin/files/upload" method="POST" enctype="multipart/form-data">
+              <h4 style="color:var(--navy); margin-bottom:.5rem;">📤 Unggah File Baru ke Server</h4>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Pilih satu atau beberapa file sekaligus (JPG, PNG, WebP, GIF, PDF max 10MB per file).</p>
+              <div style="display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
+                <input type="file" name="files" multiple required accept=".jpg,.jpeg,.png,.gif,.webp,.pdf" style="font-size:0.85rem;">
+                <button type="submit" class="btn btn--gold">⬆️ Mulai Upload</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Search & Filter Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <input type="text" id="fmSearchInput" placeholder="🔍 Cari nama file..." onkeyup="filterFiles()" style="width:100%; padding:0.5rem 0.8rem; border:1px solid var(--border); border-radius:var(--radius); font-size:0.85rem;">
+            </div>
+            <span style="font-size:0.8rem; color:var(--text-muted);">Menampilkan <strong><span id="fmVisibleCount"><%= totalFiles %></span></strong> file</span>
+          </div>
+
+          <!-- Files Grid -->
+          <% if (typeof files !== 'undefined' && files.length > 0) { %>
+          <div class="fm-grid" id="fmFileGrid">
+            <% files.forEach(function(f) { %>
+            <div class="fm-card" data-filename="<%= f.name.toLowerCase() %>">
+              <div class="fm-card__preview">
+                <% if (f.isImage) { %>
+                  <img src="/<%= f.path %>" alt="<%= f.name %>" loading="lazy">
+                <% } else if (f.isPdf) { %>
+                  <div class="file-icon">📄</div>
+                <% } else { %>
+                  <div class="file-icon">📁</div>
+                <% } %>
+              </div>
+              <div class="fm-card__body">
+                <div class="fm-card__name" title="<%= f.name %>"><%= f.name %></div>
+                <div class="fm-card__meta">
+                  <span><%= f.sizeFormatted %></span>
+                  <span><%= new Date(f.createdAt).toLocaleDateString('id-ID') %></span>
+                </div>
+                <div class="fm-card__actions">
+                  <a href="/<%= f.path %>" target="_blank" class="btn btn--outline btn--xs" title="Buka / Download file">👁️ Buka</a>
+                  <form action="/admin/files/delete/<%= encodeURIComponent(f.name) %>" method="POST" style="margin:0; flex:1;" onsubmit="return confirm('Hapus permanen file \'<%= f.name %>\' dari server? Tindakan ini tidak dapat dibatalkan.')">
+                    <button type="submit" class="btn btn--danger btn--xs" style="width:100%;" title="Hapus file ini permanen">🗑️ Hapus</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+          <% } else { %>
+          <div style="text-align:center; padding:2rem; color:var(--text-muted);">
+            <p>Belum ada file yang diunggah di folder uploads/.</p>
+          </div>
+          <% } %>
+
+        </div>
+      </div>
+
     </div>
   </main>
+
+  <script>
+    function filterFiles() {
+      const input = document.getElementById('fmSearchInput');
+      const filter = input ? input.value.toLowerCase() : '';
+      const cards = document.querySelectorAll('#fmFileGrid .fm-card');
+      let visible = 0;
+      cards.forEach(card => {
+        const name = card.getAttribute('data-filename') || '';
+        if (name.includes(filter)) {
+          card.style.display = 'flex';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      const countEl = document.getElementById('fmVisibleCount');
+      if (countEl) countEl.textContent = visible;
+    }
+  </script>
 
 </body>
 </html>

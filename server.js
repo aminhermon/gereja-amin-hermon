@@ -380,18 +380,84 @@ app.get('/admin/logout', (req, res) => {
   });
 });
 
+// Helper: Safely delete physical file in uploads/ directory
+function deleteUploadedFile(filePath) {
+  if (!filePath || typeof filePath !== 'string') return;
+  // Ensure path is inside uploads/ and prevent directory traversal
+  if (filePath.startsWith('uploads/')) {
+    const filename = path.basename(filePath);
+    const fullPath = path.join(__dirname, 'uploads', filename);
+    if (fs.existsSync(fullPath)) {
+      try {
+        fs.unlinkSync(fullPath);
+      } catch (err) {
+        console.error('Gagal menghapus file:', fullPath, err.message);
+      }
+    }
+  }
+}
+
+// Helper: Get list of all uploaded files in uploads/ directory
+function getUploadedFiles() {
+  const uploadsDir = path.join(__dirname, 'uploads');
+  if (!fs.existsSync(uploadsDir)) return [];
+  try {
+    const files = fs.readdirSync(uploadsDir);
+    return files.map(file => {
+      const fullPath = path.join(uploadsDir, file);
+      const stat = fs.statSync(fullPath);
+      const isImg = /\.(jpg|jpeg|png|gif|webp|svg|avif)$/i.test(file);
+      const isPdf = /\.pdf$/i.test(file);
+      return {
+        name: file,
+        path: 'uploads/' + file,
+        size: stat.size,
+        sizeFormatted: stat.size >= 1024 * 1024 
+          ? (stat.size / (1024 * 1024)).toFixed(2) + ' MB'
+          : (stat.size / 1024).toFixed(1) + ' KB',
+        isImage: isImg,
+        isPdf: isPdf,
+        createdAt: stat.birthtime || stat.mtime
+      };
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  } catch (err) {
+    console.error('Error reading uploads folder:', err.message);
+    return [];
+  }
+}
+
 // ---------- Admin Dashboard (tabbed) ----------
 app.get('/admin', requireAuth, (req, res) => {
-  res.render('admin', { db: getDB(), tab: req.query.tab || 'beranda' });
+  res.render('admin', { 
+    db: getDB(), 
+    tab: req.query.tab || 'beranda',
+    files: getUploadedFiles()
+  });
 });
 
 // ===== TAB: BERANDA =====
 
-// General settings (name)
+// General settings (name & logo)
 app.post('/admin/general', requireAuth, upload.single('logo'), (req, res) => {
   const db = getDB();
   db.general.churchName = req.body.churchName;
-  if (req.file) db.general.logoPath = 'uploads/' + req.file.filename;
+  if (req.file) {
+    if (db.general.logoPath && db.general.logoPath.startsWith('uploads/')) {
+      deleteUploadedFile(db.general.logoPath);
+    }
+    db.general.logoPath = 'uploads/' + req.file.filename;
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=beranda');
+});
+
+// Delete / reset logo to default
+app.post('/admin/delete-file/logo', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.general.logoPath && db.general.logoPath.startsWith('uploads/')) {
+    deleteUploadedFile(db.general.logoPath);
+  }
+  db.general.logoPath = 'assets/images/logo-gereja-amin-3d.png';
   saveDB(db);
   res.redirect('/admin?tab=beranda');
 });
@@ -403,7 +469,23 @@ app.post('/admin/home/hero', requireAuth, upload.single('bgImage'), (req, res) =
   db.home.hero.subtitle = req.body.subtitle;
   db.home.hero.ctaText = req.body.ctaText || db.home.hero.ctaText;
   db.home.hero.ctaLink = req.body.ctaLink || db.home.hero.ctaLink;
-  if (req.file) db.home.hero.bgImage = 'uploads/' + req.file.filename;
+  if (req.file) {
+    if (db.home.hero.bgImage && db.home.hero.bgImage.startsWith('uploads/')) {
+      deleteUploadedFile(db.home.hero.bgImage);
+    }
+    db.home.hero.bgImage = 'uploads/' + req.file.filename;
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=beranda');
+});
+
+// Delete / reset home hero image to default
+app.post('/admin/delete-file/hero/home', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.home.hero.bgImage && db.home.hero.bgImage.startsWith('uploads/')) {
+    deleteUploadedFile(db.home.hero.bgImage);
+  }
+  db.home.hero.bgImage = 'assets/images/church-hero-new.jpg';
   saveDB(db);
   res.redirect('/admin?tab=beranda');
 });
@@ -427,7 +509,26 @@ app.post('/admin/home/news/:id', requireAuth, upload.single('image'), (req, res)
     db.home.news[idx].date = req.body.date;
     db.home.news[idx].title = req.body.title;
     db.home.news[idx].desc = req.body.desc;
-    if (req.file) db.home.news[idx].image = 'uploads/' + req.file.filename;
+    if (req.file) {
+      if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
+        deleteUploadedFile(db.home.news[idx].image);
+      }
+      db.home.news[idx].image = 'uploads/' + req.file.filename;
+    }
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=beranda');
+});
+
+// News/events - delete image only
+app.post('/admin/home/news/delete-image/:id', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = db.home.news.findIndex(n => n.id === req.params.id);
+  if (idx > -1) {
+    if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
+      deleteUploadedFile(db.home.news[idx].image);
+    }
+    db.home.news[idx].image = 'assets/images/slider_ibadah.png';
     saveDB(db);
   }
   res.redirect('/admin?tab=beranda');
@@ -449,9 +550,13 @@ app.post('/admin/home/news/add', requireAuth, upload.single('image'), (req, res)
   res.redirect('/admin?tab=beranda');
 });
 
-// News/events - delete
+// News/events - delete item and associated file
 app.post('/admin/home/news/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
+  const item = db.home.news.find(n => n.id === req.params.id);
+  if (item && item.image && item.image.startsWith('uploads/')) {
+    deleteUploadedFile(item.image);
+  }
   db.home.news = db.home.news.filter(n => n.id !== req.params.id);
   saveDB(db);
   res.redirect('/admin?tab=beranda');
@@ -464,7 +569,23 @@ app.post('/admin/visit/hero', requireAuth, upload.single('bgImage'), (req, res) 
   const db = getDB();
   db.visit.hero.titleHTML = req.body.titleHTML;
   db.visit.hero.subtitle = req.body.subtitle;
-  if (req.file) db.visit.hero.bgImage = 'uploads/' + req.file.filename;
+  if (req.file) {
+    if (db.visit.hero.bgImage && db.visit.hero.bgImage.startsWith('uploads/')) {
+      deleteUploadedFile(db.visit.hero.bgImage);
+    }
+    db.visit.hero.bgImage = 'uploads/' + req.file.filename;
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=visit');
+});
+
+// Delete / reset visit hero image to default
+app.post('/admin/delete-file/hero/visit', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.visit.hero.bgImage && db.visit.hero.bgImage.startsWith('uploads/')) {
+    deleteUploadedFile(db.visit.hero.bgImage);
+  }
+  db.visit.hero.bgImage = 'assets/images/welcome-visitors.png';
   saveDB(db);
   res.redirect('/admin?tab=visit');
 });
@@ -522,7 +643,23 @@ app.post('/admin/about/hero', requireAuth, upload.single('bgImage'), (req, res) 
   const db = getDB();
   db.about.hero.titleHTML = req.body.titleHTML;
   db.about.hero.subtitle = req.body.subtitle;
-  if (req.file) db.about.hero.bgImage = 'uploads/' + req.file.filename;
+  if (req.file) {
+    if (db.about.hero.bgImage && db.about.hero.bgImage.startsWith('uploads/')) {
+      deleteUploadedFile(db.about.hero.bgImage);
+    }
+    db.about.hero.bgImage = 'uploads/' + req.file.filename;
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=about');
+});
+
+// Delete / reset about hero image to default
+app.post('/admin/delete-file/hero/about', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.about.hero.bgImage && db.about.hero.bgImage.startsWith('uploads/')) {
+    deleteUploadedFile(db.about.hero.bgImage);
+  }
+  db.about.hero.bgImage = 'assets/images/church-interior.png';
   saveDB(db);
   res.redirect('/admin?tab=about');
 });
@@ -554,9 +691,28 @@ app.post('/admin/about/pendeta/:idx', requireAuth, upload.single('image'), (req,
     db.about.pemimpin.pendeta[idx].name = req.body.name;
     db.about.pemimpin.pendeta[idx].role = req.body.role;
     db.about.pemimpin.pendeta[idx].bio = req.body.bio || '';
-    if (req.file) db.about.pemimpin.pendeta[idx].image = 'uploads/' + req.file.filename;
+    if (req.file) {
+      if (db.about.pemimpin.pendeta[idx].image && db.about.pemimpin.pendeta[idx].image.startsWith('uploads/')) {
+        deleteUploadedFile(db.about.pemimpin.pendeta[idx].image);
+      }
+      db.about.pemimpin.pendeta[idx].image = 'uploads/' + req.file.filename;
+    }
   }
   saveDB(db);
+  res.redirect('/admin?tab=about');
+});
+
+// About pendeta - delete photo
+app.post('/admin/delete-file/pendeta/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.about.pemimpin.pendeta[idx]) {
+    if (db.about.pemimpin.pendeta[idx].image && db.about.pemimpin.pendeta[idx].image.startsWith('uploads/')) {
+      deleteUploadedFile(db.about.pemimpin.pendeta[idx].image);
+    }
+    db.about.pemimpin.pendeta[idx].image = '';
+    saveDB(db);
+  }
   res.redirect('/admin?tab=about');
 });
 
@@ -567,9 +723,28 @@ app.post('/admin/about/pengurus/:idx', requireAuth, upload.single('image'), (req
   if (db.about.pemimpin.pengurus[idx]) {
     db.about.pemimpin.pengurus[idx].name = req.body.name;
     db.about.pemimpin.pengurus[idx].role = req.body.role;
-    if (req.file) db.about.pemimpin.pengurus[idx].image = 'uploads/' + req.file.filename;
+    if (req.file) {
+      if (db.about.pemimpin.pengurus[idx].image && db.about.pemimpin.pengurus[idx].image.startsWith('uploads/')) {
+        deleteUploadedFile(db.about.pemimpin.pengurus[idx].image);
+      }
+      db.about.pemimpin.pengurus[idx].image = 'uploads/' + req.file.filename;
+    }
   }
   saveDB(db);
+  res.redirect('/admin?tab=about');
+});
+
+// About pengurus - delete photo
+app.post('/admin/delete-file/pengurus/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.about.pemimpin.pengurus[idx]) {
+    if (db.about.pemimpin.pengurus[idx].image && db.about.pemimpin.pengurus[idx].image.startsWith('uploads/')) {
+      deleteUploadedFile(db.about.pemimpin.pengurus[idx].image);
+    }
+    db.about.pemimpin.pengurus[idx].image = '';
+    saveDB(db);
+  }
   res.redirect('/admin?tab=about');
 });
 
@@ -580,9 +755,28 @@ app.post('/admin/about/majelis/:idx', requireAuth, upload.single('image'), (req,
   if (db.about.pemimpin.majelis[idx]) {
     db.about.pemimpin.majelis[idx].name = req.body.name;
     db.about.pemimpin.majelis[idx].role = req.body.role || 'Majelis';
-    if (req.file) db.about.pemimpin.majelis[idx].image = 'uploads/' + req.file.filename;
+    if (req.file) {
+      if (db.about.pemimpin.majelis[idx].image && db.about.pemimpin.majelis[idx].image.startsWith('uploads/')) {
+        deleteUploadedFile(db.about.pemimpin.majelis[idx].image);
+      }
+      db.about.pemimpin.majelis[idx].image = 'uploads/' + req.file.filename;
+    }
   }
   saveDB(db);
+  res.redirect('/admin?tab=about');
+});
+
+// About majelis - delete photo
+app.post('/admin/delete-file/majelis/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.about.pemimpin.majelis[idx]) {
+    if (db.about.pemimpin.majelis[idx].image && db.about.pemimpin.majelis[idx].image.startsWith('uploads/')) {
+      deleteUploadedFile(db.about.pemimpin.majelis[idx].image);
+    }
+    db.about.pemimpin.majelis[idx].image = '';
+    saveDB(db);
+  }
   res.redirect('/admin?tab=about');
 });
 
@@ -593,7 +787,23 @@ app.post('/admin/pelayanan/hero', requireAuth, upload.single('bgImage'), (req, r
   const db = getDB();
   db.pelayanan.hero.titleHTML = req.body.titleHTML;
   db.pelayanan.hero.subtitle = req.body.subtitle;
-  if (req.file) db.pelayanan.hero.bgImage = 'uploads/' + req.file.filename;
+  if (req.file) {
+    if (db.pelayanan.hero.bgImage && db.pelayanan.hero.bgImage.startsWith('uploads/')) {
+      deleteUploadedFile(db.pelayanan.hero.bgImage);
+    }
+    db.pelayanan.hero.bgImage = 'uploads/' + req.file.filename;
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=pelayanan');
+});
+
+// Delete / reset pelayanan hero image to default
+app.post('/admin/delete-file/hero/pelayanan', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.pelayanan.hero.bgImage && db.pelayanan.hero.bgImage.startsWith('uploads/')) {
+    deleteUploadedFile(db.pelayanan.hero.bgImage);
+  }
+  db.pelayanan.hero.bgImage = 'assets/images/church-interior.png';
   saveDB(db);
   res.redirect('/admin?tab=pelayanan');
 });
@@ -618,7 +828,23 @@ app.post('/admin/media/hero', requireAuth, upload.single('bgImage'), (req, res) 
   const db = getDB();
   db.mediaGaleri.hero.titleHTML = req.body.titleHTML;
   db.mediaGaleri.hero.subtitle = req.body.subtitle;
-  if (req.file) db.mediaGaleri.hero.bgImage = 'uploads/' + req.file.filename;
+  if (req.file) {
+    if (db.mediaGaleri.hero.bgImage && db.mediaGaleri.hero.bgImage.startsWith('uploads/')) {
+      deleteUploadedFile(db.mediaGaleri.hero.bgImage);
+    }
+    db.mediaGaleri.hero.bgImage = 'uploads/' + req.file.filename;
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=media');
+});
+
+// Delete / reset media hero image to default
+app.post('/admin/delete-file/hero/media', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.mediaGaleri.hero.bgImage && db.mediaGaleri.hero.bgImage.startsWith('uploads/')) {
+    deleteUploadedFile(db.mediaGaleri.hero.bgImage);
+  }
+  db.mediaGaleri.hero.bgImage = 'assets/images/church-interior.png';
   saveDB(db);
   res.redirect('/admin?tab=media');
 });
@@ -638,9 +864,13 @@ app.post('/admin/media/photo', requireAuth, upload.single('photo'), (req, res) =
   res.redirect('/admin?tab=media');
 });
 
-// Delete gallery photo
+// Delete gallery photo and physical file
 app.post('/admin/media/photo/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
+  const photo = db.mediaGaleri.photos.find(p => p.id === req.params.id);
+  if (photo && photo.src && photo.src.startsWith('uploads/')) {
+    deleteUploadedFile(photo.src);
+  }
   db.mediaGaleri.photos = db.mediaGaleri.photos.filter(p => p.id !== req.params.id);
   saveDB(db);
   res.redirect('/admin?tab=media');
@@ -660,9 +890,13 @@ app.post('/admin/media/warta', requireAuth, upload.single('file'), (req, res) =>
   res.redirect('/admin?tab=media');
 });
 
-// Warta delete
+// Warta delete and physical file
 app.post('/admin/media/warta/delete/:id', requireAuth, (req, res) => {
   const db = getDB();
+  const warta = db.pelayanan.warta.find(w => w.id === req.params.id);
+  if (warta && warta.file && warta.file.startsWith('uploads/')) {
+    deleteUploadedFile(warta.file);
+  }
   db.pelayanan.warta = db.pelayanan.warta.filter(w => w.id !== req.params.id);
   saveDB(db);
   res.redirect('/admin?tab=media');
@@ -725,7 +959,23 @@ app.post('/admin/contact/hero', requireAuth, upload.single('bgImage'), (req, res
   const db = getDB();
   db.contactFaq.hero.titleHTML = req.body.titleHTML;
   db.contactFaq.hero.subtitle = req.body.subtitle;
-  if (req.file) db.contactFaq.hero.bgImage = 'uploads/' + req.file.filename;
+  if (req.file) {
+    if (db.contactFaq.hero.bgImage && db.contactFaq.hero.bgImage.startsWith('uploads/')) {
+      deleteUploadedFile(db.contactFaq.hero.bgImage);
+    }
+    db.contactFaq.hero.bgImage = 'uploads/' + req.file.filename;
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=contact');
+});
+
+// Delete / reset contact hero image to default
+app.post('/admin/delete-file/hero/contact', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.contactFaq.hero.bgImage && db.contactFaq.hero.bgImage.startsWith('uploads/')) {
+    deleteUploadedFile(db.contactFaq.hero.bgImage);
+  }
+  db.contactFaq.hero.bgImage = 'assets/images/church-interior.png';
   saveDB(db);
   res.redirect('/admin?tab=contact');
 });
@@ -765,6 +1015,97 @@ app.post('/admin/kalender/delete/:id', requireAuth, (req, res) => {
   }
   saveDB(db);
   res.redirect('/admin?tab=kalender');
+});
+
+// ===== TAB: FILE MANAGER (UPLOAD & DELETE ALL FILES) =====
+
+// Direct upload to uploads/ folder
+app.post('/admin/files/upload', requireAuth, upload.array('files', 10), (req, res) => {
+  res.redirect('/admin?tab=files');
+});
+
+// Permanently delete any file in uploads/
+app.post('/admin/files/delete/:filename', requireAuth, (req, res) => {
+  const safeFilename = path.basename(req.params.filename);
+  const filePath = 'uploads/' + safeFilename;
+  deleteUploadedFile(filePath);
+
+  // Also clean up references in database if this file was used
+  const db = getDB();
+  let changed = false;
+
+  if (db.general.logoPath === filePath) {
+    db.general.logoPath = 'assets/images/logo-gereja-amin-3d.png';
+    changed = true;
+  }
+  if (db.home.hero.bgImage === filePath) {
+    db.home.hero.bgImage = 'assets/images/church-hero-new.jpg';
+    changed = true;
+  }
+  if (db.visit.hero.bgImage === filePath) {
+    db.visit.hero.bgImage = 'assets/images/welcome-visitors.png';
+    changed = true;
+  }
+  if (db.about.hero.bgImage === filePath) {
+    db.about.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+  if (db.pelayanan.hero.bgImage === filePath) {
+    db.pelayanan.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+  if (db.mediaGaleri.hero.bgImage === filePath) {
+    db.mediaGaleri.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+  if (db.contactFaq.hero.bgImage === filePath) {
+    db.contactFaq.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+
+  // Check Leaders
+  if (db.about && db.about.pemimpin) {
+    if (db.about.pemimpin.pendeta) {
+      db.about.pemimpin.pendeta.forEach(p => {
+        if (p.image === filePath) { p.image = ''; changed = true; }
+      });
+    }
+    if (db.about.pemimpin.pengurus) {
+      db.about.pemimpin.pengurus.forEach(p => {
+        if (p.image === filePath) { p.image = ''; changed = true; }
+      });
+    }
+    if (db.about.pemimpin.majelis) {
+      db.about.pemimpin.majelis.forEach(m => {
+        if (m.image === filePath) { m.image = ''; changed = true; }
+      });
+    }
+  }
+
+  // Check News
+  if (db.home && db.home.news) {
+    db.home.news.forEach(n => {
+      if (n.image === filePath) { n.image = 'assets/images/slider_ibadah.png'; changed = true; }
+    });
+  }
+
+  // Check Photos
+  if (db.mediaGaleri && db.mediaGaleri.photos) {
+    const beforeCount = db.mediaGaleri.photos.length;
+    db.mediaGaleri.photos = db.mediaGaleri.photos.filter(p => p.src !== filePath);
+    if (db.mediaGaleri.photos.length !== beforeCount) changed = true;
+  }
+
+  // Check Warta
+  if (db.pelayanan && db.pelayanan.warta) {
+    const beforeCount = db.pelayanan.warta.length;
+    db.pelayanan.warta = db.pelayanan.warta.filter(w => w.file !== filePath);
+    if (db.pelayanan.warta.length !== beforeCount) changed = true;
+  }
+
+  if (changed) saveDB(db);
+
+  res.redirect('/admin?tab=files');
 });
 
 // ==================== ERROR HANDLING ====================
