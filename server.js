@@ -226,8 +226,47 @@ const upload = multer({
 
 // DB helpers
 const dbPath = path.join(__dirname, 'data', 'db.json');
-function getDB() { return JSON.parse(fs.readFileSync(dbPath, 'utf8')); }
-function saveDB(data) { fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8'); }
+function getDB() { 
+  try {
+    return JSON.parse(fs.readFileSync(dbPath, 'utf8')); 
+  } catch (err) {
+    console.error('❌ Error reading db.json:', err.message);
+    return {};
+  }
+}
+
+function saveDB(data) { 
+  try {
+    const dir = path.dirname(dbPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
+    console.log('✅ Database berhasil disimpan ke:', dbPath);
+    return true;
+  } catch (err) {
+    console.error('❌ GAGAL menyimpan database ke disk:', err.message);
+    return false;
+  }
+}
+
+// ==================== NO-CACHE FOR DYNAMIC HTML ====================
+// Prevent browser and proxy from caching dynamic HTML so CMS edits show immediately
+app.use((req, res, next) => {
+  if (req.method === 'GET') {
+    const isStaticAsset = req.path.startsWith('/assets') || 
+                          req.path.startsWith('/uploads') || 
+                          req.path.startsWith('/css') || 
+                          req.path.startsWith('/js') || 
+                          /\.(jpg|jpeg|png|gif|webp|svg|ico|pdf|mp4|webm|css|js|woff2?)$/i.test(req.path);
+    if (!isStaticAsset) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+  next();
+});
 
 // ==================== PUBLIC ROUTES ====================
 
