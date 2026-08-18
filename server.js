@@ -195,9 +195,10 @@ if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
 }
 
 // Multer storage with file validation
-const ALLOWED_FILE_TYPES = /\.(jpg|jpeg|png|gif|webp|pdf)$/i;
+const ALLOWED_FILE_TYPES = /\.(jpg|jpeg|png|gif|webp|pdf|mp4|webm|ogg|mov)$/i;
 const ALLOWED_MIME_TYPES = [
-  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'application/pdf',
+  'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'
 ];
 
 const storage = multer.diskStorage({
@@ -211,14 +212,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Max 10 MB
+  limits: { fileSize: 100 * 1024 * 1024 }, // Max 100 MB
   fileFilter: (req, file, cb) => {
     const extValid = ALLOWED_FILE_TYPES.test(path.extname(file.originalname));
-    const mimeValid = ALLOWED_MIME_TYPES.includes(file.mimetype);
+    const mimeValid = ALLOWED_MIME_TYPES.includes(file.mimetype) || (file.mimetype && file.mimetype.startsWith('video/'));
     if (extValid && mimeValid) {
       cb(null, true);
     } else {
-      cb(new Error('Tipe file tidak diizinkan. Hanya JPG, PNG, GIF, WebP, dan PDF yang diterima.'));
+      cb(new Error('Tipe file tidak diizinkan. Hanya JPG, PNG, GIF, WebP, PDF, dan Video (MP4, WebM, MOV) yang diterima.'));
     }
   }
 });
@@ -439,6 +440,10 @@ function cleanDbFileReferences(filePath) {
     db.home.hero.bgImage = 'assets/images/church-hero-new.jpg';
     changed = true;
   }
+  if (db.home && db.home.hero && db.home.hero.bgVideo && path.basename(db.home.hero.bgVideo) === safeFilename) {
+    db.home.hero.bgVideo = 'assets/videos/hero-video.mp4';
+    changed = true;
+  }
   if (db.visit && db.visit.hero && db.visit.hero.bgImage && path.basename(db.visit.hero.bgImage) === safeFilename) {
     db.visit.hero.bgImage = 'assets/images/welcome-visitors.png';
     changed = true;
@@ -514,6 +519,7 @@ function getUploadedFiles() {
       const stat = fs.statSync(fullPath);
       const isImg = /\.(jpg|jpeg|png|gif|webp|svg|avif)$/i.test(file);
       const isPdf = /\.pdf$/i.test(file);
+      const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(file);
       return {
         name: file,
         path: 'uploads/' + file,
@@ -523,6 +529,7 @@ function getUploadedFiles() {
           : (stat.size / 1024).toFixed(1) + ' KB',
         isImage: isImg,
         isPdf: isPdf,
+        isVideo: isVideo,
         createdAt: stat.birthtime || stat.mtime
       };
     }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -569,21 +576,34 @@ app.post('/admin/delete-file/logo', requireAuth, (req, res) => {
   res.redirect('/admin?tab=beranda');
 });
 
-// Home hero
-app.post('/admin/home/hero', requireAuth, upload.single('bgImage'), (req, res) => {
+// Home hero (Image & Video)
+app.post('/admin/home/hero', requireAuth, upload.fields([
+  { name: 'bgImage', maxCount: 1 },
+  { name: 'bgVideo', maxCount: 1 }
+]), (req, res) => {
   const db = getDB();
   db.home.hero.titleHTML = req.body.titleHTML;
   db.home.hero.subtitle = req.body.subtitle;
   db.home.hero.ctaText = req.body.ctaText || db.home.hero.ctaText;
   db.home.hero.ctaLink = req.body.ctaLink || db.home.hero.ctaLink;
-  if (req.file) {
-    if (db.home.hero.bgImage && db.home.hero.bgImage.startsWith('uploads/')) {
-      deleteUploadedFile(db.home.hero.bgImage);
+
+  if (req.files) {
+    if (req.files.bgImage && req.files.bgImage[0]) {
+      if (db.home.hero.bgImage && db.home.hero.bgImage.startsWith('uploads/')) {
+        deleteUploadedFile(db.home.hero.bgImage);
+      }
+      db.home.hero.bgImage = 'uploads/' + req.files.bgImage[0].filename;
     }
-    db.home.hero.bgImage = 'uploads/' + req.file.filename;
+    if (req.files.bgVideo && req.files.bgVideo[0]) {
+      if (db.home.hero.bgVideo && db.home.hero.bgVideo.startsWith('uploads/')) {
+        deleteUploadedFile(db.home.hero.bgVideo);
+      }
+      db.home.hero.bgVideo = 'uploads/' + req.files.bgVideo[0].filename;
+    }
   }
+
   saveDB(db);
-  res.redirect('/admin?tab=beranda');
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Hero banner & video berhasil diperbarui.'));
 });
 
 // Delete / reset home hero image to default
@@ -595,6 +615,19 @@ app.post('/admin/delete-file/hero/home', requireAuth, (req, res) => {
   db.home.hero.bgImage = 'assets/images/church-hero-new.jpg';
   saveDB(db);
   res.redirect('/admin?tab=beranda');
+});
+
+// Delete / reset home hero video to default
+app.post('/admin/delete-file/hero/video', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.home && db.home.hero && db.home.hero.bgVideo) {
+    if (db.home.hero.bgVideo.startsWith('uploads/')) {
+      deleteUploadedFile(db.home.hero.bgVideo);
+    }
+    db.home.hero.bgVideo = 'assets/videos/hero-video.mp4';
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Video hero berhasil direset ke video default.'));
 });
 
 // Home stats

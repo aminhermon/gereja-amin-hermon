@@ -208,7 +208,7 @@
 
         <!-- Hero Beranda -->
         <div class="card">
-          <h2 class="card-title">🖼️ Hero Banner</h2>
+          <h2 class="card-title">🖼️ Hero Banner (Gambar & Video)</h2>
           <form action="/admin/home/hero" method="POST" enctype="multipart/form-data">
             <div class="grid-2">
               <div class="form-group">
@@ -230,22 +230,51 @@
                 <input type="text" name="ctaLink" value="<%= db.home.hero.ctaLink %>">
               </div>
             </div>
-            <div class="form-group">
-              <label>Gambar Latar Hero</label>
-              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
-                <div class="img-preview-box">
-                  <img src="/<%= db.home.hero.bgImage %>" alt="Hero BG">
-                  <span class="file-info"><%= db.home.hero.bgImage %></span>
+            
+            <div class="grid-2">
+              <!-- Upload Gambar Latar / Poster -->
+              <div class="form-group">
+                <label>Gambar Latar / Poster Video (Image)</label>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                  <div class="img-preview-box">
+                    <img src="/<%= db.home.hero.bgImage %>" alt="Hero BG">
+                    <span class="file-info"><%= db.home.hero.bgImage %></span>
+                  </div>
+                  <% if (db.home.hero.bgImage && db.home.hero.bgImage.startsWith('uploads/')) { %>
+                  <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroHome').submit();">🗑️ Hapus & Reset</button>
+                  <% } %>
                 </div>
-                <% if (db.home.hero.bgImage && db.home.hero.bgImage.startsWith('uploads/')) { %>
-                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file background hero dan reset ke default?')) document.getElementById('formResetHeroHome').submit();">🗑️ Hapus & Reset</button>
-                <% } %>
+                <input type="file" name="bgImage" accept="image/*">
+                <span class="help-text">JPG, PNG, WebP (berfungsi juga sebagai poster sebelum video dimuat)</span>
               </div>
-              <input type="file" name="bgImage" accept="image/*">
+
+              <!-- Upload Video Latar Hero -->
+              <div class="form-group">
+                <label>🎬 Video Latar Hero (MP4 / WebM)</label>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                  <% if (db.home.hero.bgVideo) { %>
+                    <div style="max-width:180px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); background:#000;">
+                      <video src="/<%= db.home.hero.bgVideo %>" controls muted style="width:100%; height:80px; object-fit:cover; display:block;"></video>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <span class="file-info" style="font-size:0.75rem;"><%= db.home.hero.bgVideo %></span>
+                      <% if (db.home.hero.bgVideo.startsWith('uploads/')) { %>
+                      <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file video kustom dan reset ke video default?')) document.getElementById('formResetHeroVideo').submit();">🗑️ Hapus Video</button>
+                      <% } %>
+                    </div>
+                  <% } else { %>
+                    <span style="font-size:0.8rem; color:var(--text-muted);">Belum ada video latar.</span>
+                  <% } %>
+                </div>
+                <input type="file" name="bgVideo" accept="video/mp4,video/webm,video/ogg,video/quicktime">
+                <span class="help-text">Pilih file video (MP4 / WebM max 100MB) untuk latar video hero</span>
+              </div>
             </div>
-            <button type="submit" class="btn btn--gold">💾 Simpan Hero</button>
+
+            <button type="submit" class="btn btn--gold" style="margin-top:10px;">💾 Simpan Hero Banner</button>
           </form>
           <form id="formResetHeroHome" action="/admin/delete-file/hero/home" method="POST" style="display:none;"></form>
+          <form id="formResetHeroVideo" action="/admin/delete-file/hero/video" method="POST" style="display:none;"></form>
         </div>
 
         <!-- Statistik -->
@@ -863,7 +892,7 @@
       <div class="tab-content <%= tab === 'files' ? 'active' : '' %>">
         <div class="card">
           <h2 class="card-title">📁 Manajemen File & Media (Uploads)</h2>
-          <p class="card-subtitle">Kelola dan hapus semua file yang diunggah ke server (gambar, foto galeri, logo, background hero, warta PDF).</p>
+          <p class="card-subtitle">Kelola dan hapus semua file yang diunggah ke server (gambar, foto galeri, logo, background hero, video hero, warta PDF).</p>
 
           <% 
             let totalFiles = (typeof files !== 'undefined') ? files.length : 0;
@@ -872,11 +901,12 @@
               ? (totalBytes / (1024 * 1024)).toFixed(2) + ' MB' 
               : (totalBytes / 1024).toFixed(1) + ' KB';
             let imgCount = (typeof files !== 'undefined') ? files.filter(f => f.isImage).length : 0;
+            let videoCount = (typeof files !== 'undefined') ? files.filter(f => f.isVideo).length : 0;
             let pdfCount = (typeof files !== 'undefined') ? files.filter(f => f.isPdf).length : 0;
           %>
 
           <!-- Stats Bar -->
-          <div class="fm-stats-bar">
+          <div class="fm-stats-bar" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
             <div class="fm-stat-box">
               <h3><%= totalFiles %></h3>
               <span>Total File</span>
@@ -890,6 +920,10 @@
               <span>Gambar / Foto</span>
             </div>
             <div class="fm-stat-box">
+              <h3><%= videoCount %></h3>
+              <span>Video</span>
+            </div>
+            <div class="fm-stat-box">
               <h3><%= pdfCount %></h3>
               <span>Dokumen PDF</span>
             </div>
@@ -899,9 +933,9 @@
           <div class="fm-upload-zone">
             <form action="/admin/files/upload" method="POST" enctype="multipart/form-data">
               <h4 style="color:var(--navy); margin-bottom:.5rem;">📤 Unggah File Baru ke Server</h4>
-              <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Pilih satu atau beberapa file sekaligus (JPG, PNG, WebP, GIF, PDF max 10MB per file).</p>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Pilih satu atau beberapa file sekaligus (JPG, PNG, WebP, GIF, PDF, MP4, WebM, MOV max 100MB per file).</p>
               <div style="display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
-                <input type="file" name="files" multiple required accept=".jpg,.jpeg,.png,.gif,.webp,.pdf" style="font-size:0.85rem;">
+                <input type="file" name="files" multiple required accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.mp4,.webm,.mov" style="font-size:0.85rem;">
                 <button type="submit" class="btn btn--gold">⬆️ Mulai Upload</button>
               </div>
             </form>
@@ -932,6 +966,9 @@
                 <input type="checkbox" class="fm-checkbox" value="<%= f.name %>" onchange="updateSelectedCount()" style="position:absolute; top:8px; left:8px; z-index:10; width:18px; height:18px; cursor:pointer;">
                 <% if (f.isImage) { %>
                   <img src="/<%= f.path %>" alt="<%= f.name %>" loading="lazy">
+                <% } else if (f.isVideo) { %>
+                  <video src="/<%= f.path %>" style="width:100%; height:100%; object-fit:cover;" muted></video>
+                  <span style="position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.75); color:#fff; font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:600;">🎬 Video</span>
                 <% } else if (f.isPdf) { %>
                   <div class="file-icon">📄</div>
                 <% } else { %>

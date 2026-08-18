@@ -7,6 +7,7 @@
   "home": {
     "hero": {
       "bgImage": "assets/images/church-hero-new.jpg",
+      "bgVideo": "assets/videos/hero-video.mp4",
       "titleHTML": "Gereja AMIN Hermon<br><span class=\"text-gold\">Rumah Kasih, Rumah Bagi Semua</span>",
       "subtitle": "Komunitas yang bertumbuh dalam iman, kasih, dan pengharapan. Kami menanti kehadiran Anda setiap hari Minggu.",
       "ctaText": "Baru di Sini?",
