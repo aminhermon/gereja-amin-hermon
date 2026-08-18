@@ -224,13 +224,30 @@ const upload = multer({
   }
 });
 
-// DB helpers
+// DB helpers with persistent storage (immune to git deploy overwrites)
 const dbPath = path.join(__dirname, 'data', 'db.json');
+const persistedDbPath = path.join(__dirname, 'data', 'db.persisted.json');
+
 function getDB() { 
   try {
-    return JSON.parse(fs.readFileSync(dbPath, 'utf8')); 
+    // Prefer persistent DB file if exists (immune to git resets)
+    if (fs.existsSync(persistedDbPath)) {
+      return JSON.parse(fs.readFileSync(persistedDbPath, 'utf8'));
+    }
+    if (fs.existsSync(dbPath)) {
+      const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+      // Initialize persistent copy
+      try {
+        fs.writeFileSync(persistedDbPath, JSON.stringify(data, null, 2), { encoding: 'utf8', mode: 0o666 });
+      } catch (e) {}
+      return data;
+    }
+    return {};
   } catch (err) {
-    console.error('❌ Error reading db.json:', err.message);
+    console.error('❌ Error reading db:', err.message);
+    if (fs.existsSync(dbPath)) {
+      try { return JSON.parse(fs.readFileSync(dbPath, 'utf8')); } catch (e) {}
+    }
     return {};
   }
 }
@@ -241,8 +258,11 @@ function saveDB(data) {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    console.log('✅ Database berhasil disimpan ke:', dbPath);
+    const jsonString = JSON.stringify(data, null, 2);
+    // Write to both persistedDbPath and dbPath
+    fs.writeFileSync(persistedDbPath, jsonString, { encoding: 'utf8', mode: 0o666 });
+    fs.writeFileSync(dbPath, jsonString, { encoding: 'utf8', mode: 0o666 });
+    console.log('✅ Database tersimpan permanen di disk');
     return true;
   } catch (err) {
     console.error('❌ GAGAL menyimpan database ke disk:', err.message);
@@ -586,6 +606,34 @@ app.get('/admin', requireAuth, (req, res) => {
     files: getUploadedFiles(),
     msg: req.query.msg || null
   });
+});
+
+// Download / Export Database Backup
+app.get('/admin/db/export', requireAuth, (req, res) => {
+  const db = getDB();
+  const today = new Date().toISOString().split('T')[0];
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', `attachment; filename="backup-db-aminhermon-${today}.json"`);
+  res.send(JSON.stringify(db, null, 2));
+});
+
+// Upload / Restore Database Backup
+app.post('/admin/db/import', requireAuth, upload.single('dbFile'), (req, res) => {
+  if (req.file) {
+    try {
+      const content = fs.readFileSync(req.file.path, 'utf8');
+      const parsed = JSON.parse(content);
+      if (parsed && typeof parsed === 'object') {
+        saveDB(parsed);
+        deleteUploadedFile(req.file.path);
+        return res.redirect('/admin?msg=' + encodeURIComponent('Database berhasil dipulihkan dari file backup!'));
+      }
+    } catch (err) {
+      if (req.file) deleteUploadedFile(req.file.path);
+      return res.redirect('/admin?msg=' + encodeURIComponent('Gagal restore: File JSON tidak valid (' + err.message + ')'));
+    }
+  }
+  res.redirect('/admin');
 });
 
 // ===== TAB: BERANDA =====

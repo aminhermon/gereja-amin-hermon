@@ -139,7 +139,14 @@
       <li><a href="/admin?tab=contact" class="<%= tab === 'contact' ? 'active' : '' %>"><span class="emoji">📞</span> Hubungi Kami</a></li>
       <li><a href="/admin?tab=files" class="<%= tab === 'files' ? 'active' : '' %>" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 6px; padding-top: 0.9rem;"><span class="emoji">📁</span> Kelola File (<%= typeof files !== 'undefined' ? files.length : 0 %>)</a></li>
     </ul>
-    <div class="sidebar-footer">
+    <div class="sidebar-footer" style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;">
+        <a href="/admin/db/export" class="btn btn--xs" style="background:rgba(200,169,81,0.2); color:var(--gold); text-align:center; border:1px solid rgba(200,169,81,0.4); text-decoration:none;" title="Download file database JSON">📥 Backup Database</a>
+        <form action="/admin/db/import" method="POST" enctype="multipart/form-data" id="formRestoreDb" style="margin:0;">
+          <input type="file" name="dbFile" id="inputDbRestore" accept=".json" style="display:none;" onchange="if(confirm('Pulihkan database dari file backup ini? Konten saat ini akan ditimpa dengan file backup.')) document.getElementById('formRestoreDb').submit();">
+          <button type="button" class="btn btn--xs" style="width:100%; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);" onclick="document.getElementById('inputDbRestore').click()" title="Upload file database backup JSON">📤 Restore Database</button>
+        </form>
+      </div>
       <a href="/" target="_blank">🌐 Lihat Website</a>
       <a href="/admin/logout" style="color: #EF4444; margin-top: 8px;">🔒 Logout</a>
     </div>

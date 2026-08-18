@@ -4,3 +4,4 @@ node_modules/
 deploy-hostinger.zip
 *.log
 .DS_Store
+data/db.persisted.json
