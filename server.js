@@ -380,21 +380,127 @@ app.get('/admin/logout', (req, res) => {
   });
 });
 
-// Helper: Safely delete physical file in uploads/ directory
+// Helper: Safely delete physical file in uploads/ directory and any cached versions
 function deleteUploadedFile(filePath) {
-  if (!filePath || typeof filePath !== 'string') return;
-  // Ensure path is inside uploads/ and prevent directory traversal
-  if (filePath.startsWith('uploads/')) {
+  if (!filePath || typeof filePath !== 'string') return false;
+  try {
     const filename = path.basename(filePath);
+    if (!filename || filename === '.' || filename === '..') return false;
+
     const fullPath = path.join(__dirname, 'uploads', filename);
+    let deleted = false;
     if (fs.existsSync(fullPath)) {
       try {
         fs.unlinkSync(fullPath);
-      } catch (err) {
-        console.error('Gagal menghapus file:', fullPath, err.message);
+        deleted = true;
+        console.log('✅ File berhasil dihapus:', fullPath);
+      } catch (e) {
+        console.error('❌ Gagal unlink file:', fullPath, e.message);
       }
     }
+
+    // Also remove any optimized versions in .cache directory
+    const cacheDir = path.join(__dirname, '.cache');
+    if (fs.existsSync(cacheDir)) {
+      try {
+        const cachePrefix = `_uploads_${filename}`;
+        const cachedFiles = fs.readdirSync(cacheDir);
+        cachedFiles.forEach(cf => {
+          if (cf.startsWith(cachePrefix)) {
+            try {
+              fs.unlinkSync(path.join(cacheDir, cf));
+              console.log('✅ Cache file dihapus:', cf);
+            } catch (e) {}
+          }
+        });
+      } catch (e) {}
+    }
+
+    return deleted;
+  } catch (err) {
+    console.error('❌ Error deleteUploadedFile:', filePath, err.message);
+    return false;
   }
+}
+
+// Helper: Clean database references to a deleted file
+function cleanDbFileReferences(filePath) {
+  if (!filePath) return;
+  const safeFilename = path.basename(filePath);
+  const normalizedPath = 'uploads/' + safeFilename;
+  const db = getDB();
+  let changed = false;
+
+  if (db.general && db.general.logoPath && path.basename(db.general.logoPath) === safeFilename) {
+    db.general.logoPath = 'assets/images/logo-gereja-amin-3d.png';
+    changed = true;
+  }
+  if (db.home && db.home.hero && db.home.hero.bgImage && path.basename(db.home.hero.bgImage) === safeFilename) {
+    db.home.hero.bgImage = 'assets/images/church-hero-new.jpg';
+    changed = true;
+  }
+  if (db.visit && db.visit.hero && db.visit.hero.bgImage && path.basename(db.visit.hero.bgImage) === safeFilename) {
+    db.visit.hero.bgImage = 'assets/images/welcome-visitors.png';
+    changed = true;
+  }
+  if (db.about && db.about.hero && db.about.hero.bgImage && path.basename(db.about.hero.bgImage) === safeFilename) {
+    db.about.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+  if (db.pelayanan && db.pelayanan.hero && db.pelayanan.hero.bgImage && path.basename(db.pelayanan.hero.bgImage) === safeFilename) {
+    db.pelayanan.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+  if (db.mediaGaleri && db.mediaGaleri.hero && db.mediaGaleri.hero.bgImage && path.basename(db.mediaGaleri.hero.bgImage) === safeFilename) {
+    db.mediaGaleri.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+  if (db.contactFaq && db.contactFaq.hero && db.contactFaq.hero.bgImage && path.basename(db.contactFaq.hero.bgImage) === safeFilename) {
+    db.contactFaq.hero.bgImage = 'assets/images/church-interior.png';
+    changed = true;
+  }
+
+  // Check Leaders
+  if (db.about && db.about.pemimpin) {
+    if (db.about.pemimpin.pendeta) {
+      db.about.pemimpin.pendeta.forEach(p => {
+        if (p.image && path.basename(p.image) === safeFilename) { p.image = ''; changed = true; }
+      });
+    }
+    if (db.about.pemimpin.pengurus) {
+      db.about.pemimpin.pengurus.forEach(p => {
+        if (p.image && path.basename(p.image) === safeFilename) { p.image = ''; changed = true; }
+      });
+    }
+    if (db.about.pemimpin.majelis) {
+      db.about.pemimpin.majelis.forEach(m => {
+        if (m.image && path.basename(m.image) === safeFilename) { m.image = ''; changed = true; }
+      });
+    }
+  }
+
+  // Check News
+  if (db.home && db.home.news) {
+    db.home.news.forEach(n => {
+      if (n.image && path.basename(n.image) === safeFilename) { n.image = 'assets/images/slider_ibadah.png'; changed = true; }
+    });
+  }
+
+  // Check Photos
+  if (db.mediaGaleri && db.mediaGaleri.photos) {
+    const beforeCount = db.mediaGaleri.photos.length;
+    db.mediaGaleri.photos = db.mediaGaleri.photos.filter(p => path.basename(p.src) !== safeFilename);
+    if (db.mediaGaleri.photos.length !== beforeCount) changed = true;
+  }
+
+  // Check Warta
+  if (db.pelayanan && db.pelayanan.warta) {
+    const beforeCount = db.pelayanan.warta.length;
+    db.pelayanan.warta = db.pelayanan.warta.filter(w => path.basename(w.file) !== safeFilename);
+    if (db.pelayanan.warta.length !== beforeCount) changed = true;
+  }
+
+  if (changed) saveDB(db);
 }
 
 // Helper: Get list of all uploaded files in uploads/ directory
@@ -431,7 +537,8 @@ app.get('/admin', requireAuth, (req, res) => {
   res.render('admin', { 
     db: getDB(), 
     tab: req.query.tab || 'beranda',
-    files: getUploadedFiles()
+    files: getUploadedFiles(),
+    msg: req.query.msg || null
   });
 });
 
@@ -1020,92 +1127,48 @@ app.post('/admin/kalender/delete/:id', requireAuth, (req, res) => {
 // ===== TAB: FILE MANAGER (UPLOAD & DELETE ALL FILES) =====
 
 // Direct upload to uploads/ folder
-app.post('/admin/files/upload', requireAuth, upload.array('files', 10), (req, res) => {
-  res.redirect('/admin?tab=files');
+app.post('/admin/files/upload', requireAuth, upload.array('files', 20), (req, res) => {
+  const count = req.files ? req.files.length : 0;
+  res.redirect('/admin?tab=files&msg=' + encodeURIComponent(count + ' file berhasil diunggah.'));
 });
 
-// Permanently delete any file in uploads/
+// Delete one or multiple files via POST body
+app.post('/admin/files/delete', requireAuth, (req, res) => {
+  let filenames = [];
+  if (Array.isArray(req.body.filenames)) {
+    filenames = req.body.filenames;
+  } else if (req.body.filenames) {
+    filenames = [req.body.filenames];
+  } else if (req.body.filename) {
+    filenames = [req.body.filename];
+  }
+
+  let deletedCount = 0;
+  filenames.forEach(fn => {
+    if (!fn) return;
+    const safeFilename = path.basename(fn.trim());
+    if (safeFilename && safeFilename !== '.' && safeFilename !== '..') {
+      const filePath = 'uploads/' + safeFilename;
+      const ok = deleteUploadedFile(filePath);
+      if (ok) deletedCount++;
+      cleanDbFileReferences(filePath);
+    }
+  });
+
+  res.redirect('/admin?tab=files&msg=' + encodeURIComponent(deletedCount + ' file berhasil dihapus.'));
+});
+
+// Fallback: Delete single file via URL parameter
 app.post('/admin/files/delete/:filename', requireAuth, (req, res) => {
-  const safeFilename = path.basename(req.params.filename);
-  const filePath = 'uploads/' + safeFilename;
-  deleteUploadedFile(filePath);
-
-  // Also clean up references in database if this file was used
-  const db = getDB();
-  let changed = false;
-
-  if (db.general.logoPath === filePath) {
-    db.general.logoPath = 'assets/images/logo-gereja-amin-3d.png';
-    changed = true;
+  const safeFilename = path.basename(req.params.filename || '');
+  if (safeFilename && safeFilename !== '.' && safeFilename !== '..') {
+    const filePath = 'uploads/' + safeFilename;
+    deleteUploadedFile(filePath);
+    cleanDbFileReferences(filePath);
+    res.redirect('/admin?tab=files&msg=' + encodeURIComponent('File ' + safeFilename + ' berhasil dihapus.'));
+  } else {
+    res.redirect('/admin?tab=files');
   }
-  if (db.home.hero.bgImage === filePath) {
-    db.home.hero.bgImage = 'assets/images/church-hero-new.jpg';
-    changed = true;
-  }
-  if (db.visit.hero.bgImage === filePath) {
-    db.visit.hero.bgImage = 'assets/images/welcome-visitors.png';
-    changed = true;
-  }
-  if (db.about.hero.bgImage === filePath) {
-    db.about.hero.bgImage = 'assets/images/church-interior.png';
-    changed = true;
-  }
-  if (db.pelayanan.hero.bgImage === filePath) {
-    db.pelayanan.hero.bgImage = 'assets/images/church-interior.png';
-    changed = true;
-  }
-  if (db.mediaGaleri.hero.bgImage === filePath) {
-    db.mediaGaleri.hero.bgImage = 'assets/images/church-interior.png';
-    changed = true;
-  }
-  if (db.contactFaq.hero.bgImage === filePath) {
-    db.contactFaq.hero.bgImage = 'assets/images/church-interior.png';
-    changed = true;
-  }
-
-  // Check Leaders
-  if (db.about && db.about.pemimpin) {
-    if (db.about.pemimpin.pendeta) {
-      db.about.pemimpin.pendeta.forEach(p => {
-        if (p.image === filePath) { p.image = ''; changed = true; }
-      });
-    }
-    if (db.about.pemimpin.pengurus) {
-      db.about.pemimpin.pengurus.forEach(p => {
-        if (p.image === filePath) { p.image = ''; changed = true; }
-      });
-    }
-    if (db.about.pemimpin.majelis) {
-      db.about.pemimpin.majelis.forEach(m => {
-        if (m.image === filePath) { m.image = ''; changed = true; }
-      });
-    }
-  }
-
-  // Check News
-  if (db.home && db.home.news) {
-    db.home.news.forEach(n => {
-      if (n.image === filePath) { n.image = 'assets/images/slider_ibadah.png'; changed = true; }
-    });
-  }
-
-  // Check Photos
-  if (db.mediaGaleri && db.mediaGaleri.photos) {
-    const beforeCount = db.mediaGaleri.photos.length;
-    db.mediaGaleri.photos = db.mediaGaleri.photos.filter(p => p.src !== filePath);
-    if (db.mediaGaleri.photos.length !== beforeCount) changed = true;
-  }
-
-  // Check Warta
-  if (db.pelayanan && db.pelayanan.warta) {
-    const beforeCount = db.pelayanan.warta.length;
-    db.pelayanan.warta = db.pelayanan.warta.filter(w => w.file !== filePath);
-    if (db.pelayanan.warta.length !== beforeCount) changed = true;
-  }
-
-  if (changed) saveDB(db);
-
-  res.redirect('/admin?tab=files');
 });
 
 // ==================== ERROR HANDLING ====================

@@ -163,6 +163,13 @@
 
     <div class="content">
 
+      <% if (typeof msg !== 'undefined' && msg) { %>
+      <div style="background: #D1FAE5; border: 1px solid #10B981; color: #065F46; padding: 0.75rem 1.2rem; border-radius: var(--radius); margin-bottom: 1.5rem; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);">
+        <span>✅ <%= msg %></span>
+        <button onclick="this.parentElement.remove()" style="background:none; border:none; color:#065F46; cursor:pointer; font-size:1.2rem; line-height:1;">&times;</button>
+      </div>
+      <% } %>
+
       <!-- ============================== TAB: BERANDA ============================== -->
       <div class="tab-content <%= tab === 'beranda' ? 'active' : '' %>">
 
@@ -856,7 +863,7 @@
       <div class="tab-content <%= tab === 'files' ? 'active' : '' %>">
         <div class="card">
           <h2 class="card-title">📁 Manajemen File & Media (Uploads)</h2>
-          <p class="card-subtitle">Kelola dan hapus semua file yang diunggah ke server (gambar, foto galeri, logo, background, warta PDF).</p>
+          <p class="card-subtitle">Kelola dan hapus semua file yang diunggah ke server (gambar, foto galeri, logo, background hero, warta PDF).</p>
 
           <% 
             let totalFiles = (typeof files !== 'undefined') ? files.length : 0;
@@ -900,13 +907,21 @@
             </form>
           </div>
 
-          <!-- Search & Filter Bar -->
+          <!-- Toolbar: Search & Bulk Action -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem; flex-wrap:wrap;">
             <div style="flex:1; min-width:200px;">
-              <input type="text" id="fmSearchInput" placeholder="🔍 Cari nama file..." onkeyup="filterFiles()" style="width:100%; padding:0.5rem 0.8rem; border:1px solid var(--border); border-radius:var(--radius); font-size:0.85rem;">
+              <input type="text" id="fmSearchInput" placeholder="🔍 Cari nama file..." onkeyup="filterFiles()" style="width:100%; padding:0.55rem 0.85rem; border:1px solid var(--border); border-radius:var(--radius); font-size:0.85rem;">
             </div>
-            <span style="font-size:0.8rem; color:var(--text-muted);">Menampilkan <strong><span id="fmVisibleCount"><%= totalFiles %></span></strong> file</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <button type="button" id="btnBulkDelete" class="btn btn--danger btn--sm" style="display:none;" onclick="submitBulkDelete()">🗑️ Hapus yang Dipilih (<span id="selectedCount">0</span>)</button>
+              <button type="button" class="btn btn--outline btn--sm" onclick="toggleSelectAll()">☑️ Pilih Semua</button>
+            </div>
           </div>
+
+          <!-- Hidden Bulk Delete Form -->
+          <form id="formBulkDelete" action="/admin/files/delete" method="POST" style="display:none;">
+            <div id="bulkDeleteInputs"></div>
+          </form>
 
           <!-- Files Grid -->
           <% if (typeof files !== 'undefined' && files.length > 0) { %>
@@ -914,6 +929,7 @@
             <% files.forEach(function(f) { %>
             <div class="fm-card" data-filename="<%= f.name.toLowerCase() %>">
               <div class="fm-card__preview">
+                <input type="checkbox" class="fm-checkbox" value="<%= f.name %>" onchange="updateSelectedCount()" style="position:absolute; top:8px; left:8px; z-index:10; width:18px; height:18px; cursor:pointer;">
                 <% if (f.isImage) { %>
                   <img src="/<%= f.path %>" alt="<%= f.name %>" loading="lazy">
                 <% } else if (f.isPdf) { %>
@@ -930,7 +946,8 @@
                 </div>
                 <div class="fm-card__actions">
                   <a href="/<%= f.path %>" target="_blank" class="btn btn--outline btn--xs" title="Buka / Download file">👁️ Buka</a>
-                  <form action="/admin/files/delete/<%= encodeURIComponent(f.name) %>" method="POST" style="margin:0; flex:1;" onsubmit="return confirm('Hapus permanen file \'<%= f.name %>\' dari server? Tindakan ini tidak dapat dibatalkan.')">
+                  <form action="/admin/files/delete" method="POST" style="margin:0; flex:1;" onsubmit="return confirm('Hapus permanen file \'<%= f.name %>\' dari server? Tindakan ini tidak dapat dibatalkan.')">
+                    <input type="hidden" name="filename" value="<%= f.name %>">
                     <button type="submit" class="btn btn--danger btn--xs" style="width:100%;" title="Hapus file ini permanen">🗑️ Hapus</button>
                   </form>
                 </div>
@@ -939,8 +956,10 @@
             <% }); %>
           </div>
           <% } else { %>
-          <div style="text-align:center; padding:2rem; color:var(--text-muted);">
-            <p>Belum ada file yang diunggah di folder uploads/.</p>
+          <div style="text-align:center; padding:3rem; color:var(--text-muted); background:var(--bg); border-radius:var(--radius); border:1px solid var(--border);">
+            <div style="font-size:2.5rem; margin-bottom:8px;">📁</div>
+            <p style="font-weight:600; color:var(--navy); margin-bottom:4px;">Folder Upload Kosong</p>
+            <p style="font-size:0.85rem;">Belum ada file yang diunggah ke folder uploads/.</p>
           </div>
           <% } %>
 
@@ -967,6 +986,46 @@
       });
       const countEl = document.getElementById('fmVisibleCount');
       if (countEl) countEl.textContent = visible;
+    }
+
+    let allSelected = false;
+    function toggleSelectAll() {
+      const checkboxes = document.querySelectorAll('.fm-checkbox');
+      allSelected = !allSelected;
+      checkboxes.forEach(cb => {
+        if (cb.closest('.fm-card').style.display !== 'none') {
+          cb.checked = allSelected;
+        }
+      });
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      const checked = document.querySelectorAll('.fm-checkbox:checked');
+      const count = checked.length;
+      const countEl = document.getElementById('selectedCount');
+      const btn = document.getElementById('btnBulkDelete');
+      if (countEl) countEl.textContent = count;
+      if (btn) {
+        btn.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    }
+
+    function submitBulkDelete() {
+      const checked = document.querySelectorAll('.fm-checkbox:checked');
+      if (checked.length === 0) return;
+      if (!confirm('Hapus permanen ' + checked.length + ' file yang dipilih dari server?')) return;
+
+      const container = document.getElementById('bulkDeleteInputs');
+      container.innerHTML = '';
+      checked.forEach(cb => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'filenames';
+        input.value = cb.value;
+        container.appendChild(input);
+      });
+      document.getElementById('formBulkDelete').submit();
     }
   </script>
 
