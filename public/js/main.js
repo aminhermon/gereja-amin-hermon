@@ -556,3 +556,48 @@ function initDailyVerse() {
     verseRef.innerText = todaysVerse.ref;
   }, 500);
 }
+
+/* ---------- Stats Counter Animation ---------- */
+function initStatsCounter() {
+  const statNumbers = document.querySelectorAll('.stat-card-premium__number, .stat-card__number');
+  if (!statNumbers.length) return;
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.getAttribute('data-target'), 10) || 0;
+        animateNumber(el, target);
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  statNumbers.forEach(num => observer.observe(num));
+
+  function animateNumber(el, target) {
+    if (target === 0) {
+      el.textContent = '0';
+      return;
+    }
+    const duration = 1500;
+    const start = 0;
+    const startTime = performance.now();
+
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(start + (target - start) * ease);
+      el.textContent = current.toLocaleString('id-ID');
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        el.textContent = target.toLocaleString('id-ID');
+      }
+    }
+    requestAnimationFrame(update);
+  }
+}

@@ -151,47 +151,6 @@
     </div>
   </section>
 
-  <!-- ========== DASHBOARD STATISTIK JEMAAT ========== -->
-  <section class="section section--navy" id="stats">
-    <div class="container">
-      <div class="section-header" data-aos="fade-up">
-        <h2>Data <span class="text-gold">Jemaat</span></h2>
-        <span class="gold-line"></span>
-        <p>Keluarga besar Gereja AMIN Hermon dalam angka.</p>
-      </div>
-      <div class="stats-grid" data-aos="fade-up">
-        <div class="stat-card">
-          <div class="stat-card__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="stat-card__number" data-target="<%= home.stats.totalJemaat %>">0</div>
-          <div class="stat-card__label">Total Jemaat</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div class="stat-card__number" data-target="<%= home.stats.lakiLaki %>">0</div>
-          <div class="stat-card__label">Laki-laki</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div class="stat-card__number" data-target="<%= home.stats.perempuan %>">0</div>
-          <div class="stat-card__label">Perempuan</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-          </div>
-          <div class="stat-card__number" data-target="<%= home.stats.anakAnak %>">0</div>
-          <div class="stat-card__label">Anak-anak</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ========== NEWS & EVENTS (Lundev Carousel) ========== -->
   <section class="carousel" id="news">
     <!-- Main slides (fullscreen) -->
@@ -236,6 +195,55 @@
 
     <!-- Time progress bar -->
     <div class="carousel__progress"></div>
+  </section>
+
+  <!-- ========== DASHBOARD STATISTIK JEMAAT (Premium Design) ========== -->
+  <section class="section section--stats-premium" id="stats">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Data <span class="text-gold">Jemaat</span></h2>
+        <span class="gold-line"></span>
+        <p>Keluarga besar Gereja AMIN Hermon dalam angka.</p>
+      </div>
+      <div class="stats-grid-premium" data-aos="fade-up">
+        <div class="stat-card-premium">
+          <div class="stat-card-premium__glow"></div>
+          <div class="stat-card-premium__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="stat-card-premium__number" data-target="<%= home.stats.totalJemaat %>">0</div>
+          <div class="stat-card-premium__label">Total Jemaat</div>
+          <div class="stat-card-premium__bar"><span style="width: 100%;"></span></div>
+        </div>
+        <div class="stat-card-premium">
+          <div class="stat-card-premium__glow"></div>
+          <div class="stat-card-premium__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="stat-card-premium__number" data-target="<%= home.stats.lakiLaki %>">0</div>
+          <div class="stat-card-premium__label">Laki-laki</div>
+          <div class="stat-card-premium__bar"><span style="width: <%= home.stats.totalJemaat ? Math.round(home.stats.lakiLaki / home.stats.totalJemaat * 100) : 0 %>%;"></span></div>
+        </div>
+        <div class="stat-card-premium">
+          <div class="stat-card-premium__glow"></div>
+          <div class="stat-card-premium__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="stat-card-premium__number" data-target="<%= home.stats.perempuan %>">0</div>
+          <div class="stat-card-premium__label">Perempuan</div>
+          <div class="stat-card-premium__bar"><span style="width: <%= home.stats.totalJemaat ? Math.round(home.stats.perempuan / home.stats.totalJemaat * 100) : 0 %>%;"></span></div>
+        </div>
+        <div class="stat-card-premium">
+          <div class="stat-card-premium__glow"></div>
+          <div class="stat-card-premium__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          </div>
+          <div class="stat-card-premium__number" data-target="<%= home.stats.anakAnak %>">0</div>
+          <div class="stat-card-premium__label">Anak-anak</div>
+          <div class="stat-card-premium__bar"><span style="width: <%= home.stats.totalJemaat ? Math.round(home.stats.anakAnak / home.stats.totalJemaat * 100) : 0 %>%;"></span></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ========== NEWS DETAIL MODAL ========== -->
