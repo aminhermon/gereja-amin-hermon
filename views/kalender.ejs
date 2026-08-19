@@ -7,8 +7,203 @@
   <title>Kalender Kegiatan — <%= general.churchName %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="css/style.min.css?v=12">
+  <link rel="stylesheet" href="css/style.min.css?v=15">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  <style>
+    /* Direct embedded styles for Calendar Modal Overlay */
+    .cal-modal {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 999999 !important;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cal-modal.active {
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .cal-modal__backdrop {
+      position: absolute !important;
+      inset: 0 !important;
+      background: rgba(5, 10, 20, 0.82) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      cursor: pointer;
+    }
+    .cal-modal__dialog {
+      position: relative !important;
+      width: 100% !important;
+      max-width: 520px !important;
+      max-height: 85vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background: #0E1826 !important;
+      border: 1px solid rgba(200, 169, 81, 0.4) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(200, 169, 81, 0.25) !important;
+      z-index: 100 !important;
+      overflow: hidden !important;
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cal-modal.active .cal-modal__dialog {
+      transform: scale(1) translateY(0) !important;
+    }
+    .cal-modal__close {
+      position: absolute !important;
+      top: 1rem !important;
+      right: 1rem !important;
+      width: 36px !important;
+      height: 36px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 50% !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #fff !important;
+      font-size: 1.4rem !important;
+      line-height: 1 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      z-index: 105 !important;
+    }
+    .cal-modal__close:hover {
+      background: #C8A951 !important;
+      color: #0B1320 !important;
+      border-color: #C8A951 !important;
+      transform: rotate(90deg) !important;
+    }
+    .cal-modal__header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1rem !important;
+      padding: 1.75rem 1.75rem 1.25rem !important;
+      background: linear-gradient(180deg, rgba(200, 169, 81, 0.18) 0%, rgba(200, 169, 81, 0) 100%) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .cal-modal__icon {
+      width: 48px !important;
+      height: 48px !important;
+      min-width: 48px !important;
+      border-radius: 12px !important;
+      background: linear-gradient(135deg, rgba(200, 169, 81, 0.3) 0%, rgba(200, 169, 81, 0.1) 100%) !important;
+      border: 1px solid #C8A951 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: #C8A951 !important;
+    }
+    .cal-modal__subtitle {
+      display: block !important;
+      font-size: 0.75rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 1.5px !important;
+      color: #C8A951 !important;
+      margin-bottom: 2px !important;
+    }
+    .cal-modal__title {
+      font-family: inherit !important;
+      font-size: 1.25rem !important;
+      font-weight: 700 !important;
+      color: #FFFFFF !important;
+      margin: 0 !important;
+      line-height: 1.3 !important;
+    }
+    .cal-modal__body {
+      padding: 1.5rem 1.75rem !important;
+      overflow-y: auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1rem !important;
+      max-height: calc(85vh - 170px) !important;
+    }
+    .cal-modal-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+      border: 1px solid rgba(200, 169, 81, 0.25) !important;
+      border-radius: 14px !important;
+      padding: 1.25rem !important;
+      transition: all 0.3s ease !important;
+    }
+    .cal-modal-card:hover {
+      border-color: rgba(200, 169, 81, 0.5) !important;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
+    }
+    .cal-modal-card__header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 0.6rem !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    .cal-modal-card__badge {
+      font-size: 0.72rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.8px !important;
+      color: #C8A951 !important;
+      background: rgba(200, 169, 81, 0.18) !important;
+      border: 1px solid rgba(200, 169, 81, 0.35) !important;
+      padding: 3px 10px !important;
+      border-radius: 20px !important;
+    }
+    .cal-modal-card__time {
+      font-size: 0.8rem !important;
+      color: #CBD5E1 !important;
+      font-weight: 500 !important;
+    }
+    .cal-modal-card__title {
+      font-size: 1.1rem !important;
+      font-weight: 700 !important;
+      color: #FFFFFF !important;
+      margin: 0 0 0.4rem 0 !important;
+      line-height: 1.35 !important;
+    }
+    .cal-modal-card__desc {
+      font-size: 0.9rem !important;
+      color: #94A3B8 !important;
+      line-height: 1.55 !important;
+      margin: 0 !important;
+    }
+    .cal-modal-empty {
+      text-align: center !important;
+      padding: 2.5rem 1rem !important;
+      color: #94A3B8 !important;
+    }
+    .cal-modal-empty__icon {
+      font-size: 3rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    .cal-modal-empty h4 {
+      font-size: 1.1rem !important;
+      color: #FFFFFF !important;
+      margin-bottom: 0.35rem !important;
+    }
+    .cal-modal-empty p {
+      font-size: 0.85rem !important;
+      max-width: 320px !important;
+      margin: 0 auto !important;
+      line-height: 1.5 !important;
+    }
+    .cal-modal__footer {
+      padding: 1rem 1.75rem 1.5rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      display: flex !important;
+      justify-content: flex-end !important;
+    }
+    .cal-cell {
+      cursor: pointer !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -64,7 +259,7 @@
         <div class="cal-upcoming__grid">
           <% kalender.sort(function(a,b){ return new Date(a.tanggal) - new Date(b.tanggal); }).forEach(function(ev) { %>
           <% if (new Date(ev.tanggal) >= new Date(new Date().toISOString().split('T')[0])) { %>
-          <div class="cal-upcoming__card" onclick="openCalendarModalDirect('<%= ev.tanggal %>')">
+          <div class="cal-upcoming__card" data-event-date="<%= ev.tanggal %>" onclick="window.openCalendarModalDirect('<%= ev.tanggal %>')">
             <div class="cal-upcoming__date">
               <span class="cal-upcoming__day"><%= new Date(ev.tanggal).getDate() %></span>
               <span class="cal-upcoming__month"><%= ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'][new Date(ev.tanggal).getMonth()] %></span>
@@ -87,7 +282,7 @@
   <div class="cal-modal" id="calModal" role="dialog" aria-modal="true" aria-labelledby="calModalDate">
     <div class="cal-modal__backdrop" onclick="window.closeCalModal()"></div>
     <div class="cal-modal__dialog">
-      <button class="cal-modal__close" onclick="window.closeCalModal()" aria-label="Tutup popup">&times;</button>
+      <button type="button" class="cal-modal__close" onclick="window.closeCalModal()" aria-label="Tutup popup">&times;</button>
       <div class="cal-modal__header">
         <div class="cal-modal__icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -108,7 +303,7 @@
 
   <%- include('partials/footer') %>
 
-  <script src="js/main.min.js?v=4" defer></script>
+  <script src="js/main.min.js?v=5" defer></script>
   <script>
     (function() {
       // Calendar data from server
@@ -129,20 +324,34 @@
         const nextBtn = document.getElementById('calNext');
 
         if (prevBtn) {
-          prevBtn.addEventListener('click', (e) => {
+          prevBtn.onclick = function(e) {
             e.preventDefault();
             currentMonth--;
             if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCalendar();
-          });
+          };
         }
         if (nextBtn) {
-          nextBtn.addEventListener('click', (e) => {
+          nextBtn.onclick = function(e) {
             e.preventDefault();
             currentMonth++;
             if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             renderCalendar();
-          });
+          };
+        }
+
+        // Global Event Delegation on #calBody
+        const body = document.getElementById('calBody');
+        if (body) {
+          body.onclick = function(e) {
+            const cell = e.target.closest('.cal-cell');
+            if (!cell || cell.classList.contains('cal-cell--empty')) return;
+            const dateStr = cell.getAttribute('data-date');
+            if (dateStr) {
+              const dayEvents = calendarEvents.filter(ev => ev.tanggal === dateStr);
+              openCalendarModal(dateStr, dayEvents);
+            }
+          };
         }
       }
 
@@ -173,21 +382,17 @@
 
           const cell = document.createElement('div');
           cell.className = 'cal-cell' + (isToday ? ' cal-cell--today' : '') + (dayEvents.length ? ' cal-cell--has-event' : '');
+          cell.setAttribute('data-date', dateStr);
           cell.setAttribute('title', dayEvents.length ? `${dayEvents.length} kegiatan pada ${d} ${MONTHS_ID[currentMonth]}` : `Klik untuk melihat agenda tanggal ${d}`);
           cell.innerHTML = '<span class="cal-cell__num">' + d + '</span>' +
             (dayEvents.length ? '<span class="cal-cell__dot"></span>' : '');
-
-          // Click any day to show the modal overlay
-          cell.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openCalendarModal(dateStr, dayEvents);
-          });
 
           body.appendChild(cell);
         }
       }
 
       function openCalendarModal(dateStr, events) {
+        if (!dateStr) return;
         const parts = dateStr.split('-');
         const y = parseInt(parts[0], 10);
         const m = parseInt(parts[1], 10) - 1;
@@ -231,6 +436,9 @@
         // Open Modal
         const modal = document.getElementById('calModal');
         if (modal) {
+          modal.style.display = 'flex';
+          // force reflow
+          void modal.offsetHeight;
           modal.classList.add('active');
           document.body.style.overflow = 'hidden';
         }
@@ -243,7 +451,14 @@
 
       function closeCalModal() {
         const modal = document.getElementById('calModal');
-        if (modal) modal.classList.remove('active');
+        if (modal) {
+          modal.classList.remove('active');
+          setTimeout(() => {
+            if (!modal.classList.contains('active')) {
+              modal.style.display = 'none';
+            }
+          }, 250);
+        }
         document.body.style.overflow = '';
       }
 
@@ -252,6 +467,7 @@
         const y = parseInt(parts[0], 10);
         const m = parseInt(parts[1], 10) - 1;
         const d = parseInt(parts[2], 10);
+        const dateObj = new Date(y, m, d);
         const title = d + ' ' + MONTHS_ID[m] + ' ' + y;
 
         const titleEl = document.getElementById('calEventsTitle');
@@ -278,8 +494,8 @@
         // Highlight selected cell
         document.querySelectorAll('.cal-cell--selected').forEach(c => c.classList.remove('cal-cell--selected'));
         document.querySelectorAll('.cal-cell').forEach(c => {
-          const numEl = c.querySelector('.cal-cell__num');
-          if (numEl && parseInt(numEl.textContent, 10) === d) {
+          const dateAttr = c.getAttribute('data-date');
+          if (dateAttr === dateStr) {
             c.classList.add('cal-cell--selected');
           }
         });
@@ -301,10 +517,5 @@
       }
     })();
   </script>
-
 </body>
 </html>
-
-
-
-

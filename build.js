@@ -15,7 +15,7 @@ async function build() {
   const cssFiles = fs.readdirSync(cssDir).filter(f => f.endsWith('.css') && !f.endsWith('.min.css'));
   for (const file of cssFiles) {
     const src = fs.readFileSync(path.join(cssDir, file), 'utf8');
-    const result = new CleanCSS({ level: 2 }).minify(src);
+    const result = new CleanCSS({ level: 1 }).minify(src);
     const minName = file.replace('.css', '.min.css');
     fs.writeFileSync(path.join(cssDir, minName), result.styles);
     const saved = ((1 - result.stats.minifiedSize / result.stats.originalSize) * 100).toFixed(1);
