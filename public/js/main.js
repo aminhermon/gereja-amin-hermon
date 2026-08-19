@@ -4,17 +4,19 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
-  AOS.init({
-    duration: 800,
-    easing: 'ease-in-out',
-    once: true,
-    offset: 100
-  });
+  if (typeof AOS !== 'undefined') {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true,
+      offset: 100
+    });
+  }
   initRegistrationForm();
   initGallery();
   initSmoothScroll();
   setActiveNavLink();
-  initCalendar();
+  initCalendarFilterButtons();
   initGlobalLightbox();
   initVisitorCounter();
   initSwiper();
@@ -392,8 +394,8 @@ if ('IntersectionObserver' in window) {
   document.querySelectorAll('img[data-src]').forEach(img => imgObserver.observe(img));
 }
 
-/* ---------- Calendar Filter ---------- */
-function initCalendar() {
+/* ---------- Calendar Filter Buttons ---------- */
+function initCalendarFilterButtons() {
   const filterBtns = document.querySelectorAll('.calendar-filter-btn');
   const eventDots = document.querySelectorAll('.calendar-event-dot');
   

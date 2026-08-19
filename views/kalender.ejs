@@ -85,9 +85,9 @@
 
   <!-- ========== CALENDAR EVENT MODAL OVERLAY ========== -->
   <div class="cal-modal" id="calModal" role="dialog" aria-modal="true" aria-labelledby="calModalDate">
-    <div class="cal-modal__backdrop" onclick="closeCalModal()"></div>
+    <div class="cal-modal__backdrop" onclick="window.closeCalModal()"></div>
     <div class="cal-modal__dialog">
-      <button class="cal-modal__close" onclick="closeCalModal()" aria-label="Tutup popup">&times;</button>
+      <button class="cal-modal__close" onclick="window.closeCalModal()" aria-label="Tutup popup">&times;</button>
       <div class="cal-modal__header">
         <div class="cal-modal__icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -101,176 +101,205 @@
         <!-- Event items or empty state injected here -->
       </div>
       <div class="cal-modal__footer">
-        <button class="btn btn--gold btn--sm" onclick="closeCalModal()">Tutup</button>
+        <button type="button" class="btn btn--gold btn--sm" onclick="window.closeCalModal()">Tutup</button>
       </div>
     </div>
   </div>
 
   <%- include('partials/footer') %>
 
-  <script src="js/main.min.js?v=3" defer></script>
+  <script src="js/main.min.js?v=4" defer></script>
   <script>
-    // Calendar data from server
-    const calendarEvents = <%- JSON.stringify(kalender) %>;
+    (function() {
+      // Calendar data from server
+      const calendarEvents = <%- JSON.stringify(kalender || []) %>;
 
-    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-    const DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+      const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      const DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 
-    let currentYear, currentMonth;
+      let currentYear, currentMonth;
 
-    function initCalendar() {
-      const now = new Date();
-      currentYear = now.getFullYear();
-      currentMonth = now.getMonth();
-      renderCalendar();
-
-      document.getElementById('calPrev').addEventListener('click', () => {
-        currentMonth--;
-        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      function initInteractiveCalendar() {
+        const now = new Date();
+        currentYear = now.getFullYear();
+        currentMonth = now.getMonth();
         renderCalendar();
-      });
-      document.getElementById('calNext').addEventListener('click', () => {
-        currentMonth++;
-        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-        renderCalendar();
-      });
-    }
 
-    function renderCalendar() {
-      document.getElementById('calTitle').textContent = MONTHS_ID[currentMonth] + ' ' + currentYear;
-      const body = document.getElementById('calBody');
-      body.innerHTML = '';
+        const prevBtn = document.getElementById('calPrev');
+        const nextBtn = document.getElementById('calNext');
 
-      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      const today = new Date();
-
-      // Empty cells before first day
-      for (let i = 0; i < firstDay; i++) {
-        const empty = document.createElement('div');
-        empty.className = 'cal-cell cal-cell--empty';
-        body.appendChild(empty);
+        if (prevBtn) {
+          prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+          });
+        }
       }
 
-      // Day cells
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      function renderCalendar() {
+        const titleEl = document.getElementById('calTitle');
+        if (titleEl) titleEl.textContent = MONTHS_ID[currentMonth] + ' ' + currentYear;
+        
+        const body = document.getElementById('calBody');
+        if (!body) return;
+        body.innerHTML = '';
+
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const today = new Date();
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'cal-cell cal-cell--empty';
+          body.appendChild(empty);
+        }
+
+        // Day cells
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+          const dayEvents = calendarEvents.filter(e => e.tanggal === dateStr);
+          const isToday = (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === d);
+
+          const cell = document.createElement('div');
+          cell.className = 'cal-cell' + (isToday ? ' cal-cell--today' : '') + (dayEvents.length ? ' cal-cell--has-event' : '');
+          cell.setAttribute('title', dayEvents.length ? `${dayEvents.length} kegiatan pada ${d} ${MONTHS_ID[currentMonth]}` : `Klik untuk melihat agenda tanggal ${d}`);
+          cell.innerHTML = '<span class="cal-cell__num">' + d + '</span>' +
+            (dayEvents.length ? '<span class="cal-cell__dot"></span>' : '');
+
+          // Click any day to show the modal overlay
+          cell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openCalendarModal(dateStr, dayEvents);
+          });
+
+          body.appendChild(cell);
+        }
+      }
+
+      function openCalendarModal(dateStr, events) {
+        const parts = dateStr.split('-');
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        const dateObj = new Date(y, m, d);
+        
+        const dayName = DAYS_ID[dateObj.getDay()];
+        const monthName = MONTHS_ID[m];
+        const formattedTitle = `${dayName}, ${d} ${monthName} ${y}`;
+        
+        const titleModal = document.getElementById('calModalDate');
+        if (titleModal) titleModal.textContent = formattedTitle;
+
+        const body = document.getElementById('calModalBody');
+        if (body) {
+          if (events && events.length > 0) {
+            body.innerHTML = events.map(ev => `
+              <div class="cal-modal-card">
+                <div class="cal-modal-card__header">
+                  <span class="cal-modal-card__badge">${ev.kategori || 'Kegiatan'}</span>
+                  ${ev.waktu ? `<span class="cal-modal-card__time">⏰ ${ev.waktu}</span>` : ''}
+                </div>
+                <h4 class="cal-modal-card__title">${ev.judul}</h4>
+                <p class="cal-modal-card__desc">${ev.desc || 'Tidak ada deskripsi tambahan.'}</p>
+              </div>
+            `).join('');
+          } else {
+            body.innerHTML = `
+              <div class="cal-modal-empty">
+                <div class="cal-modal-empty__icon">📅</div>
+                <h4>Tidak Ada Agenda</h4>
+                <p>Belum ada jadwal kegiatan khusus yang tercatat pada tanggal ini.</p>
+              </div>
+            `;
+          }
+        }
+
+        // Also update inline panel
+        showEventsInline(dateStr, events);
+
+        // Open Modal
+        const modal = document.getElementById('calModal');
+        if (modal) {
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      function openCalendarModalDirect(dateStr) {
         const dayEvents = calendarEvents.filter(e => e.tanggal === dateStr);
-        const isToday = (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === d);
+        openCalendarModal(dateStr, dayEvents);
+      }
 
-        const cell = document.createElement('div');
-        cell.className = 'cal-cell' + (isToday ? ' cal-cell--today' : '') + (dayEvents.length ? ' cal-cell--has-event' : '');
-        cell.setAttribute('title', dayEvents.length ? `${dayEvents.length} kegiatan pada ${d} ${MONTHS_ID[currentMonth]}` : `Klik untuk melihat agenda`);
-        cell.innerHTML = '<span class="cal-cell__num">' + d + '</span>' +
-          (dayEvents.length ? '<span class="cal-cell__dot"></span>' : '');
+      function closeCalModal() {
+        const modal = document.getElementById('calModal');
+        if (modal) modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
 
-        // Click any day to show the modal overlay
-        cell.addEventListener('click', () => {
-          openCalendarModal(dateStr, dayEvents);
+      function showEventsInline(dateStr, events) {
+        const parts = dateStr.split('-');
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        const title = d + ' ' + MONTHS_ID[m] + ' ' + y;
+
+        const titleEl = document.getElementById('calEventsTitle');
+        if (titleEl) titleEl.textContent = 'Kegiatan — ' + title;
+
+        const list = document.getElementById('calEventsList');
+        if (list) {
+          if (events && events.length > 0) {
+            list.innerHTML = events.map(ev =>
+              '<div class="cal-event-card">' +
+                '<span class="cal-event-card__badge">' + ev.kategori + '</span>' +
+                '<h4>' + ev.judul + '</h4>' +
+                '<p>' + ev.desc + '</p>' +
+              '</div>'
+            ).join('');
+          } else {
+            list.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Tidak ada kegiatan pada tanggal ini.</p>';
+          }
+        }
+
+        const calEvents = document.getElementById('calEvents');
+        if (calEvents) calEvents.classList.add('active');
+
+        // Highlight selected cell
+        document.querySelectorAll('.cal-cell--selected').forEach(c => c.classList.remove('cal-cell--selected'));
+        document.querySelectorAll('.cal-cell').forEach(c => {
+          const numEl = c.querySelector('.cal-cell__num');
+          if (numEl && parseInt(numEl.textContent, 10) === d) {
+            c.classList.add('cal-cell--selected');
+          }
         });
-
-        body.appendChild(cell);
-      }
-    }
-
-    function openCalendarModal(dateStr, events) {
-      const parts = dateStr.split('-');
-      const y = parseInt(parts[0], 10);
-      const m = parseInt(parts[1], 10) - 1;
-      const d = parseInt(parts[2], 10);
-      const dateObj = new Date(y, m, d);
-      
-      const dayName = DAYS_ID[dateObj.getDay()];
-      const monthName = MONTHS_ID[m];
-      const formattedTitle = `${dayName}, ${d} ${monthName} ${y}`;
-      
-      document.getElementById('calModalDate').textContent = formattedTitle;
-
-      const body = document.getElementById('calModalBody');
-      if (events && events.length > 0) {
-        body.innerHTML = events.map(ev => `
-          <div class="cal-modal-card">
-            <div class="cal-modal-card__header">
-              <span class="cal-modal-card__badge">${ev.kategori || 'Kegiatan'}</span>
-              ${ev.waktu ? `<span class="cal-modal-card__time">⏰ ${ev.waktu}</span>` : ''}
-            </div>
-            <h4 class="cal-modal-card__title">${ev.judul}</h4>
-            <p class="cal-modal-card__desc">${ev.desc || 'Tidak ada deskripsi tambahan.'}</p>
-          </div>
-        `).join('');
-      } else {
-        body.innerHTML = `
-          <div class="cal-modal-empty">
-            <div class="cal-modal-empty__icon">📅</div>
-            <h4>Tidak Ada Agenda</h4>
-            <p>Belum ada jadwal kegiatan khusus yang tercatat pada tanggal ini.</p>
-          </div>
-        `;
       }
 
-      // Also update inline panel
-      showEventsInline(dateStr, events);
+      // Expose to window for inline onclick attributes
+      window.openCalendarModal = openCalendarModal;
+      window.openCalendarModalDirect = openCalendarModalDirect;
+      window.closeCalModal = closeCalModal;
 
-      // Open Modal
-      document.getElementById('calModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function openCalendarModalDirect(dateStr) {
-      const dayEvents = calendarEvents.filter(e => e.tanggal === dateStr);
-      openCalendarModal(dateStr, dayEvents);
-    }
-
-    function closeCalModal() {
-      const modal = document.getElementById('calModal');
-      if (modal) modal.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    function showEventsInline(dateStr, events) {
-      const parts = dateStr.split('-');
-      const y = parseInt(parts[0], 10);
-      const m = parseInt(parts[1], 10) - 1;
-      const d = parseInt(parts[2], 10);
-      const dateObj = new Date(y, m, d);
-      const title = d + ' ' + MONTHS_ID[m] + ' ' + y;
-
-      const titleEl = document.getElementById('calEventsTitle');
-      if (titleEl) titleEl.textContent = 'Kegiatan — ' + title;
-
-      const list = document.getElementById('calEventsList');
-      if (list) {
-        if (events && events.length > 0) {
-          list.innerHTML = events.map(ev =>
-            '<div class="cal-event-card">' +
-              '<span class="cal-event-card__badge">' + ev.kategori + '</span>' +
-              '<h4>' + ev.judul + '</h4>' +
-              '<p>' + ev.desc + '</p>' +
-            '</div>'
-          ).join('');
-        } else {
-          list.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Tidak ada kegiatan pada tanggal ini.</p>';
-        }
-      }
-
-      const calEvents = document.getElementById('calEvents');
-      if (calEvents) calEvents.classList.add('active');
-
-      // Highlight selected cell
-      document.querySelectorAll('.cal-cell--selected').forEach(c => c.classList.remove('cal-cell--selected'));
-      document.querySelectorAll('.cal-cell').forEach(c => {
-        const numEl = c.querySelector('.cal-cell__num');
-        if (numEl && parseInt(numEl.textContent, 10) === d) {
-          c.classList.add('cal-cell--selected');
-        }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeCalModal();
       });
-    }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeCalModal();
-    });
-
-    document.addEventListener('DOMContentLoaded', initCalendar);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initInteractiveCalendar);
+      } else {
+        initInteractiveCalendar();
+      }
+    })();
   </script>
 
 </body>
