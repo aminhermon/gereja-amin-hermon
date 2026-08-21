@@ -512,7 +512,7 @@
                   <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                     <% if (p.image) { %>
                       <img src="/<%= p.image %>" class="preview">
-                      <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus foto <%= p.name %>?')) document.getElementById('formDelPendeta_<%= i %>').submit();">🗑️ Hapus Foto</button>
+                      <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelPendeta_<%= i %>" data-del-name="<%= p.name %>" onclick="confirmAndDelete(this)">🗑️ Hapus Foto</button>
                     <% } else { %>
                       <span style="font-size:0.75rem; color:var(--text-muted);">Belum ada foto</span>
                     <% } %>
@@ -553,7 +553,7 @@
               <div style="display:flex; gap:8px; margin-top:.5rem;">
                 <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
                 <% if (pg.image) { %>
-                <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus foto <%= pg.name %>?')) document.getElementById('formDelPengurus_<%= i %>').submit();">🗑️ Hapus Foto</button>
+                <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelPengurus_<%= i %>" data-del-name="<%= pg.name %>" onclick="confirmAndDelete(this)">🗑️ Hapus Foto</button>
                 <% } %>
               </div>
             </form>
@@ -587,7 +587,7 @@
                 <div style="display:flex; gap:6px;">
                   <button type="submit" class="btn btn--gold btn--xs" style="flex:1; justify-content:center;">💾 Simpan</button>
                   <% if (m.image) { %>
-                  <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus foto majelis <%= m.name %>?')) document.getElementById('formDelMajelis_<%= i %>').submit();" title="Hapus Foto">🗑️</button>
+                  <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelMajelis_<%= i %>" data-del-name="<%= m.name %>" onclick="confirmAndDelete(this)" title="Hapus Foto">🗑️</button>
                   <% } %>
                 </div>
               </form>
@@ -1014,6 +1014,28 @@
   </main>
 
   <script>
+    // === Scroll Position Preservation ===
+    // Save scroll position before any form submit so page doesn't jump to top
+    document.addEventListener('submit', function() {
+      sessionStorage.setItem('adminScrollY', window.scrollY.toString());
+    });
+    window.addEventListener('load', function() {
+      var saved = sessionStorage.getItem('adminScrollY');
+      if (saved) {
+        window.scrollTo(0, parseInt(saved));
+        sessionStorage.removeItem('adminScrollY');
+      }
+    });
+
+    // === Safe Confirm & Delete ===
+    // Uses data attributes to avoid JS string breakage from special chars in names
+    function confirmAndDelete(btn) {
+      var name = btn.getAttribute('data-del-name') || '';
+      var formId = btn.getAttribute('data-del-form');
+      if (confirm('Hapus foto ' + name + '?')) {
+        document.getElementById(formId).submit();
+      }
+    }
     function filterFiles() {
       const input = document.getElementById('fmSearchInput');
       const filter = input ? input.value.toLowerCase() : '';
