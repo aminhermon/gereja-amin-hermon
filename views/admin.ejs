@@ -134,6 +134,7 @@
       <li><a href="/admin?tab=visit" class="<%= tab === 'visit' ? 'active' : '' %>"><span class="emoji">🆕</span> Baru di Sini?</a></li>
       <li><a href="/admin?tab=about" class="<%= tab === 'about' ? 'active' : '' %>"><span class="emoji">⛪</span> Tentang Gereja</a></li>
       <li><a href="/admin?tab=pelayanan" class="<%= tab === 'pelayanan' ? 'active' : '' %>"><span class="emoji">📋</span> Pelayanan</a></li>
+      <li><a href="/admin?tab=kalender" class="<%= tab === 'kalender' ? 'active' : '' %>"><span class="emoji">📅</span> Kalender Kegiatan</a></li>
       <li><a href="/admin?tab=media" class="<%= tab === 'media' ? 'active' : '' %>"><span class="emoji">📸</span> Media & Galeri</a></li>
       <li><a href="/admin?tab=contact" class="<%= tab === 'contact' ? 'active' : '' %>"><span class="emoji">📞</span> Hubungi Kami</a></li>
       <li><a href="/admin?tab=files" class="<%= tab === 'files' ? 'active' : '' %>" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 6px; padding-top: 0.9rem;"><span class="emoji">📁</span> Kelola File (<%= typeof files !== 'undefined' ? files.length : 0 %>)</a></li>
@@ -158,6 +159,7 @@
         <% } else if (tab === 'visit') { %>🆕 Kelola Baru di Sini?
         <% } else if (tab === 'about') { %>⛪ Kelola Tentang Gereja
         <% } else if (tab === 'pelayanan') { %>📋 Kelola Pelayanan
+        <% } else if (tab === 'kalender') { %>📅 Kelola Kalender Kegiatan
         <% } else if (tab === 'media') { %>📸 Kelola Media & Galeri
         <% } else if (tab === 'contact') { %>📞 Kelola Hubungi Kami
         <% } else if (tab === 'files') { %>📁 Kelola File (Uploads & Media)
@@ -847,6 +849,102 @@
           </form>
         </div>
 
+      </div>
+
+      <!-- ============================== TAB: KALENDER (INTEGRASI KOMSEK & BERANDA) ============================== -->
+      <div class="tab-content <%= tab === 'kalender' ? 'active' : '' %>">
+        <div class="card">
+          <h2 class="card-title">📅 Tambah Agenda / Kegiatan Baru</h2>
+          <p class="card-subtitle">Kegiatan yang ditambahkan akan muncul secara interaktif di Kalender Beranda serta halaman detail Komisi / Sektor terkait.</p>
+          <form action="/admin/kalender/add" method="POST" style="margin-bottom:1.5rem;">
+            <div class="grid-3">
+              <div class="form-group">
+                <label>Judul Agenda / Kegiatan</label>
+                <input type="text" name="judul" placeholder="Contoh: Ibadah Padang Pemuda" required>
+              </div>
+              <div class="form-group">
+                <label>Tanggal Pelaksanaan</label>
+                <input type="date" name="tanggal" required>
+              </div>
+              <div class="form-group">
+                <label>Waktu / Jam (Opsional)</label>
+                <input type="text" name="waktu" placeholder="Contoh: 09:00 WIB atau 17:00 - 19:00 WIB">
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Kategori & Terhubung ke KomSek</label>
+                <select name="kategori" required>
+                  <optgroup label="Ibadah & Kegiatan Umum Gereja">
+                    <option value="Ibadah Umum:">⛪ Ibadah Umum / Raya</option>
+                    <option value="Kegiatan Umum:">🌟 Kegiatan Umum Gereja</option>
+                    <option value="Ibadah Doa:">🙏 Ibadah Doa & Puasa</option>
+                  </optgroup>
+                  <% if (db.komsek && db.komsek.komisi && db.komsek.komisi.length) { %>
+                  <optgroup label="Komisi Kategorial">
+                    <% db.komsek.komisi.forEach(function(k) { %>
+                    <option value="<%= k.nama %>:<%= k.slug %>">👥 <%= k.nama %></option>
+                    <% }); %>
+                  </optgroup>
+                  <% } %>
+                  <% if (db.komsek && db.komsek.sektor && db.komsek.sektor.length) { %>
+                  <optgroup label="Sektor Pelayanan">
+                    <% db.komsek.sektor.forEach(function(s) { %>
+                    <option value="<%= s.nama %>:<%= s.slug %>">🏡 <%= s.nama %></option>
+                    <% }); %>
+                  </optgroup>
+                  <% } %>
+                </select>
+                <span class="help-text">Memilih Komisi/Sektor akan menghubungkan agenda ini langsung ke halaman KomSek yang bersangkutan.</span>
+              </div>
+              <div class="form-group">
+                <label>Deskripsi & Lokasi</label>
+                <input type="text" name="desc" placeholder="Contoh: Gedung Gereja AMIN Hermon Lt. 2 / Rumah Kel. Bpk. Gea" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn--gold">➕ Simpan Agenda Kalender</button>
+          </form>
+
+          <hr class="divider">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h4 style="color:var(--navy); margin:0;">📋 Daftar Agenda Kalender Terdaftar (<%= db.kalender ? db.kalender.length : 0 %>)</h4>
+            <span style="font-size:0.8rem; color:var(--text-muted);">Diurutkan berdasarkan tanggal pelaksanaan</span>
+          </div>
+
+          <% if(db.kalender && db.kalender.length > 0) { %>
+            <div style="display:flex; flex-direction:column; gap:0.6rem;">
+              <% db.kalender.sort(function(a,b){ return new Date(a.tanggal) - new Date(b.tanggal); }).forEach(function(k) { %>
+              <div class="warta-row" style="padding: 0.85rem 1rem;">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <strong style="color:var(--navy); font-size:0.95rem;"><%= k.judul %></strong>
+                    <span style="background:rgba(200,169,81,0.18); color:var(--navy); border:1px solid rgba(200,169,81,0.4); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight:600;">
+                      <%= k.kategori %>
+                    </span>
+                    <% if (k.waktu) { %>
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">⏰ <%= k.waktu %></span>
+                    <% } %>
+                  </div>
+                  <div style="font-size:0.82rem; color:var(--text-muted);">
+                    📅 <strong><%= k.tanggal %></strong> &bull; 📍 <%= k.desc %>
+                  </div>
+                </div>
+                <form action="/admin/kalender/delete/<%= k.id %>" method="POST" onsubmit="return confirm('Hapus agenda \'<%= k.judul %>\' dari kalender?')">
+                  <button type="submit" class="btn btn--danger btn--xs" style="padding:5px 10px;" title="Hapus Agenda">🗑️ Hapus</button>
+                </form>
+              </div>
+              <% }); %>
+            </div>
+          <% } else { %>
+            <div style="text-align:center; padding:2.5rem; color:var(--text-muted); background:var(--bg); border-radius:var(--radius); border:1px solid var(--border);">
+              <div style="font-size:2rem; margin-bottom:6px;">📅</div>
+              <p style="margin:0; font-weight:600;">Belum ada agenda di kalender kegiatan.</p>
+              <p style="font-size:0.8rem; margin-top:4px;">Gunakan formulir di atas untuk menambahkan kegiatan pertama.</p>
+            </div>
+          <% } %>
+        </div>
       </div>
 
       <!-- ============================== TAB: FILE MANAGER ============================== -->

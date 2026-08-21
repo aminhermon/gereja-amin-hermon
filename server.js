@@ -1216,6 +1216,46 @@ app.post('/admin/contact/whatsapp', requireAuth, (req, res) => {
   res.redirect('/admin?tab=contact');
 });
 
+// ===== TAB: KALENDER (INTEGRASI KOMSEK & BERANDA) =====
+
+// Kalender add
+app.post('/admin/kalender/add', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.kalender) db.kalender = [];
+  
+  // Extract komsekSlug if provided or infer from kategori
+  let komsekSlug = req.body.komsekSlug || '';
+  if (!komsekSlug && req.body.kategori && req.body.kategori.includes(':')) {
+    const parts = req.body.kategori.split(':');
+    komsekSlug = parts[1];
+    req.body.kategori = parts[0];
+  }
+
+  const newEvent = {
+    id: String(Date.now()),
+    judul: req.body.judul,
+    tanggal: req.body.tanggal,
+    waktu: req.body.waktu || '',
+    kategori: req.body.kategori || 'Ibadah Umum',
+    komsekSlug: komsekSlug,
+    desc: req.body.desc || ''
+  };
+
+  db.kalender.push(newEvent);
+  saveDB(db);
+  res.redirect('/admin?tab=kalender&msg=' + encodeURIComponent('Kegiatan kalender berhasil ditambahkan!'));
+});
+
+// Kalender delete
+app.post('/admin/kalender/delete/:id', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.kalender) {
+    db.kalender = db.kalender.filter(k => k.id !== req.params.id);
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=kalender&msg=' + encodeURIComponent('Kegiatan kalender berhasil dihapus.'));
+});
+
 // ===== TAB: FILE MANAGER (UPLOAD & DELETE ALL FILES) =====
 
 // Direct upload to uploads/ folder

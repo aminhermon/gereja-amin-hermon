@@ -246,6 +246,86 @@
     </div>
   </section>
 
+  <!-- ========== KALENDER KEGIATAN & AGENDA (INTERAKTIF) ========== -->
+  <section class="section section--navy section--calendar" id="kalender-section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Kalender <span class="text-gold">Kegiatan</span></h2>
+        <span class="gold-line"></span>
+        <p>Jadwal ibadah, agenda pelayanan, dan kegiatan KomSek (Komisi & Sektor) Gereja AMIN Hermon.</p>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="cal-filters" data-aos="fade-up">
+        <button type="button" class="cal-filter-btn active" data-filter="all" onclick="setCalendarFilter('all', this)">🌟 Semua Agenda</button>
+        <button type="button" class="cal-filter-btn" data-filter="ibadah" onclick="setCalendarFilter('ibadah', this)">⛪ Ibadah & Umum</button>
+        <button type="button" class="cal-filter-btn" data-filter="komisi" onclick="setCalendarFilter('komisi', this)">👥 Komisi Kategorial</button>
+        <button type="button" class="cal-filter-btn" data-filter="sektor" onclick="setCalendarFilter('sektor', this)">🏡 Sektor Pelayanan</button>
+      </div>
+
+      <!-- Main Calendar Card with Glassmorphic Luxury Style -->
+      <div class="cal-main-wrapper" data-aos="fade-up" data-aos-delay="100">
+        <!-- Calendar Navigation Header -->
+        <div class="cal-nav">
+          <button type="button" class="cal-nav__btn" id="homeCalPrev" aria-label="Bulan sebelumnya">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="cal-nav__title-wrap">
+            <h3 class="cal-nav__title" id="homeCalTitle">Agustus 2026</h3>
+            <span class="cal-nav__hint">💡 Klik tanggal bertitik emas untuk melihat detail agenda kegiatan</span>
+          </div>
+          <button type="button" class="cal-nav__btn" id="homeCalNext" aria-label="Bulan berikutnya">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </div>
+
+        <!-- Calendar Weekdays Header -->
+        <div class="cal-grid__header">
+          <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+        </div>
+
+        <!-- Calendar Grid Body -->
+        <div class="cal-grid__body" id="homeCalBody">
+          <!-- Dynamically generated day cells -->
+        </div>
+      </div>
+
+      <!-- Upcoming Events Strip -->
+      <div class="cal-upcoming-strip" data-aos="fade-up" data-aos-delay="150">
+        <div class="cal-upcoming-strip__head">
+          <h4>📅 Agenda Terdekat Mendatang</h4>
+          <span class="cal-upcoming-strip__sub">Kegiatan sepekan & sebulan ke depan</span>
+        </div>
+        <div class="cal-upcoming-strip__grid" id="homeUpcomingGrid">
+          <!-- Dynamically populated upcoming events -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== POPUP OVERLAY MODAL AGENDA KALENDER ========== -->
+  <div class="cal-modal" id="calModal" role="dialog" aria-modal="true" aria-labelledby="calModalDate">
+    <div class="cal-modal__backdrop" onclick="window.closeCalModal()"></div>
+    <div class="cal-modal__dialog">
+      <button type="button" class="cal-modal__close" onclick="window.closeCalModal()" aria-label="Tutup popup">&times;</button>
+      <div class="cal-modal__header">
+        <div class="cal-modal__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </div>
+        <div>
+          <span class="cal-modal__subtitle">Agenda Kegiatan Gereja</span>
+          <h3 class="cal-modal__title" id="calModalDate">Tanggal</h3>
+        </div>
+      </div>
+      <div class="cal-modal__body" id="calModalBody">
+        <!-- Event items injected here -->
+      </div>
+      <div class="cal-modal__footer">
+        <button type="button" class="btn btn--gold btn--sm" onclick="window.closeCalModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== NEWS DETAIL MODAL ========== -->
   <div class="news-modal" id="newsModal">
     <div class="news-modal__backdrop" onclick="closeNewsDetail()"></div>
@@ -266,15 +346,13 @@
     </div>
   </div>
 
-
-
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="js/main.min.js?v=3" defer></script>
+  <script src="js/main.min.js?v=6" defer></script>
   <script>
     // News data for modal
-    const newsData = <%- JSON.stringify(home.news) %>;
+    const newsData = <%- JSON.stringify(home.news || []) %>;
 
     function openNewsDetail(idx) {
       const item = newsData[idx];
@@ -292,9 +370,256 @@
       document.body.style.overflow = '';
     }
 
+    // =======================================================
+    // INTERACTIVE CALENDAR & KOMSEK INTEGRATION
+    // =======================================================
+    var rawCalendarEvents = <%- JSON.stringify(typeof kalender !== 'undefined' ? kalender : []) %>;
+    var komsekData = <%- JSON.stringify(typeof komsek !== 'undefined' ? komsek : { komisi: [], sektor: [] }) %>;
+
+    var MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    var DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+    var currentCalYear, currentCalMonth;
+    var activeCalFilter = 'all';
+
+    function initHomeCalendar() {
+      var now = new Date();
+      currentCalYear = now.getFullYear();
+      currentCalMonth = now.getMonth();
+
+      renderHomeCalendar();
+      renderHomeUpcomingEvents();
+
+      var prevBtn = document.getElementById('homeCalPrev');
+      var nextBtn = document.getElementById('homeCalNext');
+
+      if (prevBtn) {
+        prevBtn.onclick = function(e) {
+          e.preventDefault();
+          currentCalMonth--;
+          if (currentCalMonth < 0) { currentCalMonth = 11; currentCalYear--; }
+          renderHomeCalendar();
+        };
+      }
+      if (nextBtn) {
+        nextBtn.onclick = function(e) {
+          e.preventDefault();
+          currentCalMonth++;
+          if (currentCalMonth > 11) { currentCalMonth = 0; currentCalYear++; }
+          renderHomeCalendar();
+        };
+      }
+    }
+
+    function setCalendarFilter(filter, btn) {
+      activeCalFilter = filter;
+      var buttons = document.querySelectorAll('.cal-filter-btn');
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('active');
+      }
+      if (btn) btn.classList.add('active');
+      renderHomeCalendar();
+      renderHomeUpcomingEvents();
+    }
+
+    function isEventMatchingFilter(ev, filter) {
+      if (!filter || filter === 'all') return true;
+      var kat = (ev.kategori || '').toLowerCase();
+      var slug = (ev.komsekSlug || '').toLowerCase();
+      var judul = (ev.judul || '').toLowerCase();
+
+      if (filter === 'ibadah') {
+        return kat.includes('ibadah') || kat.includes('umum') || kat.includes('kegiatan') || judul.includes('ibadah');
+      }
+      if (filter === 'komisi') {
+        return kat.includes('komisi') || slug.startsWith('komisi') || kat.includes('kpa') || kat.includes('pemuda') || kat.includes('perempuan') || kat.includes('bapak');
+      }
+      if (filter === 'sektor') {
+        return kat.includes('sektor') || slug.startsWith('sektor') || kat.includes('maranatha') || kat.includes('berkat') || kat.includes('imanuel') || kat.includes('sion') || kat.includes('yordan');
+      }
+      return true;
+    }
+
+    function findKomsekInfo(ev) {
+      var allKomsek = (komsekData.komisi || []).concat(komsekData.sektor || []);
+      if (ev.komsekSlug) {
+        var found = allKomsek.find(function(k) { return k.slug === ev.komsekSlug; });
+        if (found) return found;
+      }
+      var katLower = (ev.kategori || '').toLowerCase();
+      return allKomsek.find(function(k) {
+        return katLower.includes(k.nama.toLowerCase().replace('komisi ', '').replace('sektor ', ''));
+      });
+    }
+
+    function renderHomeCalendar() {
+      var titleEl = document.getElementById('homeCalTitle');
+      if (titleEl) titleEl.textContent = MONTHS_ID[currentCalMonth] + ' ' + currentCalYear;
+
+      var body = document.getElementById('homeCalBody');
+      if (!body) return;
+      body.innerHTML = '';
+
+      var firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
+      var daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+      var today = new Date();
+
+      // Empty leading cells
+      for (var i = 0; i < firstDay; i++) {
+        var empty = document.createElement('div');
+        empty.className = 'cal-cell cal-cell--empty';
+        body.appendChild(empty);
+      }
+
+      // Day cells
+      for (var d = 1; d <= daysInMonth; d++) {
+        var dateStr = currentCalYear + '-' + String(currentCalMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        var allEventsOnDate = rawCalendarEvents.filter(function(e) { return e.tanggal === dateStr; });
+        var filteredEvents = allEventsOnDate.filter(function(e) { return isEventMatchingFilter(e, activeCalFilter); });
+        
+        var isToday = (today.getFullYear() === currentCalYear && today.getMonth() === currentCalMonth && today.getDate() === d);
+
+        var cell = document.createElement('div');
+        cell.className = 'cal-cell' + (isToday ? ' cal-cell--today' : '') + (filteredEvents.length ? ' cal-cell--has-event' : '');
+        cell.setAttribute('data-date', dateStr);
+        cell.setAttribute('title', filteredEvents.length ? (filteredEvents.length + ' kegiatan pada ' + d + ' ' + MONTHS_ID[currentCalMonth]) : ('Tanggal ' + d + ' ' + MONTHS_ID[currentCalMonth]));
+
+        cell.innerHTML = '<span class="cal-cell__num">' + d + '</span>' +
+          (filteredEvents.length ? '<span class="cal-cell__dot"></span>' : '');
+
+        // Direct onclick on cell to open popup overlay modal
+        (function(ds, events) {
+          cell.onclick = function(e) {
+            e.stopPropagation();
+            openCalendarModal(ds, events);
+          };
+        })(dateStr, allEventsOnDate);
+
+        body.appendChild(cell);
+      }
+    }
+
+    function renderHomeUpcomingEvents() {
+      var grid = document.getElementById('homeUpcomingGrid');
+      if (!grid) return;
+
+      var todayStr = new Date().toISOString().split('T')[0];
+      var upcoming = rawCalendarEvents.filter(function(ev) {
+        return ev.tanggal >= todayStr && isEventMatchingFilter(ev, activeCalFilter);
+      }).sort(function(a, b) {
+        return new Date(a.tanggal) - new Date(b.tanggal);
+      }).slice(0, 6);
+
+      if (upcoming.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:1.5rem; color:#94A3B8; font-size:0.9rem;">Belum ada agenda mendatang untuk kategori ini.</div>';
+        return;
+      }
+
+      grid.innerHTML = upcoming.map(function(ev) {
+        var d = new Date(ev.tanggal);
+        var dayNum = d.getDate();
+        var monthStr = MONTHS_ID[d.getMonth()].substring(0, 3);
+        var komsek = findKomsekInfo(ev);
+
+        return '<div class="cal-upcoming__card" onclick="openCalendarModalDirect(\'' + ev.tanggal + '\')">' +
+          '<div class="cal-upcoming__date">' +
+            '<span class="cal-upcoming__day">' + dayNum + '</span>' +
+            '<span class="cal-upcoming__month">' + monthStr + '</span>' +
+          '</div>' +
+          '<div class="cal-upcoming__info">' +
+            '<span class="cal-modal-card__badge">' + (ev.kategori || 'Kegiatan') + '</span>' +
+            '<h4>' + ev.judul + '</h4>' +
+            '<p>' + (ev.waktu ? '⏰ ' + ev.waktu + ' &bull; ' : '') + (ev.desc || '') + '</p>' +
+            (komsek ? '<a href="/komsek/' + komsek.slug + '" class="cal-komsek-link" onclick="event.stopPropagation()">Wadah ' + komsek.nama + ' &rarr;</a>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function openCalendarModal(dateStr, events) {
+      if (!dateStr) return;
+      var parts = dateStr.split('-');
+      var y = parseInt(parts[0], 10);
+      var m = parseInt(parts[1], 10) - 1;
+      var d = parseInt(parts[2], 10);
+      var dateObj = new Date(y, m, d);
+
+      var dayName = DAYS_ID[dateObj.getDay()];
+      var monthName = MONTHS_ID[m];
+      var formattedTitle = dayName + ', ' + d + ' ' + monthName + ' ' + y;
+
+      var titleModal = document.getElementById('calModalDate');
+      if (titleModal) titleModal.textContent = formattedTitle;
+
+      var modalBody = document.getElementById('calModalBody');
+      if (modalBody) {
+        if (events && events.length > 0) {
+          modalBody.innerHTML = events.map(function(ev) {
+            var komsek = findKomsekInfo(ev);
+            return '<div class="cal-modal-card">' +
+              '<div class="cal-modal-card__header">' +
+                '<span class="cal-modal-card__badge">' + (ev.kategori || 'Kegiatan') + '</span>' +
+                (ev.waktu ? '<span class="cal-modal-card__time">⏰ ' + ev.waktu + '</span>' : '') +
+              '</div>' +
+              '<h4 class="cal-modal-card__title">' + ev.judul + '</h4>' +
+              '<p class="cal-modal-card__desc">' + (ev.desc || 'Tidak ada deskripsi tambahan.') + '</p>' +
+              (komsek ? '<a href="/komsek/' + komsek.slug + '" class="cal-komsek-link" style="margin-top:10px;">🌟 Lihat Halaman ' + komsek.nama + ' &rarr;</a>' : '') +
+            '</div>';
+          }).join('');
+        } else {
+          modalBody.innerHTML = '<div class="cal-modal-empty">' +
+            '<div class="cal-modal-empty__icon">📅</div>' +
+            '<h4>Tidak Ada Agenda Khusus</h4>' +
+            '<p>Belum ada jadwal ibadah atau kegiatan khusus yang tercatat pada tanggal ini.</p>' +
+          '</div>';
+        }
+      }
+
+      var modal = document.getElementById('calModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        void modal.offsetHeight;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function openCalendarModalDirect(dateStr) {
+      var dayEvents = rawCalendarEvents.filter(function(e) { return e.tanggal === dateStr; });
+      openCalendarModal(dateStr, dayEvents);
+    }
+
+    function closeCalModal() {
+      var modal = document.getElementById('calModal');
+      if (modal) {
+        modal.classList.remove('active');
+        setTimeout(function() {
+          if (!modal.classList.contains('active')) {
+            modal.style.display = 'none';
+          }
+        }, 250);
+      }
+      document.body.style.overflow = '';
+    }
+
+    window.openCalendarModal = openCalendarModal;
+    window.openCalendarModalDirect = openCalendarModalDirect;
+    window.closeCalModal = closeCalModal;
+    window.setCalendarFilter = setCalendarFilter;
+
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeNewsDetail();
+      if (e.key === 'Escape') {
+        closeNewsDetail();
+        closeCalModal();
+      }
     });
+
+    // Initialize calendar on page load
+    if (document.readyState === 'complete') {
+      initHomeCalendar();
+    } else {
+      window.addEventListener('load', initHomeCalendar);
+    }
   </script>
 </body>
 </html>
