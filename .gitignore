@@ -6,3 +6,4 @@ deploy-hostinger.zip
 .DS_Store
 data/db.persisted.json
 uploads/
+!uploads/.gitkeep
