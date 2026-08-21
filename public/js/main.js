@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initGallery();
   initSmoothScroll();
   setActiveNavLink();
-  initCalendarFilterButtons();
   initGlobalLightbox();
   initVisitorCounter();
   initSwiper();
@@ -393,33 +392,6 @@ if ('IntersectionObserver' in window) {
   });
   document.querySelectorAll('img[data-src]').forEach(img => imgObserver.observe(img));
 }
-
-/* ---------- Calendar Filter Buttons ---------- */
-function initCalendarFilterButtons() {
-  const filterBtns = document.querySelectorAll('.calendar-filter-btn');
-  const eventDots = document.querySelectorAll('.calendar-event-dot');
-  
-  if (!filterBtns.length) return;
-  
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Remove active from all
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      const filter = btn.dataset.filter;
-      
-      eventDots.forEach(dot => {
-        if (filter === 'all' || dot.dataset.cat === filter) {
-          dot.classList.remove('hidden');
-        } else {
-          dot.classList.add('hidden');
-        }
-      });
-    });
-  });
-}
-
 /* ---------- Global Lightbox (For Non-Gallery Images) ---------- */
 function initGlobalLightbox() {
   const images = document.querySelectorAll('.section img:not(.gallery-item img)');

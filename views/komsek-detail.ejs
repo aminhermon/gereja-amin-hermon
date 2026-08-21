@@ -61,7 +61,8 @@
       <div class="cal-upcoming__grid">
         <% 
           var mainName = unit.nama.toLowerCase().replace('komisi ', '').replace('sektor ', '');
-          var upcomingEvents = kalender.filter(function(ev) {
+          var eventsList = (typeof kalender !== 'undefined' && Array.isArray(kalender)) ? kalender : [];
+          var upcomingEvents = eventsList.filter(function(ev) {
             var searchTxt = (ev.judul + ' ' + ev.kategori + ' ' + ev.desc).toLowerCase();
             return searchTxt.includes(mainName) && new Date(ev.tanggal) >= new Date(new Date().toISOString().split('T')[0]);
           }).sort(function(a,b) { return new Date(a.tanggal) - new Date(b.tanggal); });

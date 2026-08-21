@@ -294,7 +294,7 @@ app.get('/', (req, res) => { res.render('index', getDB()); });
 app.get('/index.html', (req, res) => { res.redirect('/'); });
 
 // Dynamic pages
-const pages = ['visit', 'about', 'pelayanan', 'media', 'contact', 'kalender'];
+const pages = ['visit', 'about', 'pelayanan', 'media', 'contact'];
 pages.forEach(page => {
   app.get(`/${page}.html`, (req, res) => { res.render(page, getDB()); });
 });
@@ -323,7 +323,6 @@ app.get('/search', (req, res) => {
       { title: 'Tentang Gereja', url: '/about.html', desc: 'Sejarah, visi, misi, dan struktur kepemimpinan gereja' },
       { title: 'Pelayanan', url: '/pelayanan.html', desc: 'Daftar wadah pelayanan, komisi kategorial, dan sektor' },
       { title: 'Media & Galeri', url: '/media.html', desc: 'Kumpulan foto, galeri kegiatan, dan renungan' },
-      { title: 'Kalender Kegiatan', url: '/kalender.html', desc: 'Jadwal kegiatan gereja sepekan' },
       { title: 'Hubungi Kami', url: '/contact.html', desc: 'Informasi kontak dan pertanyaan umum (FAQ)' }
     ];
     
@@ -1215,33 +1214,6 @@ app.post('/admin/contact/whatsapp', requireAuth, (req, res) => {
   db.contactFaq.whatsapp.label = req.body.label;
   saveDB(db);
   res.redirect('/admin?tab=contact');
-});
-
-// ===== TAB: KALENDER =====
-
-// Kalender add
-app.post('/admin/kalender/add', requireAuth, (req, res) => {
-  const db = getDB();
-  if (!db.kalender) db.kalender = [];
-  db.kalender.push({
-    id: String(Date.now()),
-    judul: req.body.judul,
-    tanggal: req.body.tanggal,
-    kategori: req.body.kategori,
-    desc: req.body.desc
-  });
-  saveDB(db);
-  res.redirect('/admin?tab=kalender');
-});
-
-// Kalender delete
-app.post('/admin/kalender/delete/:id', requireAuth, (req, res) => {
-  const db = getDB();
-  if (db.kalender) {
-    db.kalender = db.kalender.filter(k => k.id !== req.params.id);
-  }
-  saveDB(db);
-  res.redirect('/admin?tab=kalender');
 });
 
 // ===== TAB: FILE MANAGER (UPLOAD & DELETE ALL FILES) =====

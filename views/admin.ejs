@@ -134,7 +134,6 @@
       <li><a href="/admin?tab=visit" class="<%= tab === 'visit' ? 'active' : '' %>"><span class="emoji">🆕</span> Baru di Sini?</a></li>
       <li><a href="/admin?tab=about" class="<%= tab === 'about' ? 'active' : '' %>"><span class="emoji">⛪</span> Tentang Gereja</a></li>
       <li><a href="/admin?tab=pelayanan" class="<%= tab === 'pelayanan' ? 'active' : '' %>"><span class="emoji">📋</span> Pelayanan</a></li>
-      <li><a href="/admin?tab=kalender" class="<%= tab === 'kalender' ? 'active' : '' %>"><span class="emoji">📅</span> Kalender Kegiatan</a></li>
       <li><a href="/admin?tab=media" class="<%= tab === 'media' ? 'active' : '' %>"><span class="emoji">📸</span> Media & Galeri</a></li>
       <li><a href="/admin?tab=contact" class="<%= tab === 'contact' ? 'active' : '' %>"><span class="emoji">📞</span> Hubungi Kami</a></li>
       <li><a href="/admin?tab=files" class="<%= tab === 'files' ? 'active' : '' %>" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 6px; padding-top: 0.9rem;"><span class="emoji">📁</span> Kelola File (<%= typeof files !== 'undefined' ? files.length : 0 %>)</a></li>
@@ -159,7 +158,6 @@
         <% } else if (tab === 'visit') { %>🆕 Kelola Baru di Sini?
         <% } else if (tab === 'about') { %>⛪ Kelola Tentang Gereja
         <% } else if (tab === 'pelayanan') { %>📋 Kelola Pelayanan
-        <% } else if (tab === 'kalender') { %>📅 Kelola Kalender Kegiatan
         <% } else if (tab === 'media') { %>📸 Kelola Media & Galeri
         <% } else if (tab === 'contact') { %>📞 Kelola Hubungi Kami
         <% } else if (tab === 'files') { %>📁 Kelola File (Uploads & Media)
@@ -849,50 +847,6 @@
           </form>
         </div>
 
-      </div>
-
-      <!-- ============================== TAB: KALENDER ============================== -->
-      <div class="tab-content <%= tab === 'kalender' ? 'active' : '' %>">
-        <div class="card">
-          <h2 class="card-title">📅 Tambah Kegiatan Baru</h2>
-          <form action="/admin/kalender/add" method="POST" style="margin-bottom:1rem;">
-            <div class="grid-3">
-              <div class="form-group"><label>Judul Kegiatan</label><input type="text" name="judul" placeholder="Ibadah Raya Mingguan" required></div>
-              <div class="form-group"><label>Tanggal (YYYY-MM-DD)</label><input type="date" name="tanggal" required></div>
-              <div class="form-group">
-                <label>Kategori (Penting untuk KomSek)</label>
-                <select name="kategori" required>
-                  <option value="ibadah">Ibadah Umum</option>
-                  <option value="kegiatan">Kegiatan Umum</option>
-                  <option value="anak">Komisi Anak</option>
-                  <option value="pemuda">Komisi Pemuda</option>
-                  <option value="perempuan">Komisi Perempuan</option>
-                  <option value="bapak">Komisi Bapak</option>
-                  <option value="pembangunan">Komisi Pembangunan</option>
-                  <option value="pelayanan kasih">Komisi Pelayanan Kasih</option>
-                  <option value="musik">Komisi Musik & Ibadah</option>
-                  <option value="hubgermas">Komisi HubGermas</option>
-                  <option value="maranatha">Sektor Maranatha</option>
-                  <option value="berkat">Sektor Berkat</option>
-                  <option value="imanuel">Sektor Imanuel</option>
-                  <option value="sion">Sektor Sion</option>
-                  <option value="yordan">Sektor Yordan</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group"><label>Deskripsi Singkat</label><input type="text" name="desc" placeholder="Ibadah di gedung gereja..." required></div>
-            <button type="submit" class="btn btn--gold">➕ Tambah Kegiatan</button>
-          </form>
-
-          <hr class="divider">
-          <h4 style="color:var(--navy); margin-bottom:.5rem;">Daftar Kegiatan Kalender (<%= db.kalender ? db.kalender.length : 0 %>)</h4>
-          <% if(db.kalender) { db.kalender.sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).forEach(function(k) { %>
-          <div class="warta-row">
-            <span><strong><%= k.judul %></strong> (<%= k.tanggal %>) - <span style="background:rgba(200,169,81,0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;"><%= k.kategori %></span></span>
-            <form action="/admin/kalender/delete/<%= k.id %>" method="POST" onsubmit="return confirm('Hapus kegiatan ini?')"><button type="submit" class="btn btn--danger btn--sm">🗑</button></form>
-          </div>
-          <% }); } %>
-        </div>
       </div>
 
       <!-- ============================== TAB: FILE MANAGER ============================== -->
