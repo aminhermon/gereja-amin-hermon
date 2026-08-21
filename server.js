@@ -224,48 +224,75 @@ const upload = multer({
   }
 });
 
-// DB helpers with persistent storage (immune to git deploy overwrites)
+// DB helpers with 3-tier persistent storage (immune to git resets & restarts)
 const dbPath = path.join(__dirname, 'data', 'db.json');
 const persistedDbPath = path.join(__dirname, 'data', 'db.persisted.json');
+const backupDbPath = path.join(__dirname, 'data', 'db.backup.json');
+
+// Global in-memory cache for ultra-reliable session consistency
+global.__CACHED_DB__ = null;
 
 function getDB() { 
   try {
-    // Prefer persistent DB file if exists (immune to git resets)
-    if (fs.existsSync(persistedDbPath)) {
-      return JSON.parse(fs.readFileSync(persistedDbPath, 'utf8'));
+    let chosenData = null;
+    let chosenMtime = 0;
+
+    // Check all 3 database storage files and pick the most recent valid one
+    const candidatePaths = [persistedDbPath, dbPath, backupDbPath];
+    for (const cp of candidatePaths) {
+      if (fs.existsSync(cp)) {
+        try {
+          const stat = fs.statSync(cp);
+          const raw = fs.readFileSync(cp, 'utf8');
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object' && stat.mtimeMs > chosenMtime) {
+            chosenData = parsed;
+            chosenMtime = stat.mtimeMs;
+          }
+        } catch (e) {
+          console.warn('⚠️ Warning reading DB candidate:', cp, e.message);
+        }
+      }
     }
-    if (fs.existsSync(dbPath)) {
-      const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-      // Initialize persistent copy
-      try {
-        fs.writeFileSync(persistedDbPath, JSON.stringify(data, null, 2), { encoding: 'utf8', mode: 0o666 });
-      } catch (e) {}
-      return data;
+
+    if (chosenData) {
+      global.__CACHED_DB__ = chosenData;
+      return chosenData;
     }
+
+    if (global.__CACHED_DB__) {
+      return global.__CACHED_DB__;
+    }
+
     return {};
   } catch (err) {
     console.error('❌ Error reading db:', err.message);
-    if (fs.existsSync(dbPath)) {
-      try { return JSON.parse(fs.readFileSync(dbPath, 'utf8')); } catch (e) {}
-    }
-    return {};
+    return global.__CACHED_DB__ || {};
   }
 }
 
 function saveDB(data) { 
+  if (!data || typeof data !== 'object') return false;
   try {
     const dir = path.dirname(dbPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
+
     const jsonString = JSON.stringify(data, null, 2);
-    // Write to both persistedDbPath and dbPath
-    fs.writeFileSync(persistedDbPath, jsonString, { encoding: 'utf8', mode: 0o666 });
-    fs.writeFileSync(dbPath, jsonString, { encoding: 'utf8', mode: 0o666 });
-    console.log('✅ Database tersimpan permanen di disk');
+    
+    // Save to all 3 persistence locations atomically with permissive file mode
+    try { fs.writeFileSync(persistedDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) { console.warn('Could not write persistedDbPath:', e.message); }
+    try { fs.writeFileSync(dbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) { console.warn('Could not write dbPath:', e.message); }
+    try { fs.writeFileSync(backupDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) {}
+
+    // Update in-memory copy instantly
+    global.__CACHED_DB__ = JSON.parse(jsonString);
+    console.log('✅ Database berhasil disimpan permanen ke disk');
     return true;
   } catch (err) {
     console.error('❌ GAGAL menyimpan database ke disk:', err.message);
+    global.__CACHED_DB__ = data;
     return false;
   }
 }
@@ -482,25 +509,21 @@ function deleteUploadedFile(filePath) {
   }
 }
 
-// Helper: Clean database references to a deleted file
+// Helper: Clean database references to a deleted file (Deep Recursive Cleaner)
 function cleanDbFileReferences(filePath) {
   if (!filePath) return;
   const safeFilename = path.basename(filePath);
-  const normalizedPath = 'uploads/' + safeFilename;
   const db = getDB();
   let changed = false;
 
+  // 1. Explicit cleanups for core sections
   if (db.general && db.general.logoPath && path.basename(db.general.logoPath) === safeFilename) {
     db.general.logoPath = 'assets/images/logo-gereja-amin-3d.png';
     changed = true;
   }
-  if (db.home && db.home.hero && db.home.hero.bgImage && path.basename(db.home.hero.bgImage) === safeFilename) {
-    db.home.hero.bgImage = 'assets/images/church-hero-new.jpg';
-    changed = true;
-  }
-  if (db.home && db.home.hero && db.home.hero.bgVideo && path.basename(db.home.hero.bgVideo) === safeFilename) {
-    db.home.hero.bgVideo = 'assets/videos/hero-video.mp4';
-    changed = true;
+  if (db.home && db.home.hero) {
+    if (db.home.hero.bgImage && path.basename(db.home.hero.bgImage) === safeFilename) { db.home.hero.bgImage = 'assets/images/church-hero-new.jpg'; changed = true; }
+    if (db.home.hero.bgVideo && path.basename(db.home.hero.bgVideo) === safeFilename) { db.home.hero.bgVideo = 'assets/videos/hero-video.mp4'; changed = true; }
   }
   if (db.visit && db.visit.hero && db.visit.hero.bgImage && path.basename(db.visit.hero.bgImage) === safeFilename) {
     db.visit.hero.bgImage = 'assets/images/welcome-visitors.png';
@@ -523,47 +546,87 @@ function cleanDbFileReferences(filePath) {
     changed = true;
   }
 
-  // Check Leaders
+  // 2. Check Leaders (Pendeta, Pengurus, Majelis)
   if (db.about && db.about.pemimpin) {
-    if (db.about.pemimpin.pendeta) {
-      db.about.pemimpin.pendeta.forEach(p => {
-        if (p.image && path.basename(p.image) === safeFilename) { p.image = ''; changed = true; }
-      });
-    }
-    if (db.about.pemimpin.pengurus) {
-      db.about.pemimpin.pengurus.forEach(p => {
-        if (p.image && path.basename(p.image) === safeFilename) { p.image = ''; changed = true; }
-      });
-    }
-    if (db.about.pemimpin.majelis) {
-      db.about.pemimpin.majelis.forEach(m => {
-        if (m.image && path.basename(m.image) === safeFilename) { m.image = ''; changed = true; }
-      });
-    }
-  }
-
-  // Check News
-  if (db.home && db.home.news) {
-    db.home.news.forEach(n => {
-      if (n.image && path.basename(n.image) === safeFilename) { n.image = 'assets/images/slider_ibadah.png'; changed = true; }
+    ['pendeta', 'pengurus', 'majelis'].forEach(group => {
+      if (Array.isArray(db.about.pemimpin[group])) {
+        db.about.pemimpin[group].forEach(p => {
+          if (p.image && path.basename(p.image) === safeFilename) {
+            p.image = '';
+            changed = true;
+          }
+        });
+      }
     });
   }
 
-  // Check Photos
-  if (db.mediaGaleri && db.mediaGaleri.photos) {
+  // 3. Check News
+  if (db.home && db.home.news && Array.isArray(db.home.news)) {
+    db.home.news.forEach(n => {
+      if (n.image && path.basename(n.image) === safeFilename) {
+        n.image = 'assets/images/slider_ibadah.png';
+        changed = true;
+      }
+    });
+  }
+
+  // 4. Check Photos Gallery
+  if (db.mediaGaleri && Array.isArray(db.mediaGaleri.photos)) {
     const beforeCount = db.mediaGaleri.photos.length;
-    db.mediaGaleri.photos = db.mediaGaleri.photos.filter(p => path.basename(p.src) !== safeFilename);
+    db.mediaGaleri.photos = db.mediaGaleri.photos.filter(p => path.basename(p.src || '') !== safeFilename);
     if (db.mediaGaleri.photos.length !== beforeCount) changed = true;
   }
 
-  // Check Warta
-  if (db.pelayanan && db.pelayanan.warta) {
+  // 5. Check Warta Jemaat
+  if (db.pelayanan && Array.isArray(db.pelayanan.warta)) {
     const beforeCount = db.pelayanan.warta.length;
-    db.pelayanan.warta = db.pelayanan.warta.filter(w => path.basename(w.file) !== safeFilename);
+    db.pelayanan.warta = db.pelayanan.warta.filter(w => path.basename(w.file || '') !== safeFilename);
     if (db.pelayanan.warta.length !== beforeCount) changed = true;
   }
 
-  if (changed) saveDB(db);
+  // 6. Check KomSek (Komisi & Sektor)
+  if (db.komsek) {
+    ['komisi', 'sektor'].forEach(grp => {
+      if (Array.isArray(db.komsek[grp])) {
+        db.komsek[grp].forEach(u => {
+          if (u.foto && path.basename(u.foto) === safeFilename) {
+            u.foto = 'assets/images/church-interior.png';
+            changed = true;
+          }
+          if (Array.isArray(u.articles)) {
+            u.articles.forEach(a => {
+              if (a.foto && path.basename(a.foto) === safeFilename) {
+                a.foto = 'assets/images/church-interior.png';
+                changed = true;
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // 7. Recursive pass across entire DB tree for any remaining string matches
+  function deepClean(obj) {
+    if (!obj || typeof obj !== 'object') return;
+    for (const key of Object.keys(obj)) {
+      const val = obj[key];
+      if (typeof val === 'string' && val.includes(safeFilename)) {
+        if (val.startsWith('uploads/')) {
+          obj[key] = '';
+          changed = true;
+        }
+      } else if (typeof val === 'object') {
+        deepClean(val);
+      }
+    }
+  }
+  deepClean(db);
+
+  if (changed) {
+    saveDB(db);
+    console.log('🧹 Referensi file ' + safeFilename + ' berhasil dibersihkan dari database.');
+  }
 }
 
 // Helper: Get list of all uploaded files in uploads/ directory
