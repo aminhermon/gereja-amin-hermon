@@ -51,31 +51,54 @@
     </div>
   </section>
 
-  <!-- ========== RENUNGAN HARIAN ========== -->
+  <!-- ========== RENUNGAN HARIAN (INTERAKTIF) ========== -->
   <section class="section section--navy" id="renungan">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
         <h2>Renungan <span class="text-gold">Harian</span></h2>
         <span class="gold-line"></span>
-        <p>Santapan rohani untuk menumbuhkan iman Anda setiap hari.</p>
+        <p>Santapan rohani dan pesan firman Tuhan untuk menumbuhkan iman dan menguatkan langkah Anda.</p>
       </div>
 
-      <div class="renungan-grid" data-aos="fade-up" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+      <!-- Live Search & Filter Bar -->
+      <div class="renungan-search-bar" data-aos="fade-up">
+        <span class="renungan-search-icon">🔍</span>
+        <input type="text" id="renunganSearchInput" class="renungan-search-input" placeholder="Cari renungan berdasarkan tema, judul, atau ayat (misal: Mazmur, Kasih, Iman)..." onkeyup="window.filterRenunganCards()">
+      </div>
+
+      <div class="renungan-grid" id="renunganGrid" data-aos="fade-up" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.75rem;">
         <% if (mediaGaleri.renungan && mediaGaleri.renungan.length > 0) { %>
-          <% mediaGaleri.renungan.forEach(function(r) { %>
-          <div class="renungan-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(200,169,81,0.15); border-radius: var(--radius-xl); padding: 2rem; position: relative;">
-            <div style="color: var(--gold); margin-bottom: 1rem;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <% mediaGaleri.renungan.slice().sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).forEach(function(r) { %>
+          <div class="renungan-card-rich" data-id="<%= r.id %>" data-title="<%= r.judul.toLowerCase() %>" data-ayat="<%= r.ayat.toLowerCase() %>" data-isi="<%= r.isi.toLowerCase() %>" onclick="window.openRenunganModal('<%= r.id %>')" style="cursor: pointer;">
+            <div class="renungan-card-rich__top">
+              <span class="renungan-card-rich__date">🗓️ <%= new Date(r.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+              <span class="renungan-card-rich__badge">📖 <%= r.ayat %></span>
             </div>
-            <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 0.5rem;"><%= new Date(r.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
-            <h3 style="color: var(--white); font-size: 1.3rem; margin-bottom: 0.5rem; font-family: var(--font-heading);"><%= r.judul %></h3>
-            <span style="display: inline-block; background: rgba(200,169,81,0.1); color: var(--gold); padding: 4px 12px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;"><%= r.ayat %></span>
-            <p style="color: rgba(255,255,255,0.8); line-height: 1.7; font-size: 0.95rem;"><%= r.isi %></p>
+            <h3 class="renungan-card-rich__title"><%= r.judul %></h3>
+            <p class="renungan-card-rich__excerpt"><%= r.isi %></p>
+            <div class="renungan-card-rich__footer">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="btn btn--gold btn--xs" onclick="event.stopPropagation(); window.openRenunganModal('<%= r.id %>')">
+                  📖 Baca Lengkap
+                </button>
+                <button type="button" class="btn btn--outline btn--xs" onclick="event.stopPropagation(); window.openRenunganModal('<%= r.id %>', true)" title="Dengarkan Audio">
+                  🔊 Dengar
+                </button>
+              </div>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="btn btn--outline btn--xs" onclick="event.stopPropagation(); window.shareRenunganDirect('<%= r.id %>')" title="Bagikan ke WhatsApp">
+                  📲 Bagikan
+                </button>
+              </div>
+            </div>
           </div>
           <% }); %>
         <% } else { %>
-          <p style="color: var(--text-light); text-align: center; grid-column: 1 / -1;">Belum ada renungan harian yang tersedia.</p>
+          <p style="color: var(--text-light); text-align: center; grid-column: 1 / -1; padding: 3rem 0;">Belum ada renungan harian yang tersedia.</p>
         <% } %>
+      </div>
+      <div id="renunganNoResult" style="display: none; text-align: center; color: #94A3B8; padding: 2.5rem; font-style: italic;">
+        Tidak ada renungan yang cocok dengan kata kunci pencarian Anda.
       </div>
     </div>
   </section>
@@ -184,8 +207,14 @@
     </div>
   </div>
 
+  <!-- ========== INTERACTIVE RENUNGAN MODAL ========== -->
+  <%- include('partials/renungan-modal') %>
+
   <%- include('partials/footer') %>
-  <script src="js/main.min.js?v=3" defer></script>
+  <script src="js/main.min.js?v=7" defer></script>
+  <script>
+    window.rawRenunganList = <%- JSON.stringify(typeof mediaGaleri !== 'undefined' && mediaGaleri.renungan ? mediaGaleri.renungan : []) %>;
+  </script>
 </body>
 </html>
 
