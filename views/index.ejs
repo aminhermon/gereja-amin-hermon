@@ -136,40 +136,17 @@
     </div>
   </section>
 
-  <!-- ========== RENUNGAN HARIAN (INTERAKTIF) ========== -->
-  <section class="section section--off-white" id="renungan-otomatis" style="padding: 4.5rem 0;">
+  <!-- ========== RENUNGAN HARIAN (OTOMATIS) ========== -->
+  <section class="section section--off-white" id="renungan-otomatis" style="padding: 4rem 0;">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
-        <h2>Ayat & <span class="text-gold">Renungan Hari Ini</span></h2>
+        <h2>Ayat <span class="text-gold">Hari Ini</span></h2>
         <span class="gold-line"></span>
-        <p>Santapan rohani penuntun langkah iman dan penguat jiwa Anda setiap hari.</p>
       </div>
-      <div class="renungan-interactive-card" data-aos="fade-up" data-aos-delay="100">
-        <div class="renungan-interactive-card__bg-quote">“</div>
-        <div class="renungan-interactive-card__badge">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Mutiara Firman Hari Ini
-        </div>
-        <p class="renungan-interactive-card__verse" id="daily-verse-text">"Memuat firman Tuhan..."</p>
-        <span class="renungan-interactive-card__ref" id="daily-verse-ref">-</span>
-        
-        <div class="renungan-action-bar">
-          <button type="button" class="renungan-action-btn" id="btnNextVerse" onclick="window.shuffleDailyVerse()" title="Ganti ayat firman inspiratif lain">
-            🔄 Ganti Firman
-          </button>
-          <button type="button" class="renungan-action-btn" id="btnSpeakVerse" onclick="window.speakCurrentVerse()" title="Dengarkan pembacaan ayat ini">
-            🔊 Dengarkan
-          </button>
-          <button type="button" class="renungan-action-btn renungan-action-btn--primary" onclick="window.openTodayRenunganModal(event)" title="Buka renungan lengkap hari ini">
-            📖 Baca Renungan Lengkap
-          </button>
-          <button type="button" class="renungan-action-btn renungan-action-btn--wa" onclick="window.shareVerseWhatsApp()" title="Bagikan ayat firman ini ke WhatsApp">
-            📲 Bagikan Firman
-          </button>
-          <button type="button" class="renungan-action-btn" onclick="window.copyCurrentVerse()" title="Salin teks firman">
-            📋 Salin Ayat
-          </button>
-        </div>
+      <div class="renungan-otomatis-card" data-aos="fade-up" data-aos-delay="100" style="max-width: 800px; margin: 0 auto; background: var(--white); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 3rem; text-align: center; border-top: 4px solid var(--gold); position: relative;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--gold)" opacity="0.2" style="position: absolute; top: 20px; left: 20px;"><path d="M14.017 21v-7.391c0-5.714 4.82-8.609 8.354-9.609l.942 2.604c-3.136 1.054-6.386 3.636-6.386 7.429h5.688V21h-8.598zm-11.419 0v-7.391c0-5.714 4.82-8.609 8.354-9.609l.942 2.604c-3.136 1.054-6.386 3.636-6.386 7.429h5.688V21H2.598z"/></svg>
+        <p id="daily-verse-text" style="font-size: 1.25rem; font-style: italic; color: var(--navy); line-height: 1.8; margin-bottom: 1.5rem;">Memuat firman Tuhan...</p>
+        <h4 id="daily-verse-ref" style="font-family: var(--font-heading); color: var(--gold); font-size: 1.1rem; margin: 0;">-</h4>
       </div>
     </div>
   </section>
@@ -369,16 +346,12 @@
     </div>
   </div>
 
-  <!-- ========== INTERACTIVE RENUNGAN MODAL ========== -->
-  <%- include('partials/renungan-modal') %>
-
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script src="js/main.min.js?v=6" defer></script>
   <script>
-    // Renungan & News data
-    window.rawRenunganList = <%- JSON.stringify(typeof mediaGaleri !== 'undefined' && mediaGaleri.renungan ? mediaGaleri.renungan : []) %>;
+    // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
 
     function openNewsDetail(idx) {
