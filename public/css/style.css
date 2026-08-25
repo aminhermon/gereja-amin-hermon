@@ -3519,6 +3519,15 @@ p {
   overflow: hidden;
   border-top: 1px solid rgba(200, 169, 81, 0.15);
   border-bottom: 1px solid rgba(200, 169, 81, 0.15);
+  color: var(--white);
+}
+
+.section--stats-premium .section-header h2 {
+  color: #FFFFFF;
+}
+
+.section--stats-premium .section-header p {
+  color: var(--gold-light);
 }
 
 .section--stats-premium::before {
