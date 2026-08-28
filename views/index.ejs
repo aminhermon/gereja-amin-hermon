@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="css/style.min.css?v=8">
+  <link rel="stylesheet" href="css/style.min.css?v=9">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -136,204 +136,7 @@
     </div>
   </section>
 
-  <!-- ========== RENUNGAN HARIAN (YouVersion & Today Devotional Premium Hub) ========== -->
-  <section class="section section--devotional-premium" id="renungan-otomatis">
-    <!-- Ambient Background Glows -->
-    <div class="devotional-glow devotional-glow--top"></div>
-    <div class="devotional-glow devotional-glow--bottom"></div>
 
-    <div class="container">
-      <div class="section-header section-header--light" data-aos="fade-up">
-        <div class="devotional-eyebrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          SANTAPAN ROHANI HARIAN
-        </div>
-        <h2>Renungan &amp; Firman <span class="text-gold">Hari Ini</span></h2>
-        <span class="gold-line"></span>
-        <p>Santapan firman Tuhan terstruktur ala YouVersion dengan narasi audio harian untuk menumbuhkan iman Anda.</p>
-      </div>
-
-      <div class="devotional-card-luxury" data-aos="fade-up" data-aos-delay="100">
-        <!-- Top App Bar -->
-        <div class="devotional-luxury-header">
-          <div class="devotional-luxury-header__left">
-            <div class="yv-brand-pill">
-              <span class="yv-icon">📖</span>
-              <span class="yv-title">VERSE OF THE DAY</span>
-            </div>
-            <div class="yv-streak-pill" id="devStreakPill">
-              <span class="yv-flame">🔥</span>
-              <span id="devDayNum">Hari ke-1 dari 31</span>
-            </div>
-          </div>
-
-          <div class="devotional-luxury-header__right">
-            <div class="devotional-date-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span id="devDateText"><%= new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
-            </div>
-            <div class="devotional-font-tools">
-              <button class="devotional-tool-btn" onclick="adjustDevotionalFontSize(-1)" title="Perkecil Teks">A-</button>
-              <button class="devotional-tool-btn" onclick="adjustDevotionalFontSize(1)" title="Perbesar Teks">A+</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Glowing Progress Track -->
-        <div class="devotional-progress-track">
-          <div class="devotional-progress-fill" id="devProgressFill" style="width: 10%"></div>
-        </div>
-
-        <!-- Interactive Mode Navigation (Tabs) -->
-        <div class="devotional-tabs-nav">
-          <button class="dev-tab-btn active" data-tab="all" onclick="switchDevotionalTab('all', this)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-            Semua
-          </button>
-          <button class="dev-tab-btn" data-tab="verse" onclick="switchDevotionalTab('verse', this)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            Ayat Emas
-          </button>
-          <button class="dev-tab-btn" data-tab="reflection" onclick="switchDevotionalTab('reflection', this)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            Renungan
-          </button>
-          <button class="dev-tab-btn" data-tab="prayer" onclick="switchDevotionalTab('prayer', this)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Doa
-          </button>
-          <button class="dev-tab-btn dev-tab-btn--audio-tab" data-tab="audio" onclick="switchDevotionalTab('audio', this)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-            Audio Narasi
-          </button>
-        </div>
-
-        <!-- Devotional Content Area -->
-        <div class="devotional-content-wrapper" id="devotionalContentWrapper">
-
-          <!-- 1. Verse of the Day Card (Holy Moment Art) -->
-          <div class="devotional-panel dev-panel--verse" id="panelVerse">
-            <div class="verse-art-frame">
-              <div class="verse-quote-mark verse-quote-mark--left">&ldquo;</div>
-              <p class="verse-art-text" id="devVerseText">Memuat firman Tuhan...</p>
-              <div class="verse-quote-mark verse-quote-mark--right">&rdquo;</div>
-
-              <div class="verse-art-meta">
-                <span class="verse-art-ref" id="devVerseRef">-</span>
-                <span class="verse-art-badge">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  Terjemahan Baru (TB)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. Dedicated Today Devotional Audio Player Bar -->
-          <div class="devotional-panel dev-panel--audio" id="panelAudio">
-            <div class="devotional-audio-player-luxury" id="devAudioPlayerBox">
-              <div class="audio-player-left">
-                <button class="audio-play-circle" id="devAudioBtn" onclick="speakDevotional()" aria-label="Putar Narasi Audio" title="Putar Audio Renungan">
-                  <svg class="icon-play" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-                  <svg class="icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                </button>
-                <div class="audio-track-info">
-                  <div class="audio-track-title">
-                    <span>Today Devotional Audio</span>
-                    <span class="audio-live-pill" id="devAudioLivePill" style="display:none;">LIVE</span>
-                  </div>
-                  <div class="audio-track-subtitle">Narasi Suara Renungan Rohani Gereja AMIN Hermon</div>
-                </div>
-              </div>
-
-              <!-- Animated Wave Equalizer -->
-              <div class="audio-equalizer" id="devAudioEqualizer">
-                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-
-              <div class="audio-player-right">
-                <button class="audio-speed-btn" id="devSpeedBtn" onclick="toggleAudioSpeed()" title="Kecepatan Pemutaran">1.0x</button>
-                <span class="audio-time-label" id="devAudioTimer">00:00</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. Renungan (Spiritual Reflection) Box -->
-          <div class="devotional-panel dev-panel--reflection" id="panelReflection">
-            <div class="reflection-luxury-box">
-              <div class="reflection-header">
-                <div class="reflection-icon-circle">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                </div>
-                <div class="reflection-title-group">
-                  <h3>Renungan &amp; Refleksi Harian</h3>
-                  <span>Merenungkan hikmat firman untuk kehidupan praktis</span>
-                </div>
-              </div>
-              <div class="reflection-body">
-                <p id="devReflection">Memuat renungan...</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 4. Doa Penutup (Prayer Sanctum) -->
-          <div class="devotional-panel dev-panel--prayer" id="panelPrayer">
-            <div class="prayer-luxury-sanctum">
-              <div class="prayer-header">
-                <div class="prayer-icon-circle">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </div>
-                <div class="prayer-title-group">
-                  <h3>Doa Penutup Hari Ini</h3>
-                  <span>Bawalah permohonan dan syukur Anda kepada Tuhan</span>
-                </div>
-              </div>
-              <div class="prayer-body">
-                <p class="prayer-text" id="devPrayer">Memuat doa...</p>
-              </div>
-              <div class="prayer-footer">
-                <button class="btn-amen-burst" id="btnAmen" onclick="triggerAmenBurst(this)">
-                  <span class="amen-heart">🙏</span>
-                  <span class="amen-label">Katakan Amin</span>
-                  <span class="amen-counter" id="amenCounter">(+1)</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Luxury Action Suite Footer -->
-        <div class="devotional-luxury-actions">
-          <div class="dev-actions-left">
-            <button class="dev-action-btn dev-action-btn--primary" onclick="speakDevotional()" id="devMainAudioBtn" title="Dengarkan Audio">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-              <span>Dengarkan</span>
-            </button>
-            <button class="dev-action-btn" onclick="shuffleDevotional()" title="Ganti Ayat Lain">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
-              <span>Ayat Lain</span>
-            </button>
-          </div>
-
-          <div class="dev-actions-right">
-            <button class="dev-action-btn dev-action-btn--wa" onclick="shareDevotional()" title="Bagikan ke WhatsApp">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.64-.93-2.25-.25-.58-.5-.5-.68-.51-.18-.01-.38-.01-.58-.01s-.53.07-.8.38c-.28.3-1.06 1.03-1.06 2.52 0 1.49 1.08 2.92 1.23 3.12.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zm-5.42 7.4A9.87 9.87 0 0 1 7 20.14l-.36-.21-3.73.98.99-3.63-.24-.37a9.88 9.88 0 0 1-1.51-5.26c0-5.46 4.44-9.9 9.9-9.9 2.65 0 5.13 1.03 7 2.9a9.84 9.84 0 0 1 2.9 7c0 5.46-4.44 9.9-9.9 9.9zm8.41-18.31A11.82 11.82 0 0 0 12.05.03C5.5.03.16 5.37.16 11.92c0 2.1.55 4.14 1.58 5.95L0 24l6.3-1.65a11.87 11.87 0 0 0 5.75 1.47c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.48-8.41z"/></svg>
-              <span>Bagikan</span>
-            </button>
-            <button class="dev-action-btn" id="devCopyBtn" onclick="copyDevotional()" title="Salin Teks Lengkap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <span>Salin</span>
-            </button>
-            <button class="dev-action-btn dev-action-btn--fav" id="devFavBtn" onclick="toggleDevotionalFav(this)" title="Simpan ke Favorit">
-              <svg class="fav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span id="favText">Favorit</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
 
   <!-- ========== NEWS & EVENTS (Lundev Carousel) ========== -->
   <section class="carousel" id="news">
@@ -533,7 +336,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="js/main.min.js?v=8" defer></script>
+  <script src="js/main.min.js?v=9" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
