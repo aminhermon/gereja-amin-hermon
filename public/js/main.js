@@ -486,11 +486,27 @@ const DEVOTIONALS = [
 
 let currentDevIdx = 0;
 let isSpeakingDev = false;
+let devSpeechRate = 1.0;
+let devAudioTimerSec = 0;
+let devAudioTimerInterval = null;
+let devFontSizeDelta = 0;
 
 function initDailyVerse() {
   const today = new Date();
   currentDevIdx = (today.getDate() - 1) % DEVOTIONALS.length;
   renderDevotional(currentDevIdx);
+
+  // Restore favorite status from storage
+  try {
+    const favs = JSON.parse(localStorage.getItem('amin_dev_favs') || '[]');
+    const isFav = favs.includes(currentDevIdx);
+    const favBtn = document.getElementById('devFavBtn');
+    const favText = document.getElementById('favText');
+    if (favBtn && isFav) {
+      favBtn.classList.add('active');
+      if (favText) favText.textContent = 'Tersimpan';
+    }
+  } catch (e) {}
 }
 
 function renderDevotional(idx) {
@@ -504,70 +520,278 @@ function renderDevotional(idx) {
   const dayEl = el('devDayNum');
   const progEl = el('devProgressFill');
 
-  if (verseEl) { verseEl.style.opacity = '0'; setTimeout(() => { verseEl.textContent = '"' + d.verse + '"'; verseEl.style.opacity = '1'; }, 150); }
+  if (verseEl) {
+    verseEl.style.opacity = '0';
+    setTimeout(() => {
+      verseEl.textContent = d.verse;
+      verseEl.style.opacity = '1';
+    }, 150);
+  }
   if (refEl) refEl.textContent = d.ref;
   if (reflEl) reflEl.textContent = d.reflection;
   if (prayerEl) prayerEl.textContent = '"' + d.prayer + '"';
   if (dayEl) dayEl.textContent = 'Hari ke-' + (idx + 1) + ' dari ' + DEVOTIONALS.length;
   if (progEl) progEl.style.width = Math.round(((idx + 1) / DEVOTIONALS.length) * 100) + '%';
+
+  // Stop any active speech if user changed verse
+  if (isSpeakingDev && window.speechSynthesis) {
+    stopDevotionalAudio();
+  }
 }
 
 function shuffleDevotional() {
   let next;
-  do { next = Math.floor(Math.random() * DEVOTIONALS.length); } while (next === currentDevIdx && DEVOTIONALS.length > 1);
+  do {
+    next = Math.floor(Math.random() * DEVOTIONALS.length);
+  } while (next === currentDevIdx && DEVOTIONALS.length > 1);
   currentDevIdx = next;
   renderDevotional(currentDevIdx);
 }
 
+function switchDevotionalTab(tabName, btn) {
+  const tabs = document.querySelectorAll('.dev-tab-btn');
+  tabs.forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const panels = {
+    verse: document.getElementById('panelVerse'),
+    audio: document.getElementById('panelAudio'),
+    reflection: document.getElementById('panelReflection'),
+    prayer: document.getElementById('panelPrayer')
+  };
+
+  if (tabName === 'all') {
+    Object.values(panels).forEach(p => { if (p) p.style.display = 'block'; });
+  } else {
+    Object.keys(panels).forEach(key => {
+      if (panels[key]) {
+        panels[key].style.display = (key === tabName) ? 'block' : 'none';
+      }
+    });
+  }
+}
+
+function adjustDevotionalFontSize(delta) {
+  const verseText = document.getElementById('devVerseText');
+  const reflText = document.getElementById('devReflection');
+  const prayerText = document.getElementById('devPrayer');
+
+  devFontSizeDelta = Math.max(-2, Math.min(4, devFontSizeDelta + delta));
+
+  const baseVerse = 1.45;
+  const baseRefl = 1.02;
+  const basePrayer = 1.08;
+
+  if (verseText) verseText.style.fontSize = (baseVerse + devFontSizeDelta * 0.12) + 'rem';
+  if (reflText) reflText.style.fontSize = (baseRefl + devFontSizeDelta * 0.08) + 'rem';
+  if (prayerText) prayerText.style.fontSize = (basePrayer + devFontSizeDelta * 0.08) + 'rem';
+}
+
+function toggleAudioSpeed() {
+  const speeds = [1.0, 1.25, 0.9];
+  const currentSpeedIdx = speeds.indexOf(devSpeechRate);
+  const nextIdx = (currentSpeedIdx + 1) % speeds.length;
+  devSpeechRate = speeds[nextIdx];
+
+  const speedBtn = document.getElementById('devSpeedBtn');
+  if (speedBtn) speedBtn.textContent = devSpeechRate.toFixed(1) + 'x';
+
+  // If speaking, restart with new speed
+  if (isSpeakingDev) {
+    stopDevotionalAudio();
+    speakDevotional();
+  }
+}
+
 function speakDevotional() {
-  if (!('speechSynthesis' in window)) return;
-  const btn = document.getElementById('devAudioBtn');
-  const wave = document.getElementById('devAudioWave');
+  if (!('speechSynthesis' in window)) {
+    alert('Browser Anda belum mendukung fitur narasi suara.');
+    return;
+  }
+
+  const playCircle = document.getElementById('devAudioBtn');
+  const mainAudioBtn = document.getElementById('devMainAudioBtn');
+  const eq = document.getElementById('devAudioEqualizer');
+  const livePill = document.getElementById('devAudioLivePill');
+  const timerEl = document.getElementById('devAudioTimer');
 
   if (isSpeakingDev) {
-    window.speechSynthesis.cancel();
-    isSpeakingDev = false;
-    if (btn) btn.classList.remove('playing');
-    if (wave) wave.style.display = 'none';
+    stopDevotionalAudio();
     return;
   }
 
   window.speechSynthesis.cancel();
   const d = DEVOTIONALS[currentDevIdx];
-  const text = 'Renungan Harian Gereja AMIN Hermon. Bacaan hari ini dari ' + d.ref + '. ' + d.verse + '. Renungan: ' + d.reflection + '. Doa Penutup: ' + d.prayer;
+  const text = 'Renungan Harian Gereja AMIN Hermon. Bacaan hari ini terambil dari ' + d.ref + '. ' + d.verse + '. Renungan Firman: ' + d.reflection + '. Doa Penutup: ' + d.prayer;
+  
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'id-ID';
-  utter.rate = 0.92;
+  utter.rate = devSpeechRate;
+
+  // Pick best Indonesian voice available
   const voices = window.speechSynthesis.getVoices();
-  const idVoice = voices.find(v => v.lang && v.lang.startsWith('id'));
+  const idVoice = voices.find(v => v.lang && (v.lang.startsWith('id') || v.lang === 'id-ID'));
   if (idVoice) utter.voice = idVoice;
 
-  utter.onstart = () => { isSpeakingDev = true; if (btn) btn.classList.add('playing'); if (wave) wave.style.display = 'inline-flex'; };
-  utter.onend = utter.onerror = () => { isSpeakingDev = false; if (btn) btn.classList.remove('playing'); if (wave) wave.style.display = 'none'; };
+  utter.onstart = () => {
+    isSpeakingDev = true;
+    if (playCircle) {
+      playCircle.classList.add('playing');
+      const iconPlay = playCircle.querySelector('.icon-play');
+      const iconPause = playCircle.querySelector('.icon-pause');
+      if (iconPlay) iconPlay.style.display = 'none';
+      if (iconPause) iconPause.style.display = 'block';
+    }
+    if (mainAudioBtn) mainAudioBtn.classList.add('playing');
+    if (eq) eq.classList.add('playing');
+    if (livePill) livePill.style.display = 'inline-block';
+
+    // Start live timer
+    devAudioTimerSec = 0;
+    if (devAudioTimerInterval) clearInterval(devAudioTimerInterval);
+    devAudioTimerInterval = setInterval(() => {
+      devAudioTimerSec++;
+      const mins = Math.floor(devAudioTimerSec / 60).toString().padStart(2, '0');
+      const secs = (devAudioTimerSec % 60).toString().padStart(2, '0');
+      if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+    }, 1000);
+  };
+
+  utter.onend = utter.onerror = () => {
+    stopDevotionalAudio();
+  };
+
   window.speechSynthesis.speak(utter);
+}
+
+function stopDevotionalAudio() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  isSpeakingDev = false;
+
+  const playCircle = document.getElementById('devAudioBtn');
+  const mainAudioBtn = document.getElementById('devMainAudioBtn');
+  const eq = document.getElementById('devAudioEqualizer');
+  const livePill = document.getElementById('devAudioLivePill');
+  const timerEl = document.getElementById('devAudioTimer');
+
+  if (playCircle) {
+    playCircle.classList.remove('playing');
+    const iconPlay = playCircle.querySelector('.icon-play');
+    const iconPause = playCircle.querySelector('.icon-pause');
+    if (iconPlay) iconPlay.style.display = 'block';
+    if (iconPause) iconPause.style.display = 'none';
+  }
+  if (mainAudioBtn) mainAudioBtn.classList.remove('playing');
+  if (eq) eq.classList.remove('playing');
+  if (livePill) livePill.style.display = 'none';
+  if (timerEl) timerEl.textContent = '00:00';
+
+  if (devAudioTimerInterval) {
+    clearInterval(devAudioTimerInterval);
+    devAudioTimerInterval = null;
+  }
 }
 
 function shareDevotional() {
   const d = DEVOTIONALS[currentDevIdx];
-  const text = '*Renungan Harian — Gereja AMIN Hermon*\n\n📖 *' + d.ref + '*\n"' + d.verse + '"\n\n✍️ *Renungan:*\n' + d.reflection + '\n\n🙏 *Doa:*\n' + d.prayer + '\n\n🌐 ' + window.location.origin;
+  const siteUrl = window.location.origin;
+  const text = `*📖 RENUNGAN HARIAN GEREJA AMIN HERMON*\n` +
+               `_${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}_\n\n` +
+               `✨ *${d.ref}*\n` +
+               `"${d.verse}"\n\n` +
+               `✍️ *Renungan:*\n` +
+               `${d.reflection}\n\n` +
+               `🙏 *Doa Penutup:*\n` +
+               `"${d.prayer}"\n\n` +
+               `🌐 Baca selengkapnya & dengarkan audio di:\n${siteUrl}`;
+
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
 function copyDevotional() {
   const d = DEVOTIONALS[currentDevIdx];
-  const text = d.ref + '\n"' + d.verse + '"\n\nRenungan: ' + d.reflection + '\n\nDoa: ' + d.prayer + '\n\n— Gereja AMIN Hermon';
+  const text = `${d.ref}\n"${d.verse}"\n\nRenungan:\n${d.reflection}\n\nDoa Penutup:\n"${d.prayer}"\n\n— Gereja AMIN Hermon (${window.location.origin})`;
+
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(() => {
       const btn = document.getElementById('devCopyBtn');
-      if (btn) { const orig = btn.innerHTML; btn.innerHTML = '✅ Tersalin!'; setTimeout(() => { btn.innerHTML = orig; }, 2000); }
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span>✅ Tersalin!</span>';
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+      }
     }).catch(() => {});
   }
+}
+
+function triggerAmenBurst(btn) {
+  if (!btn) return;
+  btn.classList.add('amen-active');
+
+  const counter = document.getElementById('amenCounter');
+  if (counter) {
+    counter.textContent = '❤️ Amin!';
+  }
+
+  // Create floating hearts / sparkles
+  for (let i = 0; i < 6; i++) {
+    const particle = document.createElement('span');
+    particle.textContent = ['✨', '🙏', '❤️', '🌟', '🕊️'][i % 5];
+    particle.style.position = 'fixed';
+    const rect = btn.getBoundingClientRect();
+    particle.style.left = (rect.left + rect.width / 2 + (Math.random() * 40 - 20)) + 'px';
+    particle.style.top = (rect.top - 10) + 'px';
+    particle.style.fontSize = '1.2rem';
+    particle.style.pointerEvents = 'none';
+    particle.style.transition = 'all 1s cubic-bezier(0.1, 0.8, 0.2, 1)';
+    particle.style.opacity = '1';
+    particle.style.zIndex = '9999';
+
+    document.body.appendChild(particle);
+
+    setTimeout(() => {
+      particle.style.transform = `translate(${Math.random() * 60 - 30}px, -${60 + Math.random() * 40}px) scale(1.4)`;
+      particle.style.opacity = '0';
+    }, 20);
+
+    setTimeout(() => {
+      particle.remove();
+    }, 1100);
+  }
+
+  setTimeout(() => {
+    btn.classList.remove('amen-active');
+  }, 2500);
+}
+
+function toggleDevotionalFav(btn) {
+  try {
+    let favs = JSON.parse(localStorage.getItem('amin_dev_favs') || '[]');
+    const isFav = favs.includes(currentDevIdx);
+    const favText = document.getElementById('favText');
+
+    if (isFav) {
+      favs = favs.filter(id => id !== currentDevIdx);
+      if (btn) btn.classList.remove('active');
+      if (favText) favText.textContent = 'Favorit';
+    } else {
+      favs.push(currentDevIdx);
+      if (btn) btn.classList.add('active');
+      if (favText) favText.textContent = 'Tersimpan';
+    }
+    localStorage.setItem('amin_dev_favs', JSON.stringify(favs));
+  } catch (e) {}
 }
 
 window.shuffleDevotional = shuffleDevotional;
 window.speakDevotional = speakDevotional;
 window.shareDevotional = shareDevotional;
 window.copyDevotional = copyDevotional;
+window.switchDevotionalTab = switchDevotionalTab;
+window.adjustDevotionalFontSize = adjustDevotionalFontSize;
+window.toggleAudioSpeed = toggleAudioSpeed;
+window.triggerAmenBurst = triggerAmenBurst;
+window.toggleDevotionalFav = toggleDevotionalFav;
 
 /* ---------- Stats Counter Animation ---------- */
 function initStatsCounter() {
