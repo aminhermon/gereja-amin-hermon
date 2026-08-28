@@ -297,6 +297,56 @@ function saveDB(data) {
   }
 }
 
+// ==================== REAL-TIME VISITOR TRACKING ====================
+// In-memory active visitor tracking (session-based, auto-expires after 5 min)
+global.__ACTIVE_VISITORS__ = global.__ACTIVE_VISITORS__ || new Map();
+const VISITOR_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Middleware: track every unique session as an active visitor
+app.use((req, res, next) => {
+  // Skip static assets and API calls from counting
+  const skip = /\.(jpg|jpeg|png|gif|webp|svg|ico|pdf|mp4|webm|css|js|woff2?|map)$/i.test(req.path)
+    || req.path.startsWith('/api/');
+  if (!skip && req.session) {
+    const sid = req.sessionID || req.session.id || 'anon_' + (req.ip || 'unknown');
+    global.__ACTIVE_VISITORS__.set(sid, Date.now());
+
+    // Increment total visitor count (only once per session)
+    if (!req.session._counted) {
+      req.session._counted = true;
+      try {
+        const db = getDB();
+        if (!db._visitors) db._visitors = { total: 0 };
+        db._visitors.total = (db._visitors.total || 0) + 1;
+        saveDB(db);
+      } catch (e) { /* silent */ }
+    }
+  }
+  next();
+});
+
+// Cleanup expired visitors every 60 seconds
+setInterval(() => {
+  const now = Date.now();
+  for (const [sid, ts] of global.__ACTIVE_VISITORS__) {
+    if (now - ts > VISITOR_TTL) {
+      global.__ACTIVE_VISITORS__.delete(sid);
+    }
+  }
+}, 60 * 1000);
+
+// API endpoint: get real-time visitor stats
+app.get('/api/visitors', (req, res) => {
+  // Clean expired before responding
+  const now = Date.now();
+  for (const [sid, ts] of global.__ACTIVE_VISITORS__) {
+    if (now - ts > VISITOR_TTL) global.__ACTIVE_VISITORS__.delete(sid);
+  }
+  const db = getDB();
+  const total = (db._visitors && db._visitors.total) || 0;
+  res.json({ online: global.__ACTIVE_VISITORS__.size, total });
+});
+
 // ==================== NO-CACHE FOR DYNAMIC HTML ====================
 // Prevent browser and proxy from caching dynamic HTML so CMS edits show immediately
 app.use((req, res, next) => {

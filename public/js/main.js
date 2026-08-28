@@ -122,39 +122,6 @@ function initNewsSwiper() {
   resetAutoplay();
 }
 
-/* ---------- Stats Counter Animation ---------- */
-function initStatsCounter() {
-  const counters = document.querySelectorAll('.stat-card__number');
-  if (!counters.length) return;
-  
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const el = entry.target;
-        const target = parseInt(el.getAttribute('data-target'), 10);
-        if (isNaN(target)) return;
-        
-        let current = 0;
-        const duration = 2000;
-        const step = target / (duration / 16);
-        
-        const timer = setInterval(() => {
-          current += step;
-          if (current >= target) {
-            el.textContent = target;
-            clearInterval(timer);
-          } else {
-            el.textContent = Math.floor(current);
-          }
-        }, 16);
-        
-        observer.unobserve(el);
-      }
-    });
-  }, { threshold: 0.3 });
-  
-  counters.forEach(c => observer.observe(c));
-}
 
 /* ---------- FAQ Accordion ---------- */
 function initFaqAccordion() {
@@ -442,26 +409,24 @@ function initGlobalLightbox() {
   });
 }
 
-/* ---------- Visitor Counter ---------- */
+/* ---------- Real-Time Visitor Counter ---------- */
 function initVisitorCounter() {
-  const footerBottom = document.querySelector('.footer__bottom');
-  if (!footerBottom) return;
-  
-  // Use localStorage to simulate unique visits or returning visits counter
-  let visits = localStorage.getItem('amin_hermon_visits');
-  if (!visits) {
-    // Starting offset for realistic look
-    visits = 12450; 
-  } else {
-    visits = parseInt(visits, 10) + 1;
+  const onlineEl = document.getElementById('visitorOnline');
+  const totalEl = document.getElementById('visitorTotal');
+  if (!onlineEl || !totalEl) return;
+
+  function fetchVisitors() {
+    fetch('/api/visitors')
+      .then(r => r.json())
+      .then(data => {
+        if (onlineEl) onlineEl.textContent = (data.online || 0).toLocaleString('id-ID');
+        if (totalEl) totalEl.textContent = (data.total || 0).toLocaleString('id-ID');
+      })
+      .catch(() => {});
   }
-  localStorage.setItem('amin_hermon_visits', visits);
-  
-  const counterSpan = document.createElement('span');
-  counterSpan.className = 'visitor-counter';
-  counterSpan.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 6px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Kunjungan: ${visits.toLocaleString('id-ID')}`;
-  
-  footerBottom.appendChild(counterSpan);
+
+  fetchVisitors();
+  setInterval(fetchVisitors, 30000);
 }
 
 /* ---------- Back to Top ---------- */
@@ -485,56 +450,124 @@ function initBackToTop() {
   });
 }
 
-/* ---------- Daily Verse (Renungan Otomatis) ---------- */
+/* ---------- YouVersion-Style Daily Devotional ---------- */
+const DEVOTIONALS = [
+  { verse: "Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku.", ref: "Filipi 4:13", reflection: "Kekuatan kita bukan berasal dari diri sendiri, melainkan dari Kristus yang berdiam di dalam kita. Dalam setiap tantangan hari ini, ingatlah bahwa Tuhan telah memperlengkapi kita dengan segala yang kita butuhkan.", prayer: "Tuhan Yesus, terima kasih karena Engkau adalah sumber kekuatanku. Ajar aku untuk bersandar kepada-Mu dalam segala perkara. Amin." },
+  { verse: "Karena begitu besar kasih Allah akan dunia ini, sehingga Ia telah mengaruniakan Anak-Nya yang tunggal, supaya setiap orang yang percaya kepada-Nya tidak binasa, melainkan beroleh hidup yang kekal.", ref: "Yohanes 3:16", reflection: "Kasih Allah bukan hanya kata-kata, melainkan tindakan nyata melalui pengorbanan Yesus Kristus. Kasih ini tidak bersyarat dan tersedia bagi setiap orang yang percaya.", prayer: "Bapa di surga, terima kasih untuk kasih-Mu yang tak terhingga. Tolong aku untuk membagikan kasih ini kepada sesama. Amin." },
+  { verse: "Sebab Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu, yaitu rancangan damai sejahtera dan bukan rancangan kecelakaan, untuk memberikan kepadamu hari depan yang penuh harapan.", ref: "Yeremia 29:11", reflection: "Tuhan memiliki rencana yang indah untuk setiap anak-Nya. Meskipun jalan yang kita lalui tidak selalu mudah, tujuan akhirnya adalah damai sejahtera dan harapan.", prayer: "Tuhan, aku percaya bahwa rancangan-Mu lebih baik dari rencanaku sendiri. Tuntun langkahku hari ini menurut kehendak-Mu. Amin." },
+  { verse: "Janganlah hendaknya kamu kuatir tentang apa pun juga, tetapi nyatakanlah dalam segala hal keinginanmu kepada Allah dalam doa dan permohonan dengan ucapan syukur.", ref: "Filipi 4:6", reflection: "Kekuatiran adalah musuh iman. Tuhan mengajak kita untuk menukar kecemasan dengan doa dan ucapan syukur. Setiap kali kuatir datang, jadikan itu sebagai undangan untuk berdoa.", prayer: "Ya Tuhan, aku serahkan segala kekuatiranku kepada-Mu. Gantikan dengan damai sejahtera-Mu yang melampaui segala akal. Amin." },
+  { verse: "Percayalah kepada TUHAN dengan segenap hatimu, dan janganlah bersandar kepada pengertianmu sendiri. Akuilah Dia dalam segala lakumu, maka Ia akan meluruskan jalanmu.", ref: "Amsal 3:5-6", reflection: "Percaya kepada Tuhan berarti melepaskan kendali dan membiarkan Dia yang memimpin. Bukan berarti kita pasif, tetapi kita aktif mencari kehendak-Nya dalam setiap langkah.", prayer: "Tuhan, ajarku untuk percaya sepenuhnya kepada-Mu, bukan kepada pengertianku sendiri. Luruskan jalanku hari ini. Amin." },
+  { verse: "Marilah kepada-Ku, semua yang letih lesu dan berbeban berat, Aku akan memberi kelegaan kepadamu.", ref: "Matius 11:28", reflection: "Yesus tidak menjanjikan hidup tanpa beban, tetapi Ia menawarkan kelegaan di tengah beban itu. Datanglah kepada-Nya apa adanya, dengan segala kelelahan dan bebanmu.", prayer: "Yesus, aku datang kepada-Mu dengan segala bebanku. Berilah kelegaan dan istirahat bagi jiwaku. Amin." },
+  { verse: "Kita tahu sekarang, bahwa Allah turut bekerja dalam segala sesuatu untuk mendatangkan kebaikan bagi mereka yang mengasihi Dia.", ref: "Roma 8:28", reflection: "Tidak semua yang terjadi itu baik, tetapi Tuhan mampu mendatangkan kebaikan dari segala sesuatu. Percayalah bahwa Ia sedang bekerja bahkan di saat-saat yang paling sulit.", prayer: "Tuhan, tolong aku untuk percaya bahwa Engkau sedang bekerja dalam setiap situasi hidupku, bahkan yang tidak aku mengerti. Amin." },
+  { verse: "Tetapi orang-orang yang menanti-nantikan TUHAN mendapat kekuatan baru: mereka seumpama rajawali yang naik terbang dengan kekuatan sayapnya.", ref: "Yesaya 40:31", reflection: "Menantikan Tuhan bukan berarti diam tanpa melakukan apa-apa. Menantikan Tuhan berarti tetap setia dalam iman sambil menunggu waktu-Nya yang sempurna.", prayer: "Tuhan, berikan aku kesabaran untuk menantikan waktu-Mu. Perbaharui kekuatanku hari ini. Amin." },
+  { verse: "Firman-Mu itu pelita bagi kakiku dan terang bagi jalanku.", ref: "Mazmur 119:105", reflection: "Firman Tuhan adalah panduan hidup kita. Seperti pelita yang menerangi jalan di kegelapan, demikianlah firman-Nya memberikan arah dan hikmat untuk setiap keputusan.", prayer: "Tuhan, buka mataku untuk melihat kebenaran dalam firman-Mu. Jadikanlah firman-Mu panduan hidupku setiap hari. Amin." },
+  { verse: "Kasih itu sabar; kasih itu murah hati; ia tidak cemburu. Ia tidak memegahkan diri dan tidak sombong.", ref: "1 Korintus 13:4", reflection: "Kasih sejati bukan perasaan semata, melainkan pilihan dan tindakan. Setiap hari kita diberi kesempatan untuk memilih sabar, murah hati, dan rendah hati.", prayer: "Tuhan, bentuklah kasih-Mu di dalam hatiku. Ajarku untuk mengasihi seperti Engkau mengasihi. Amin." },
+  { verse: "Serahkanlah kuatirmu kepada TUHAN, maka Ia akan memelihara engkau! Tidak untuk selama-lamanya dibiarkannya orang benar itu goyah.", ref: "Mazmur 55:22", reflection: "Tuhan tidak pernah meninggalkan umat-Nya. Ia mengundang kita untuk menyerahkan setiap beban kepada-Nya dan percaya bahwa Ia akan memelihara kita.", prayer: "Bapa, aku serahkan semua kekhawatiranku kepada-Mu hari ini. Aku percaya Engkau akan memelihara dan menjaga langkahku. Amin." },
+  { verse: "Bersukacitalah senantiasa. Tetaplah berdoa. Mengucap syukurlah dalam segala hal, sebab itulah yang dikehendaki Allah di dalam Kristus Yesus bagi kamu.", ref: "1 Tesalonika 5:16-18", reflection: "Sukacita, doa, dan syukur adalah tiga pilar kehidupan Kristen yang sehat. Bukan bergantung pada keadaan, tetapi pada hubungan kita dengan Kristus.", prayer: "Tuhan Yesus, ajarlah aku untuk bersukacita, berdoa, dan bersyukur senantiasa dalam segala keadaan. Amin." },
+  { verse: "Sebab karena kasih karunia kamu diselamatkan oleh iman; itu bukan hasil usahamu, tetapi pemberian Allah.", ref: "Efesus 2:8", reflection: "Keselamatan adalah anugerah, bukan upah. Kita tidak dapat memperolehnya dengan usaha sendiri. Inilah keindahan kasih karunia Allah yang tak terbatas.", prayer: "Terima kasih Tuhan untuk kasih karunia-Mu yang menyelamatkan. Ajar aku untuk hidup layak bagi anugerah yang telah Engkau berikan. Amin." },
+  { verse: "Tetapi carilah dahulu Kerajaan Allah dan kebenarannya, maka semuanya itu akan ditambahkan kepadamu.", ref: "Matius 6:33", reflection: "Prioritas yang benar menghasilkan berkat yang benar. Ketika Tuhan menjadi yang pertama dalam hidup kita, segala kebutuhan akan dipenuhi menurut kekayaan-Nya.", prayer: "Tuhan, ajarku untuk selalu mendahulukan Kerajaan-Mu di atas segala sesuatu. Aku percaya Engkau akan mencukupkan kebutuhanku. Amin." },
+  { verse: "TUHAN adalah gembalaku, takkan kekurangan aku. Ia membaringkan aku di padang yang berumput hijau, Ia membimbing aku ke air yang tenang.", ref: "Mazmur 23:1-2", reflection: "Tuhan sebagai Gembala menunjukkan betapa dekat dan personal-Nya hubungan kita dengan-Nya. Ia menyediakan tempat perhentian dan pemulihan bagi jiwa kita.", prayer: "Tuhan Gembalaku, pimpin aku ke tempat perhentian-Mu. Pulihkan jiwaku dan perbaharui kekuatanku. Amin." },
+  { verse: "Apa pun juga yang kamu perbuat, perbuatlah dengan segenap hatimu seperti untuk Tuhan dan bukan untuk manusia.", ref: "Kolose 3:23", reflection: "Setiap pekerjaan, sekecil apa pun, menjadi ibadah ketika dilakukan untuk kemuliaan Tuhan. Motivasi kita bukan pujian manusia, melainkan kesetiaan kepada Kristus.", prayer: "Tuhan, berikanku hati yang rela untuk bekerja dengan sungguh-sungguh demi kemuliaan-Mu, bukan demi pujian manusia. Amin." },
+  { verse: "Sebab Allah memberikan kepada kita bukan roh ketakutan, melainkan roh yang membangkitkan kekuatan, kasih dan ketertiban.", ref: "2 Timotius 1:7", reflection: "Ketakutan bukanlah berasal dari Tuhan. Roh yang Tuhan berikan adalah roh yang penuh kuasa, kasih, dan pengendalian diri untuk menghadapi setiap tantangan.", prayer: "Tuhan, usir segala roh ketakutan dari hidupku. Isi aku dengan kuasa, kasih, dan ketertiban dari Roh-Mu. Amin." },
+  { verse: "Mintalah, maka akan diberikan kepadamu; carilah, maka kamu akan mendapat; ketoklah, maka pintu akan dibukakan bagimu.", ref: "Matius 7:7", reflection: "Tuhan mengundang kita untuk datang kepada-Nya dengan keberanian dan ketekunan. Ia bukan Tuhan yang pelit, melainkan Bapa yang murah hati.", prayer: "Bapa surgawi, berikanku keberanian untuk meminta, ketekunan untuk mencari, dan iman untuk mengetuk pintu-Mu. Amin." },
+  { verse: "Damai sejahtera Kutinggalkan bagimu. Damai sejahtera-Ku Kuberikan kepadamu, dan apa yang Kuberikan tidak seperti yang diberikan oleh dunia kepadamu.", ref: "Yohanes 14:27", reflection: "Damai sejahtera dari Yesus berbeda dari kedamaian duniawi. Damai-Nya tidak bergantung pada situasi, melainkan hadir di tengah badai kehidupan.", prayer: "Yesus, aku terima damai sejahtera-Mu yang melampaui segala keadaan. Biarkan damai-Mu memenuhi hatiku hari ini. Amin." },
+  { verse: "Jika kita mengaku dosa kita, maka Ia adalah setia dan adil, sehingga Ia akan mengampuni segala dosa kita dan menyucikan kita dari segala kejahatan.", ref: "1 Yohanes 1:9", reflection: "Pengampunan Tuhan selalu tersedia bagi mereka yang datang dengan hati yang jujur dan rendah. Tidak ada dosa yang terlalu besar bagi kasih karunia-Nya.", prayer: "Tuhan, aku mengaku dosaku di hadapan-Mu. Terima kasih untuk pengampunan dan pemurnian yang Engkau sediakan. Amin." },
+  { verse: "Hendaklah kamu murah hati, sama seperti Bapamu adalah murah hati.", ref: "Lukas 6:36", reflection: "Kemurahan hati adalah cerminan karakter Allah dalam diri kita. Ketika kita murah hati kepada orang lain, kita menjadi saluran berkat Tuhan.", prayer: "Tuhan, bentuklah hatiku agar murah hati seperti Engkau. Ajarku untuk memberi tanpa mengharapkan balasan. Amin." },
+  { verse: "Aku memberikan perintah baru kepada kamu, yaitu supaya kamu saling mengasihi; sama seperti Aku telah mengasihi kamu demikian pula kamu harus saling mengasihi.", ref: "Yohanes 13:34", reflection: "Kasih adalah tanda pengenal murid Kristus. Bukan kasih yang memilih-milih, tetapi kasih yang rela berkorban seperti Kristus telah berkorban.", prayer: "Yesus, tolong aku untuk mengasihi sesamaku seperti Engkau telah mengasihi aku. Jadikan kasih-Mu nyata melalui hidupku. Amin." },
+  { verse: "Karena itu rendahkanlah dirimu di bawah tangan Tuhan yang kuat, supaya kamu ditinggikan-Nya pada waktunya.", ref: "1 Petrus 5:6", reflection: "Kerendahan hati adalah kunci kemuliaan sejati. Tuhan meninggikan mereka yang merendahkan diri, bukan di hadapan manusia saja, tetapi di hadapan-Nya.", prayer: "Tuhan, ajarku untuk rendah hati dan menyerahkan segala ambisiku kepada-Mu. Aku percaya waktu-Mu selalu sempurna. Amin." },
+  { verse: "Berbahagialah orang yang membawa damai, karena mereka akan disebut anak-anak Allah.", ref: "Matius 5:9", reflection: "Menjadi pembawa damai bukan berarti menghindari konflik, melainkan menjadi jembatan rekonsiliasi dan pemulihan di tengah perpecahan.", prayer: "Tuhan, jadikan aku alat damai-Mu. Di mana ada kebencian, biarkan aku menaburkan kasih; di mana ada perpecahan, biarkan aku membawa persatuan. Amin." },
+  { verse: "Sebab upah dosa ialah maut; tetapi karunia Allah ialah hidup yang kekal dalam Kristus Yesus, Tuhan kita.", ref: "Roma 6:23", reflection: "Injil dalam satu ayat: dosa membawa maut, tetapi kasih karunia Allah memberikan hidup kekal. Perbedaan antara upah dan karunia menunjukkan betapa besar kasih Allah.", prayer: "Terima kasih Tuhan untuk karunia hidup kekal melalui Yesus Kristus. Ajarku untuk hidup di dalam kasih karunia-Mu setiap hari. Amin." },
+  { verse: "Segala tulisan yang diilhamkan Allah memang bermanfaat untuk mengajar, untuk menyatakan kesalahan, untuk memperbaiki kelakuan dan untuk mendidik orang dalam kebenaran.", ref: "2 Timotius 3:16", reflection: "Alkitab bukan buku biasa, melainkan firman Allah yang hidup. Setiap halaman mengajarkan, mengoreksi, dan membentuk kita menjadi serupa dengan Kristus.", prayer: "Tuhan, berikan aku kerinduan untuk membaca dan merenungkan firman-Mu setiap hari. Biarlah firman-Mu mengubah hidupku. Amin." },
+  { verse: "Lebih baik sepiring sayur dengan kasih dari pada lembu tambun dengan kebencian.", ref: "Amsal 15:17", reflection: "Kekayaan materi tidak ada artinya tanpa kasih. Rumah yang sederhana dengan penuh kasih jauh lebih berharga dari pada kemewahan yang penuh perselisihan.", prayer: "Tuhan, ajarku untuk menghargai kasih di atas segalanya. Biarlah rumah tanggaku dipenuhi kasih dan damai sejahtera. Amin." },
+  { verse: "Hendaklah kata-katamu senantiasa penuh kasih, jangan hambar, sehingga kamu tahu, bagaimana kamu harus memberi jawab kepada setiap orang.", ref: "Kolose 4:6", reflection: "Kata-kata kita memiliki kuasa untuk membangun atau menghancurkan. Tuhan mengajak kita untuk berbicara dengan hikmat dan penuh kasih karunia.", prayer: "Tuhan, jaga lidahku hari ini. Biarlah setiap kata yang keluar dari mulutku membangun dan memberkati orang lain. Amin." },
+  { verse: "Dan inilah keberanian percaya kita kepada-Nya, yaitu bahwa Ia mengabulkan doa kita, jikalau kita meminta sesuatu kepada-Nya menurut kehendak-Nya.", ref: "1 Yohanes 5:14", reflection: "Berdoa menurut kehendak Tuhan bukan membatasi doa, tetapi mengarahkan doa kepada apa yang terbaik. Tuhan selalu mendengar dan menjawab setiap doa yang selaras dengan rencana-Nya.", prayer: "Tuhan, selaraskan keinginanku dengan kehendak-Mu. Aku percaya bahwa jawaban-Mu selalu yang terbaik untukku. Amin." },
+  { verse: "Pencuri datang hanya untuk mencuri dan membunuh dan membinasakan; Aku datang, supaya mereka mempunyai hidup, dan mempunyainya dalam segala kelimpahan.", ref: "Yohanes 10:10", reflection: "Yesus datang untuk memberikan hidup yang berkelimpahan, bukan hanya hidup yang bertahan. Kelimpahan ini bukan soal materi, melainkan sukacita, damai, dan tujuan hidup.", prayer: "Yesus, aku terima hidup yang berkelimpahan dari-Mu. Buka mataku untuk melihat berkat-berkat yang telah Engkau sediakan. Amin." }
+];
+
+let currentDevIdx = 0;
+let isSpeakingDev = false;
+
 function initDailyVerse() {
-  const verseText = document.getElementById('daily-verse-text');
-  const verseRef = document.getElementById('daily-verse-ref');
-  if (!verseText || !verseRef) return;
-
-  const verses = [
-    { text: "Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku.", ref: "Filipi 4:13" },
-    { text: "Karena begitu besar kasih Allah akan dunia ini, sehingga Ia telah mengaruniakan Anak-Nya yang tunggal...", ref: "Yohanes 3:16" },
-    { text: "Sebab Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu, demikianlah firman TUHAN...", ref: "Yeremia 29:11" },
-    { text: "Janganlah hendaknya kamu kuatir tentang apa pun juga, tetapi nyatakanlah dalam segala hal keinginanmu kepada Allah...", ref: "Filipi 4:6" },
-    { text: "Percayalah kepada TUHAN dengan segenap hatimu, dan janganlah bersandar kepada pengertianmu sendiri.", ref: "Amsal 3:5" },
-    { text: "Marilah kepada-Ku, semua yang letih lesu dan berbeban berat, Aku akan memberi kelegaan kepadamu.", ref: "Matius 11:28" },
-    { text: "Pencuri datang hanya untuk mencuri dan membunuh dan membinasakan; Aku datang, supaya mereka mempunyai hidup...", ref: "Yohanes 10:10" },
-    { text: "Kita tahu sekarang, bahwa Allah turut bekerja dalam segala sesuatu untuk mendatangkan kebaikan...", ref: "Roma 8:28" },
-    { text: "Tetapi orang-orang yang menanti-nantikan TUHAN mendapat kekuatan baru...", ref: "Yesaya 40:31" },
-    { text: "Firman-Mu itu pelita bagi kakiku dan terang bagi jalanku.", ref: "Mazmur 119:105" },
-    { text: "Kasih itu sabar; kasih itu murah hati; ia tidak cemburu. Ia tidak memegahkan diri dan tidak sombong.", ref: "1 Korintus 13:4" },
-    { text: "Janganlah kamu menjadi hamba uang dan cukupkanlah dirimu dengan apa yang ada padamu...", ref: "Ibrani 13:5" },
-    { text: "Serahkanlah kuatirmu kepada TUHAN, maka Ia akan memelihara engkau!", ref: "Mazmur 55:22" },
-    { text: "Bersukacitalah senantiasa. Tetaplah berdoa. Mengucap syukurlah dalam segala hal...", ref: "1 Tesalonika 5:16-18" },
-    { text: "Sebab karena kasih karunia kamu diselamatkan oleh iman...", ref: "Efesus 2:8" },
-    { text: "Dan inilah keberanian percaya kita kepada-Nya, yaitu bahwa Ia mengabulkan doa kita...", ref: "1 Yohanes 5:14" },
-    { text: "Tetapi carilah dahulu Kerajaan Allah dan kebenarannya, maka semuanya itu akan ditambahkan kepadamu.", ref: "Matius 6:33" },
-    { text: "Aku memberikan perintah baru kepada kamu, yaitu supaya kamu saling mengasihi...", ref: "Yohanes 13:34" },
-    { text: "Hendaklah kamu murah hati, sama seperti Bapamu adalah murah hati.", ref: "Lukas 6:36" },
-    { text: "TUHAN adalah gembalaku, takkan kekurangan aku.", ref: "Mazmur 23:1" },
-    { text: "Hendaklah perkataanmu senantiasa penuh kasih, jangan hambar...", ref: "Kolose 4:6" },
-    { text: "Berbahagialah orang yang membawa damai, karena mereka akan disebut anak-anak Allah.", ref: "Matius 5:9" },
-    { text: "Apa pun juga yang kamu perbuat, perbuatlah dengan segenap hatimu seperti untuk Tuhan dan bukan untuk manusia.", ref: "Kolose 3:23" },
-    { text: "Sebab Allah memberikan kepada kita bukan roh ketakutan, melainkan roh yang membangkitkan kekuatan...", ref: "2 Timotius 1:7" },
-    { text: "Lebih baik sepiring sayur dengan kasih dari pada lembu tambun dengan kebencian.", ref: "Amsal 15:17" },
-    { text: "Karena itu rendahkanlah dirimu di bawah tangan Tuhan yang kuat, supaya kamu ditinggikan-Nya pada waktunya.", ref: "1 Petrus 5:6" },
-    { text: "Mintalah, maka akan diberikan kepadamu; carilah, maka kamu akan mendapat...", ref: "Matius 7:7" },
-    { text: "Jika kita mengaku dosa kita, maka Ia adalah setia dan adil, sehingga Ia akan mengampuni...", ref: "1 Yohanes 1:9" },
-    { text: "Damai sejahtera Kutinggalkan bagimu. Damai sejahtera-Ku Kuberikan kepadamu...", ref: "Yohanes 14:27" },
-    { text: "Segala tulisan yang diilhamkan Allah memang bermanfaat untuk mengajar, untuk menyatakan kesalahan...", ref: "2 Timotius 3:16" },
-    { text: "Sebab upah dosa ialah maut; tetapi karunia Allah ialah hidup yang kekal dalam Kristus Yesus, Tuhan kita.", ref: "Roma 6:23" }
-  ];
-
   const today = new Date();
-  const dayIndex = (today.getDate() - 1) % verses.length;
-  const todaysVerse = verses[dayIndex];
-
-  // Optional: add a slight delay for realism
-  setTimeout(() => {
-    verseText.innerText = `"${todaysVerse.text}"`;
-    verseRef.innerText = todaysVerse.ref;
-  }, 500);
+  currentDevIdx = (today.getDate() - 1) % DEVOTIONALS.length;
+  renderDevotional(currentDevIdx);
 }
+
+function renderDevotional(idx) {
+  const d = DEVOTIONALS[idx];
+  const el = (id) => document.getElementById(id);
+
+  const verseEl = el('devVerseText');
+  const refEl = el('devVerseRef');
+  const reflEl = el('devReflection');
+  const prayerEl = el('devPrayer');
+  const dayEl = el('devDayNum');
+  const progEl = el('devProgressFill');
+
+  if (verseEl) { verseEl.style.opacity = '0'; setTimeout(() => { verseEl.textContent = '"' + d.verse + '"'; verseEl.style.opacity = '1'; }, 150); }
+  if (refEl) refEl.textContent = d.ref;
+  if (reflEl) reflEl.textContent = d.reflection;
+  if (prayerEl) prayerEl.textContent = '"' + d.prayer + '"';
+  if (dayEl) dayEl.textContent = 'Hari ke-' + (idx + 1) + ' dari ' + DEVOTIONALS.length;
+  if (progEl) progEl.style.width = Math.round(((idx + 1) / DEVOTIONALS.length) * 100) + '%';
+}
+
+function shuffleDevotional() {
+  let next;
+  do { next = Math.floor(Math.random() * DEVOTIONALS.length); } while (next === currentDevIdx && DEVOTIONALS.length > 1);
+  currentDevIdx = next;
+  renderDevotional(currentDevIdx);
+}
+
+function speakDevotional() {
+  if (!('speechSynthesis' in window)) return;
+  const btn = document.getElementById('devAudioBtn');
+  const wave = document.getElementById('devAudioWave');
+
+  if (isSpeakingDev) {
+    window.speechSynthesis.cancel();
+    isSpeakingDev = false;
+    if (btn) btn.classList.remove('playing');
+    if (wave) wave.style.display = 'none';
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+  const d = DEVOTIONALS[currentDevIdx];
+  const text = 'Renungan Harian Gereja AMIN Hermon. Bacaan hari ini dari ' + d.ref + '. ' + d.verse + '. Renungan: ' + d.reflection + '. Doa Penutup: ' + d.prayer;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'id-ID';
+  utter.rate = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const idVoice = voices.find(v => v.lang && v.lang.startsWith('id'));
+  if (idVoice) utter.voice = idVoice;
+
+  utter.onstart = () => { isSpeakingDev = true; if (btn) btn.classList.add('playing'); if (wave) wave.style.display = 'inline-flex'; };
+  utter.onend = utter.onerror = () => { isSpeakingDev = false; if (btn) btn.classList.remove('playing'); if (wave) wave.style.display = 'none'; };
+  window.speechSynthesis.speak(utter);
+}
+
+function shareDevotional() {
+  const d = DEVOTIONALS[currentDevIdx];
+  const text = '*Renungan Harian — Gereja AMIN Hermon*\n\n📖 *' + d.ref + '*\n"' + d.verse + '"\n\n✍️ *Renungan:*\n' + d.reflection + '\n\n🙏 *Doa:*\n' + d.prayer + '\n\n🌐 ' + window.location.origin;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+function copyDevotional() {
+  const d = DEVOTIONALS[currentDevIdx];
+  const text = d.ref + '\n"' + d.verse + '"\n\nRenungan: ' + d.reflection + '\n\nDoa: ' + d.prayer + '\n\n— Gereja AMIN Hermon';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('devCopyBtn');
+      if (btn) { const orig = btn.innerHTML; btn.innerHTML = '✅ Tersalin!'; setTimeout(() => { btn.innerHTML = orig; }, 2000); }
+    }).catch(() => {});
+  }
+}
+
+window.shuffleDevotional = shuffleDevotional;
+window.speakDevotional = speakDevotional;
+window.shareDevotional = shareDevotional;
+window.copyDevotional = copyDevotional;
 
 /* ---------- Stats Counter Animation ---------- */
 function initStatsCounter() {
