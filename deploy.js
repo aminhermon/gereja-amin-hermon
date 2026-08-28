@@ -24,8 +24,9 @@ const EXCLUDE = [
   'temp.html',
   'views.zip',
   'script.js',
-  'styles.css',
   'update-db.js',
+  'data/db.persisted.json',
+  'data/snapshots',
 ];
 
 // Kumpulkan semua file yang akan di-zip

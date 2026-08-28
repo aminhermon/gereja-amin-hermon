@@ -224,44 +224,95 @@ const upload = multer({
   }
 });
 
-// DB helpers with 3-tier persistent storage (immune to git resets & restarts)
+// ==================== ROCK-SOLID CMS DATABASE PERSISTENCE ====================
+// Priority: db.persisted.json (Master Production DB - NEVER overwritten by git pulls/updates)
 const dbPath = path.join(__dirname, 'data', 'db.json');
 const persistedDbPath = path.join(__dirname, 'data', 'db.persisted.json');
 const backupDbPath = path.join(__dirname, 'data', 'db.backup.json');
+const snapshotsDir = path.join(__dirname, 'data', 'snapshots');
 
 // Global in-memory cache for ultra-reliable session consistency
 global.__CACHED_DB__ = null;
 
-function getDB() { 
+/**
+ * Safe Schema Enrichment:
+ * Adds brand-new top-level sections if added in code updates (e.g. new modules),
+ * WITHOUT touching existing arrays or resurrecting deleted items!
+ */
+function enrichMissingTopLevelKeys(targetDb) {
+  if (!fs.existsSync(dbPath) || !targetDb || typeof targetDb !== 'object') return;
   try {
-    let chosenData = null;
-    let chosenMtime = 0;
+    const seedRaw = fs.readFileSync(dbPath, 'utf8');
+    const seedDb = JSON.parse(seedRaw);
+    if (!seedDb || typeof seedDb !== 'object') return;
 
-    // Check all 3 database storage files and pick the most recent valid one
-    const candidatePaths = [persistedDbPath, dbPath, backupDbPath];
-    for (const cp of candidatePaths) {
-      if (fs.existsSync(cp)) {
-        try {
-          const stat = fs.statSync(cp);
-          const raw = fs.readFileSync(cp, 'utf8');
-          const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === 'object' && stat.mtimeMs > chosenMtime) {
-            chosenData = parsed;
-            chosenMtime = stat.mtimeMs;
-          }
-        } catch (e) {
-          console.warn('⚠️ Warning reading DB candidate:', cp, e.message);
+    let modified = false;
+    for (const key of Object.keys(seedDb)) {
+      // Only copy a top-level section if completely absent in targetDb
+      if (targetDb[key] === undefined) {
+        targetDb[key] = JSON.parse(JSON.stringify(seedDb[key]));
+        modified = true;
+        console.log(`✨ Schema baru ditambahkan ke database: [${key}]`);
+      }
+    }
+    if (modified) {
+      saveDB(targetDb);
+    }
+  } catch (e) {}
+}
+
+/**
+ * Initialize and load database with strict persistence hierarchy:
+ * 1. db.persisted.json (Master Production DB — ALWAYS 100% priority over git files)
+ * 2. db.backup.json (Secondary mirror fallback)
+ * 3. db.json (Initial fresh install template seed ONLY)
+ */
+function getDB() { 
+  if (global.__CACHED_DB__) {
+    return global.__CACHED_DB__;
+  }
+
+  try {
+    // 1. PRIMARY MASTER FILE: db.persisted.json (Ignored by Git, persists forever)
+    if (fs.existsSync(persistedDbPath)) {
+      try {
+        const raw = fs.readFileSync(persistedDbPath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          enrichMissingTopLevelKeys(parsed);
+          global.__CACHED_DB__ = parsed;
+          return parsed;
         }
+      } catch (e) {
+        console.warn('⚠️ Gagal membaca db.persisted.json, mencoba fallback:', e.message);
       }
     }
 
-    if (chosenData) {
-      global.__CACHED_DB__ = chosenData;
-      return chosenData;
+    // 2. SECONDARY FALLBACK: db.backup.json
+    if (fs.existsSync(backupDbPath)) {
+      try {
+        const raw = fs.readFileSync(backupDbPath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          enrichMissingTopLevelKeys(parsed);
+          global.__CACHED_DB__ = parsed;
+          saveDB(parsed); // Re-establish master file
+          return parsed;
+        }
+      } catch (e) {}
     }
 
-    if (global.__CACHED_DB__) {
-      return global.__CACHED_DB__;
+    // 3. TERTIARY SEED: db.json (Initial installation template seed only)
+    if (fs.existsSync(dbPath)) {
+      try {
+        const raw = fs.readFileSync(dbPath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          global.__CACHED_DB__ = parsed;
+          saveDB(parsed); // Initialize master file for the first time
+          return parsed;
+        }
+      } catch (e) {}
     }
 
     return {};
@@ -271,6 +322,9 @@ function getDB() {
   }
 }
 
+/**
+ * Save database permanently across all persistence targets and snapshot history
+ */
 function saveDB(data) { 
   if (!data || typeof data !== 'object') return false;
   try {
@@ -281,13 +335,36 @@ function saveDB(data) {
 
     const jsonString = JSON.stringify(data, null, 2);
     
-    // Save to all 3 persistence locations atomically with permissive file mode
-    try { fs.writeFileSync(persistedDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) { console.warn('Could not write persistedDbPath:', e.message); }
-    try { fs.writeFileSync(dbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) { console.warn('Could not write dbPath:', e.message); }
+    // 1. Save to MASTER persistence file first (immune to git resets & deploys)
+    try { 
+      fs.writeFileSync(persistedDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); 
+    } catch (e) { 
+      console.warn('Could not write persistedDbPath:', e.message); 
+    }
+
+    // 2. Sync runtime mirror and backup
+    try { fs.writeFileSync(dbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) {}
     try { fs.writeFileSync(backupDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) {}
 
-    // Update in-memory copy instantly
-    global.__CACHED_DB__ = JSON.parse(jsonString);
+    // 3. Automated rotating snapshots (keeps last 25 historical snapshots)
+    try {
+      if (!fs.existsSync(snapshotsDir)) fs.mkdirSync(snapshotsDir, { recursive: true });
+      const snapName = `snap-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+      fs.writeFileSync(path.join(snapshotsDir, snapName), jsonString, 'utf8');
+
+      // Keep maximum 25 snapshot files
+      const snapFiles = fs.readdirSync(snapshotsDir)
+        .filter(f => f.startsWith('snap-') && f.endsWith('.json'))
+        .sort();
+      if (snapFiles.length > 25) {
+        for (let i = 0; i < snapFiles.length - 25; i++) {
+          try { fs.unlinkSync(path.join(snapshotsDir, snapFiles[i])); } catch (e) {}
+        }
+      }
+    } catch (e) {}
+
+    // 4. Update in-memory cache
+    global.__CACHED_DB__ = data;
     console.log('✅ Database berhasil disimpan permanen ke disk');
     return true;
   } catch (err) {
