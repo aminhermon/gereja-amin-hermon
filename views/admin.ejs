@@ -1066,28 +1066,90 @@
   </main>
 
   <script>
-    // === Scroll Position Preservation ===
-    // Save scroll position before any form submit so page doesn't jump to top
-    document.addEventListener('submit', function() {
-      sessionStorage.setItem('adminScrollY', window.scrollY.toString());
-    });
-    window.addEventListener('load', function() {
-      var saved = sessionStorage.getItem('adminScrollY');
-      if (saved) {
-        window.scrollTo(0, parseInt(saved));
-        sessionStorage.removeItem('adminScrollY');
+    // === ROCK-SOLID SCROLL & POSITION PRESERVATION ===
+    // Continuously tracks scroll on window, document, and .content container
+    function recordAdminScroll(elem) {
+      try {
+        const contentEl = document.querySelector('.content');
+        const cScroll = contentEl ? contentEl.scrollTop : 0;
+        const wScroll = window.scrollY || (document.documentElement ? document.documentElement.scrollTop : 0) || (document.body ? document.body.scrollTop : 0);
+        
+        sessionStorage.setItem('adminContentScrollTop', cScroll.toString());
+        sessionStorage.setItem('adminWindowScrollY', wScroll.toString());
+
+        if (elem && elem.id) {
+          sessionStorage.setItem('adminAnchorId', elem.id);
+        } else if (elem) {
+          const card = elem.closest('.card, .item-card, .fm-card, form');
+          if (card && card.id) {
+            sessionStorage.setItem('adminAnchorId', card.id);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Auto-record on any scroll event (passive)
+    window.addEventListener('scroll', function() { recordAdminScroll(); }, { passive: true });
+    const cEl = document.querySelector('.content');
+    if (cEl) {
+      cEl.addEventListener('scroll', function() { recordAdminScroll(); }, { passive: true });
+    }
+
+    // Record on any form submit or button click
+    document.addEventListener('submit', function(e) {
+      recordAdminScroll(e.target);
+    }, true);
+
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('button[type="submit"], input[type="submit"], a.btn, .btn');
+      if (btn) {
+        recordAdminScroll(btn);
       }
+    }, true);
+
+    window.addEventListener('beforeunload', function() {
+      recordAdminScroll();
+    });
+
+    // Multi-pass restoration across all layout lifecycle stages
+    function applyAdminScrollRestoration() {
+      try {
+        const cScroll = sessionStorage.getItem('adminContentScrollTop');
+        const wScroll = sessionStorage.getItem('adminWindowScrollY');
+
+        const contentEl = document.querySelector('.content');
+        if (cScroll && contentEl && parseInt(cScroll, 10) > 0) {
+          contentEl.scrollTop = parseInt(cScroll, 10);
+        }
+        if (wScroll && parseInt(wScroll, 10) > 0) {
+          const s = parseInt(wScroll, 10);
+          window.scrollTo(0, s);
+          if (document.documentElement) document.documentElement.scrollTop = s;
+          if (document.body) document.body.scrollTop = s;
+        }
+      } catch (e) {}
+    }
+
+    // Run multi-pass restoration
+    applyAdminScrollRestoration();
+    document.addEventListener('DOMContentLoaded', applyAdminScrollRestoration);
+    window.addEventListener('load', function() {
+      applyAdminScrollRestoration();
+      setTimeout(applyAdminScrollRestoration, 50);
+      setTimeout(applyAdminScrollRestoration, 150);
+      setTimeout(applyAdminScrollRestoration, 350);
     });
 
     // === Safe Confirm & Delete ===
-    // Uses data attributes to avoid JS string breakage from special chars in names
     function confirmAndDelete(btn) {
       var name = btn.getAttribute('data-del-name') || '';
       var formId = btn.getAttribute('data-del-form');
       if (confirm('Hapus foto ' + name + '?')) {
+        recordAdminScroll(btn);
         document.getElementById(formId).submit();
       }
     }
+
     function filterFiles() {
       const input = document.getElementById('fmSearchInput');
       const filter = input ? input.value.toLowerCase() : '';
@@ -1134,6 +1196,7 @@
       if (checked.length === 0) return;
       if (!confirm('Hapus permanen ' + checked.length + ' file yang dipilih dari server?')) return;
 
+      recordAdminScroll(document.getElementById('btnBulkDelete'));
       const container = document.getElementById('bulkDeleteInputs');
       container.innerHTML = '';
       checked.forEach(cb => {
