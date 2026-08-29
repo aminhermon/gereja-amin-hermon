@@ -51,7 +51,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="css/style.min.css?v=9">
+  <link rel="stylesheet" href="css/style.min.css?v=10">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -136,7 +136,21 @@
     </div>
   </section>
 
-
+  <!-- ========== AYAT HARI INI ========== -->
+  <section class="section section--off-white" id="ayat-hari-ini" style="padding: 4rem 0;">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Ayat <span class="text-gold">Hari Ini</span></h2>
+        <span class="gold-line"></span>
+        <p>Santapan firman Tuhan untuk menguatkan iman dan langkah hidup Anda setiap hari</p>
+      </div>
+      <div class="renungan-otomatis-card" data-aos="fade-up" data-aos-delay="100" style="max-width: 800px; margin: 0 auto; background: var(--white); border-radius: 16px; box-shadow: 0 10px 35px rgba(0,0,0,0.06); padding: 3rem 2.5rem; text-align: center; border-top: 4px solid var(--gold); position: relative;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--gold)" opacity="0.2" style="position: absolute; top: 20px; left: 20px;"><path d="M14.017 21v-7.391c0-5.714 4.82-8.609 8.354-9.609l.942 2.604c-3.136 1.054-6.386 3.636-6.386 7.429h5.688V21h-8.598zm-11.419 0v-7.391c0-5.714 4.82-8.609 8.354-9.609l.942 2.604c-3.136 1.054-6.386 3.636-6.386 7.429h5.688V21H2.598z"/></svg>
+        <p id="daily-verse-text" style="font-size: 1.25rem; font-style: italic; color: var(--navy); line-height: 1.85; margin-bottom: 1.5rem; font-family: 'Georgia', serif;">Memuat firman Tuhan...</p>
+        <h4 id="daily-verse-ref" style="font-family: var(--font-heading); color: var(--gold); font-size: 1.1rem; margin: 0; font-weight: 700;">-</h4>
+      </div>
+    </div>
+  </section>
 
   <!-- ========== NEWS & EVENTS (Lundev Carousel) ========== -->
   <section class="carousel" id="news">
@@ -336,7 +350,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="js/main.min.js?v=9" defer></script>
+  <script src="js/main.min.js?v=10" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
