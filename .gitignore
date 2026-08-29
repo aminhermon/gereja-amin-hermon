@@ -4,7 +4,13 @@ node_modules/
 deploy-hostinger.zip
 *.log
 .DS_Store
+# Live CMS Database files (never overwrite user edits/deletions on deploy)
+data/db.json
+data/db.backup.json
 data/db.persisted.json
 data/snapshots/
+!data/db.seed.json
+
 uploads/
 !uploads/.gitkeep
+

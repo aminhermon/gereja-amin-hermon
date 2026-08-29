@@ -229,6 +229,7 @@ const upload = multer({
 const dbPath = path.join(__dirname, 'data', 'db.json');
 const persistedDbPath = path.join(__dirname, 'data', 'db.persisted.json');
 const backupDbPath = path.join(__dirname, 'data', 'db.backup.json');
+const seedDbPath = path.join(__dirname, 'data', 'db.seed.json');
 const snapshotsDir = path.join(__dirname, 'data', 'snapshots');
 
 // Global in-memory cache for ultra-reliable session consistency
@@ -240,9 +241,10 @@ global.__CACHED_DB__ = null;
  * WITHOUT touching existing arrays or resurrecting deleted items!
  */
 function enrichMissingTopLevelKeys(targetDb) {
-  if (!fs.existsSync(dbPath) || !targetDb || typeof targetDb !== 'object') return;
+  const referenceSeedPath = fs.existsSync(seedDbPath) ? seedDbPath : dbPath;
+  if (!fs.existsSync(referenceSeedPath) || !targetDb || typeof targetDb !== 'object') return;
   try {
-    const seedRaw = fs.readFileSync(dbPath, 'utf8');
+    const seedRaw = fs.readFileSync(referenceSeedPath, 'utf8');
     const seedDb = JSON.parse(seedRaw);
     if (!seedDb || typeof seedDb !== 'object') return;
 
@@ -264,8 +266,9 @@ function enrichMissingTopLevelKeys(targetDb) {
 /**
  * Initialize and load database with strict persistence hierarchy:
  * 1. db.persisted.json (Master Production DB — ALWAYS 100% priority over git files)
- * 2. db.backup.json (Secondary mirror fallback)
- * 3. db.json (Initial fresh install template seed ONLY)
+ * 2. db.json (Active local database file)
+ * 3. db.backup.json (Secondary mirror fallback)
+ * 4. db.seed.json (Initial fresh install template seed ONLY)
  */
 function getDB() { 
   if (global.__CACHED_DB__) {
@@ -288,7 +291,21 @@ function getDB() {
       }
     }
 
-    // 2. SECONDARY FALLBACK: db.backup.json
+    // 2. ACTIVE LOCAL DB FILE: db.json (Ignored by Git, persists forever)
+    if (fs.existsSync(dbPath)) {
+      try {
+        const raw = fs.readFileSync(dbPath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          enrichMissingTopLevelKeys(parsed);
+          global.__CACHED_DB__ = parsed;
+          saveDB(parsed); // Ensure master persisted file is also written
+          return parsed;
+        }
+      } catch (e) {}
+    }
+
+    // 3. SECONDARY FALLBACK: db.backup.json
     if (fs.existsSync(backupDbPath)) {
       try {
         const raw = fs.readFileSync(backupDbPath, 'utf8');
@@ -302,10 +319,10 @@ function getDB() {
       } catch (e) {}
     }
 
-    // 3. TERTIARY SEED: db.json (Initial installation template seed only)
-    if (fs.existsSync(dbPath)) {
+    // 4. TERTIARY SEED: db.seed.json (Initial installation template seed only)
+    if (fs.existsSync(seedDbPath)) {
       try {
-        const raw = fs.readFileSync(dbPath, 'utf8');
+        const raw = fs.readFileSync(seedDbPath, 'utf8');
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
           global.__CACHED_DB__ = parsed;

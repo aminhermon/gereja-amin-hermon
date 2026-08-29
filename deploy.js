@@ -25,6 +25,8 @@ const EXCLUDE = [
   'views.zip',
   'script.js',
   'update-db.js',
+  'data/db.json',
+  'data/db.backup.json',
   'data/db.persisted.json',
   'data/snapshots',
 ];
