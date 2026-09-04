@@ -225,15 +225,79 @@ const upload = multer({
 });
 
 // ==================== ROCK-SOLID CMS DATABASE PERSISTENCE ====================
-// Priority: db.persisted.json (Master Production DB - NEVER overwritten by git pulls/updates)
-const dbPath = path.join(__dirname, 'data', 'db.json');
-const persistedDbPath = path.join(__dirname, 'data', 'db.persisted.json');
-const backupDbPath = path.join(__dirname, 'data', 'db.backup.json');
+// CRITICAL FIX: Store database OUTSIDE the Git project directory.
+// When Hostinger does a Git auto-deploy, it wipes/replaces the entire project folder.
+// Files in .gitignore are NOT preserved — they simply don't exist in the repo.
+// By storing the master DB in ~/persistent-data/, Git deploys can NEVER touch it.
+
+const os = require('os');
+
+// Determine the persistent storage directory OUTSIDE the git project
+const isProduction = process.env.NODE_ENV === 'production' || !process.env.NODE_ENV;
+const isWindows = os.platform() === 'win32';
+
+// On Linux/Hostinger: ~/persistent-data/gereja-amin-hermon/
+// On Windows dev: ./data/ (for convenience)
+const PERSISTENT_DIR = isWindows
+  ? path.join(__dirname, 'data')
+  : path.join(os.homedir(), 'persistent-data', 'gereja-amin-hermon');
+
+// Ensure the persistent directory exists
+if (!fs.existsSync(PERSISTENT_DIR)) {
+  fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
+  console.log(`📁 Created persistent data directory: ${PERSISTENT_DIR}`);
+}
+
+// Database file paths (stored OUTSIDE git project on production)
+const externalDbPath = path.join(PERSISTENT_DIR, 'db.json');
+const externalBackupPath = path.join(PERSISTENT_DIR, 'db.backup.json');
+const externalSnapshotsDir = path.join(PERSISTENT_DIR, 'snapshots');
+
+// Legacy paths inside the project (for migration only)
+const legacyDbPath = path.join(__dirname, 'data', 'db.json');
+const legacyPersistedPath = path.join(__dirname, 'data', 'db.persisted.json');
+const legacyBackupPath = path.join(__dirname, 'data', 'db.backup.json');
+
+// Seed file stays in the project (it's the initial template, tracked by Git)
 const seedDbPath = path.join(__dirname, 'data', 'db.seed.json');
-const snapshotsDir = path.join(__dirname, 'data', 'snapshots');
 
 // Global in-memory cache for ultra-reliable session consistency
 global.__CACHED_DB__ = null;
+
+/**
+ * ONE-TIME MIGRATION: Move existing database from inside the project to the
+ * external persistent directory. This runs once on first startup after the fix.
+ */
+function migrateToExternalStorage() {
+  // Skip if external DB already exists (migration already done)
+  if (fs.existsSync(externalDbPath)) return;
+
+  console.log('🔄 Checking for database migration to external storage...');
+
+  // Try to migrate from legacy locations (in order of priority)
+  const legacySources = [legacyPersistedPath, legacyDbPath, legacyBackupPath];
+  for (const src of legacySources) {
+    if (fs.existsSync(src)) {
+      try {
+        const raw = fs.readFileSync(src, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          fs.writeFileSync(externalDbPath, raw, 'utf8');
+          fs.writeFileSync(externalBackupPath, raw, 'utf8');
+          console.log(`✅ Database berhasil dimigrasikan dari ${src} ke ${externalDbPath}`);
+          return;
+        }
+      } catch (e) {
+        console.warn(`⚠️ Gagal migrasi dari ${src}:`, e.message);
+      }
+    }
+  }
+
+  console.log('ℹ️ Tidak ada database lama untuk dimigrasikan. Akan menggunakan db.seed.json saat pertama kali.');
+}
+
+// Run migration on startup
+migrateToExternalStorage();
 
 /**
  * Safe Schema Enrichment:
@@ -241,10 +305,9 @@ global.__CACHED_DB__ = null;
  * WITHOUT touching existing arrays or resurrecting deleted items!
  */
 function enrichMissingTopLevelKeys(targetDb) {
-  const referenceSeedPath = fs.existsSync(seedDbPath) ? seedDbPath : dbPath;
-  if (!fs.existsSync(referenceSeedPath) || !targetDb || typeof targetDb !== 'object') return;
+  if (!fs.existsSync(seedDbPath) || !targetDb || typeof targetDb !== 'object') return;
   try {
-    const seedRaw = fs.readFileSync(referenceSeedPath, 'utf8');
+    const seedRaw = fs.readFileSync(seedDbPath, 'utf8');
     const seedDb = JSON.parse(seedRaw);
     if (!seedDb || typeof seedDb !== 'object') return;
 
@@ -265,10 +328,10 @@ function enrichMissingTopLevelKeys(targetDb) {
 
 /**
  * Initialize and load database with strict persistence hierarchy:
- * 1. db.persisted.json (Master Production DB — ALWAYS 100% priority over git files)
- * 2. db.json (Active local database file)
- * 3. db.backup.json (Secondary mirror fallback)
- * 4. db.seed.json (Initial fresh install template seed ONLY)
+ * 1. EXTERNAL db.json (Master Production DB — stored OUTSIDE git, survives all deploys)
+ * 2. EXTERNAL db.backup.json (Backup mirror outside git)
+ * 3. LEGACY db.persisted.json / db.json / db.backup.json (inside project, for migration)
+ * 4. db.seed.json (Initial fresh install template seed ONLY — tracked by Git)
  */
 function getDB() { 
   if (global.__CACHED_DB__) {
@@ -276,10 +339,10 @@ function getDB() {
   }
 
   try {
-    // 1. PRIMARY MASTER FILE: db.persisted.json (Ignored by Git, persists forever)
-    if (fs.existsSync(persistedDbPath)) {
+    // 1. PRIMARY: External persistent DB (OUTSIDE git directory — immune to deploys)
+    if (fs.existsSync(externalDbPath)) {
       try {
-        const raw = fs.readFileSync(persistedDbPath, 'utf8');
+        const raw = fs.readFileSync(externalDbPath, 'utf8');
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
           enrichMissingTopLevelKeys(parsed);
@@ -287,46 +350,51 @@ function getDB() {
           return parsed;
         }
       } catch (e) {
-        console.warn('⚠️ Gagal membaca db.persisted.json, mencoba fallback:', e.message);
+        console.warn('⚠️ Gagal membaca external db.json, mencoba fallback:', e.message);
       }
     }
 
-    // 2. ACTIVE LOCAL DB FILE: db.json (Ignored by Git, persists forever)
-    if (fs.existsSync(dbPath)) {
+    // 2. BACKUP: External backup DB
+    if (fs.existsSync(externalBackupPath)) {
       try {
-        const raw = fs.readFileSync(dbPath, 'utf8');
+        const raw = fs.readFileSync(externalBackupPath, 'utf8');
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
           enrichMissingTopLevelKeys(parsed);
           global.__CACHED_DB__ = parsed;
-          saveDB(parsed); // Ensure master persisted file is also written
+          saveDB(parsed);
           return parsed;
         }
       } catch (e) {}
     }
 
-    // 3. SECONDARY FALLBACK: db.backup.json
-    if (fs.existsSync(backupDbPath)) {
-      try {
-        const raw = fs.readFileSync(backupDbPath, 'utf8');
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-          enrichMissingTopLevelKeys(parsed);
-          global.__CACHED_DB__ = parsed;
-          saveDB(parsed); // Re-establish master file
-          return parsed;
-        }
-      } catch (e) {}
+    // 3. LEGACY FALLBACK: Try old locations inside project (handles edge cases)
+    const legacySources = [legacyPersistedPath, legacyDbPath, legacyBackupPath];
+    for (const src of legacySources) {
+      if (fs.existsSync(src)) {
+        try {
+          const raw = fs.readFileSync(src, 'utf8');
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+            enrichMissingTopLevelKeys(parsed);
+            global.__CACHED_DB__ = parsed;
+            saveDB(parsed); // Migrate to external storage
+            console.log(`🔄 Dimigrasikan dari legacy ${path.basename(src)} ke external storage`);
+            return parsed;
+          }
+        } catch (e) {}
+      }
     }
 
-    // 4. TERTIARY SEED: db.seed.json (Initial installation template seed only)
+    // 4. SEED: db.seed.json (Initial installation template — first-time only)
     if (fs.existsSync(seedDbPath)) {
       try {
         const raw = fs.readFileSync(seedDbPath, 'utf8');
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
           global.__CACHED_DB__ = parsed;
-          saveDB(parsed); // Initialize master file for the first time
+          saveDB(parsed); // Initialize external storage for the first time
+          console.log('🌱 Database baru diinisialisasi dari db.seed.json (instalasi pertama)');
           return parsed;
         }
       } catch (e) {}
@@ -340,49 +408,59 @@ function getDB() {
 }
 
 /**
- * Save database permanently across all persistence targets and snapshot history
+ * Save database permanently to EXTERNAL persistent storage (outside git project)
  */
 function saveDB(data) { 
   if (!data || typeof data !== 'object') return false;
   try {
-    const dir = path.dirname(dbPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    // Ensure external persistent directory exists
+    if (!fs.existsSync(PERSISTENT_DIR)) {
+      fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
     }
 
     const jsonString = JSON.stringify(data, null, 2);
     
-    // 1. Save to MASTER persistence file first (immune to git resets & deploys)
+    // 1. Save to EXTERNAL master DB file (OUTSIDE git — 100% deploy-proof)
     try { 
-      fs.writeFileSync(persistedDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); 
+      fs.writeFileSync(externalDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); 
     } catch (e) { 
-      console.warn('Could not write persistedDbPath:', e.message); 
+      console.warn('❌ Could not write external DB:', e.message); 
     }
 
-    // 2. Sync runtime mirror and backup
-    try { fs.writeFileSync(dbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) {}
-    try { fs.writeFileSync(backupDbPath, jsonString, { encoding: 'utf8', mode: 0o666 }); } catch (e) {}
+    // 2. Save to EXTERNAL backup
+    try { 
+      fs.writeFileSync(externalBackupPath, jsonString, { encoding: 'utf8', mode: 0o666 }); 
+    } catch (e) {}
 
-    // 3. Automated rotating snapshots (keeps last 25 historical snapshots)
+    // 3. Also save inside project data/ for convenience (non-critical, best-effort)
     try {
-      if (!fs.existsSync(snapshotsDir)) fs.mkdirSync(snapshotsDir, { recursive: true });
+      const localDataDir = path.join(__dirname, 'data');
+      if (!fs.existsSync(localDataDir)) fs.mkdirSync(localDataDir, { recursive: true });
+      fs.writeFileSync(legacyDbPath, jsonString, { encoding: 'utf8', mode: 0o666 });
+      fs.writeFileSync(legacyPersistedPath, jsonString, { encoding: 'utf8', mode: 0o666 });
+      fs.writeFileSync(legacyBackupPath, jsonString, { encoding: 'utf8', mode: 0o666 });
+    } catch (e) {} // Non-critical — these will be wiped by deploy anyway
+
+    // 4. Automated rotating snapshots in EXTERNAL directory (keeps last 25)
+    try {
+      if (!fs.existsSync(externalSnapshotsDir)) fs.mkdirSync(externalSnapshotsDir, { recursive: true });
       const snapName = `snap-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-      fs.writeFileSync(path.join(snapshotsDir, snapName), jsonString, 'utf8');
+      fs.writeFileSync(path.join(externalSnapshotsDir, snapName), jsonString, 'utf8');
 
       // Keep maximum 25 snapshot files
-      const snapFiles = fs.readdirSync(snapshotsDir)
+      const snapFiles = fs.readdirSync(externalSnapshotsDir)
         .filter(f => f.startsWith('snap-') && f.endsWith('.json'))
         .sort();
       if (snapFiles.length > 25) {
         for (let i = 0; i < snapFiles.length - 25; i++) {
-          try { fs.unlinkSync(path.join(snapshotsDir, snapFiles[i])); } catch (e) {}
+          try { fs.unlinkSync(path.join(externalSnapshotsDir, snapFiles[i])); } catch (e) {}
         }
       }
     } catch (e) {}
 
-    // 4. Update in-memory cache
+    // 5. Update in-memory cache
     global.__CACHED_DB__ = data;
-    console.log('✅ Database berhasil disimpan permanen ke disk');
+    console.log(`✅ Database berhasil disimpan permanen ke: ${PERSISTENT_DIR}`);
     return true;
   } catch (err) {
     console.error('❌ GAGAL menyimpan database ke disk:', err.message);
