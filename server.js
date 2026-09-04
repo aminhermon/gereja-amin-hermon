@@ -1417,13 +1417,18 @@ app.post('/admin/media/warta/delete/:id', requireAuth, (req, res) => {
 app.post('/admin/media/renungan', requireAuth, (req, res) => {
   const db = getDB();
   if (!db.mediaGaleri.renungan) db.mediaGaleri.renungan = [];
-  db.mediaGaleri.renungan.push({
+  const entry = {
     id: String(Date.now()),
     judul: req.body.judul,
     tanggal: req.body.tanggal,
     ayat: req.body.ayat,
     isi: req.body.isi
-  });
+  };
+  // Add audio URL if provided
+  if (req.body.audioUrl && req.body.audioUrl.trim()) {
+    entry.audioUrl = req.body.audioUrl.trim();
+  }
+  db.mediaGaleri.renungan.push(entry);
   saveDB(db);
   res.redirect('/admin?tab=media');
 });

@@ -719,13 +719,14 @@
               <div class="form-group"><label>Ayat</label><input type="text" name="ayat" placeholder="Yohanes 3:16" required></div>
             </div>
             <div class="form-group"><label>Isi Renungan</label><textarea name="isi" rows="3" required placeholder="Tuliskan renungan..."></textarea></div>
+            <div class="form-group"><label>🎧 URL Audio (opsional)</label><input type="url" name="audioUrl" placeholder="https://drive.google.com/... atau link MP3"></div>
             <button type="submit" class="btn btn--gold">➕ Tambah Renungan</button>
           </form>
           <hr class="divider">
           <h4 style="color:var(--navy); margin-bottom:.5rem;">Daftar Renungan (<%= db.mediaGaleri.renungan ? db.mediaGaleri.renungan.length : 0 %>)</h4>
           <% if(db.mediaGaleri.renungan) { db.mediaGaleri.renungan.sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).forEach(function(r) { %>
           <div class="warta-row">
-            <span><strong><%= r.judul %></strong> (<%= r.tanggal %>) - <%= r.ayat %></span>
+            <span><strong><%= r.judul %></strong> (<%= r.tanggal %>) - <%= r.ayat %><% if(r.audioUrl) { %> <span style="color:var(--gold);">🎧 Audio</span><% } %></span>
             <form action="/admin/media/renungan/delete/<%= r.id %>" method="POST" onsubmit="return confirm('Hapus renungan ini?')"><button type="submit" class="btn btn--danger btn--sm">🗑</button></form>
           </div>
           <% }); } %>
