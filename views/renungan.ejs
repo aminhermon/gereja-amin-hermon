@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <meta name="description" content="Renungan Harian <%= general.churchName %> — Santapan rohani untuk menumbuhkan iman Anda setiap hari.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.or.id' %>/renungan.html">
+  <title>Renungan Harian — <%= general.churchName %></title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Renungan Harian — <%= general.churchName %>">
+  <meta property="og:description" content="Santapan rohani untuk menumbuhkan iman Anda setiap hari.">
+  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.or.id' %>/renungan.html">
+  <meta property="og:site_name" content="<%= general.churchName %>">
+  <meta property="og:locale" content="id_ID">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/style.min.css?v=11">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+</head>
+<body>
+  <%- include('partials/skeleton') %>
+  <%- include('partials/navbar') %>
+
+  <!-- ========== RENUNGAN HERO ========== -->
+  <section class="hero hero--sub" id="hero-renungan">
+    <div class="hero__bg"><img src="<%= mediaGaleri.hero.bgImage %>" alt="Renungan Harian" loading="eager"></div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <div class="hero__eyebrow">Santapan Rohani</div>
+      <h1>Renungan <span class="text-gold">Harian</span></h1>
+      <p class="hero__subtitle">Santapan rohani untuk menumbuhkan iman Anda setiap hari.</p>
+    </div>
+  </section>
+
+  <!-- Inject all renungan data as JSON for client-side JS -->
+  <script>
+    window.__RENUNGAN_DATA__ = <%- JSON.stringify(
+      (mediaGaleri.renungan || [])
+        .filter(function(r) { return r.published !== false; })
+        .sort(function(a, b) { return new Date(b.tanggal) - new Date(a.tanggal); })
+    ) %>;
+    window.__SITE_URL__ = '<%= general.siteUrl || "https://aminhermon.or.id" %>';
+    window.__CHURCH_NAME__ = '<%= general.churchName %>';
+  </script>
+
+  <!-- ========== RENUNGAN HARI INI ========== -->
+  <section class="section section--navy rv-section" id="renungan-today">
+    <div class="container">
+      <!-- Date Navigation -->
+      <div class="rv-date-nav" data-aos="fade-up">
+        <button class="rv-date-nav__btn" id="rvPrevBtn" aria-label="Renungan sebelumnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="rv-date-nav__center">
+          <span class="rv-date-nav__label" id="rvDateLabel">Memuat...</span>
+          <button class="rv-date-nav__calendar-btn" id="rvCalendarBtn" aria-label="Pilih tanggal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Pilih Tanggal
+          </button>
+        </div>
+        <button class="rv-date-nav__btn" id="rvNextBtn" aria-label="Renungan berikutnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+      <!-- Calendar Picker (hidden by default) -->
+      <div class="rv-calendar" id="rvCalendar" style="display:none;" data-aos="fade-up">
+        <div class="rv-calendar__header">
+          <button class="rv-calendar__nav" id="rvCalPrev" aria-label="Bulan sebelumnya">‹</button>
+          <span class="rv-calendar__title" id="rvCalTitle"></span>
+          <button class="rv-calendar__nav" id="rvCalNext" aria-label="Bulan berikutnya">›</button>
+        </div>
+        <div class="rv-calendar__days-header">
+          <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+        </div>
+        <div class="rv-calendar__grid" id="rvCalGrid"></div>
+      </div>
+
+      <!-- Featured Devotion Card -->
+      <div class="rv-featured" id="rvFeatured" data-aos="fade-up">
+        <div class="rv-featured__badge">RENUNGAN HARI INI</div>
+        <div class="rv-featured__date" id="rvFeaturedDate"></div>
+        <h2 class="rv-featured__title" id="rvFeaturedTitle"></h2>
+        <div class="rv-featured__verse-ref" id="rvFeaturedRef"></div>
+        <blockquote class="rv-featured__quote" id="rvFeaturedQuote"></blockquote>
+        <p class="rv-featured__excerpt" id="rvFeaturedExcerpt"></p>
+        <div class="rv-featured__author" id="rvFeaturedAuthor"></div>
+        <div class="rv-featured__actions">
+          <button class="rv-btn rv-btn--primary" id="rvReadBtn" aria-label="Baca Renungan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            Baca Renungan
+          </button>
+          <button class="rv-btn rv-btn--outline" id="rvListenBtn" aria-label="Dengarkan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Dengarkan
+          </button>
+          <button class="rv-btn rv-btn--outline" id="rvSaveBtn" aria-label="Simpan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Simpan
+          </button>
+          <button class="rv-btn rv-btn--outline" id="rvShareBtn" aria-label="Bagikan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Bagikan
+          </button>
+        </div>
+        <!-- No audio state -->
+        <div class="rv-no-audio" id="rvNoAudio" style="display:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <span>Audio belum tersedia untuk renungan ini.</span>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="rv-search" data-aos="fade-up">
+        <div class="rv-search__wrapper">
+          <svg class="rv-search__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="rv-search__input" id="rvSearchInput" placeholder="Cari renungan berdasarkan judul, ayat, atau penulis..." aria-label="Cari renungan">
+          <button class="rv-search__clear" id="rvSearchClear" style="display:none;" aria-label="Hapus pencarian">&times;</button>
+        </div>
+      </div>
+
+      <!-- Search Empty State -->
+      <div class="rv-empty" id="rvSearchEmpty" style="display:none;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <p>Renungan yang Anda cari belum ditemukan.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== RENUNGAN SEBELUMNYA ========== -->
+  <section class="section section--navy rv-section" id="renungan-prev" style="padding-top: 0;">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Renungan <span class="text-gold">Sebelumnya</span></h2>
+        <span class="gold-line"></span>
+      </div>
+
+      <div class="rv-grid" id="rvGrid" data-aos="fade-up">
+        <!-- Cards populated by JS -->
+      </div>
+
+      <div class="rv-load-more" id="rvLoadMore" style="display:none;">
+        <button class="rv-btn rv-btn--outline" id="rvLoadMoreBtn">Muat Lebih Banyak</button>
+      </div>
+
+      <!-- Empty state for no data -->
+      <div class="rv-empty" id="rvEmptyState" style="display:none;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <p>Belum ada renungan harian yang tersedia.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DETAIL MODAL ========== -->
+  <div class="rv-modal" id="rvModal" role="dialog" aria-modal="true" aria-labelledby="rvModalTitle">
+    <div class="rv-modal__backdrop" id="rvModalBackdrop"></div>
+    <div class="rv-modal__container">
+      <button class="rv-modal__close" id="rvModalClose" aria-label="Tutup">&times;</button>
+      <div class="rv-modal__content" id="rvModalContent">
+        <div class="rv-modal__header">
+          <div class="rv-modal__category" id="rvModalCategory"></div>
+          <h2 class="rv-modal__title" id="rvModalTitle"></h2>
+          <div class="rv-modal__meta">
+            <span id="rvModalDate"></span>
+            <span class="rv-modal__meta-sep">·</span>
+            <span id="rvModalAuthor"></span>
+          </div>
+        </div>
+
+        <div class="rv-modal__verse">
+          <div class="rv-modal__verse-ref" id="rvModalVerseRef"></div>
+          <blockquote class="rv-modal__verse-text" id="rvModalVerseText"></blockquote>
+        </div>
+
+        <div class="rv-modal__body" id="rvModalBody"></div>
+
+        <div class="rv-modal__section" id="rvModalReflectionWrap" style="display:none;">
+          <h3>💭 Refleksi</h3>
+          <p id="rvModalReflection"></p>
+        </div>
+
+        <div class="rv-modal__section" id="rvModalAppWrap" style="display:none;">
+          <h3>📋 Aplikasi Kehidupan</h3>
+          <p id="rvModalApp"></p>
+        </div>
+
+        <div class="rv-modal__section rv-modal__prayer" id="rvModalPrayerWrap" style="display:none;">
+          <h3>🙏 Doa Penutup</h3>
+          <p id="rvModalPrayer"></p>
+        </div>
+
+        <!-- Audio Player -->
+        <div class="rv-audio" id="rvAudioWrap" style="display:none;">
+          <div class="rv-audio__label">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            Dengarkan Audio Renungan
+          </div>
+          <div class="rv-audio__controls">
+            <button class="rv-audio__play" id="rvAudioPlay" aria-label="Play/Pause">
+              <svg class="rv-audio__icon-play" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <svg class="rv-audio__icon-pause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </button>
+            <div class="rv-audio__progress-wrap">
+              <div class="rv-audio__time" id="rvAudioCurrent">0:00</div>
+              <div class="rv-audio__progress" id="rvAudioProgress">
+                <div class="rv-audio__progress-bar" id="rvAudioBar"></div>
+              </div>
+              <div class="rv-audio__time" id="rvAudioDuration">0:00</div>
+            </div>
+            <div class="rv-audio__volume-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <input type="range" class="rv-audio__volume" id="rvAudioVolume" min="0" max="1" step="0.1" value="1" aria-label="Volume">
+            </div>
+          </div>
+          <audio id="rvAudioEl" preload="none"></audio>
+        </div>
+        <div class="rv-no-audio rv-no-audio--modal" id="rvModalNoAudio" style="display:none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <span>Audio belum tersedia untuk renungan ini.</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="rv-modal__actions">
+          <button class="rv-btn rv-btn--outline rv-btn--sm" id="rvModalSave" aria-label="Simpan">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Simpan
+          </button>
+          <button class="rv-btn rv-btn--outline rv-btn--sm" id="rvModalShareWA" aria-label="Bagikan via WhatsApp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.64-.93-2.25-.25-.58-.5-.5-.68-.51-.18-.01-.38-.01-.58-.01s-.53.07-.8.38c-.28.3-1.06 1.03-1.06 2.52 0 1.49 1.08 2.92 1.23 3.12.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/></svg>
+            WhatsApp
+          </button>
+          <button class="rv-btn rv-btn--outline rv-btn--sm" id="rvModalShareFB" aria-label="Bagikan via Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            Facebook
+          </button>
+          <button class="rv-btn rv-btn--outline rv-btn--sm" id="rvModalCopyLink" aria-label="Salin link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Salin Link
+          </button>
+        </div>
+
+        <!-- Reactions -->
+        <div class="rv-reactions">
+          <p class="rv-reactions__label">Apakah renungan ini memberkati Anda?</p>
+          <div class="rv-reactions__buttons">
+            <button class="rv-reaction" data-type="blessed" aria-label="Saya Diberkati">
+              <span class="rv-reaction__emoji">❤️</span>
+              <span class="rv-reaction__text">Diberkati</span>
+              <span class="rv-reaction__count" id="rvReactBlessed">0</span>
+            </button>
+            <button class="rv-reaction" data-type="amin" aria-label="Amin">
+              <span class="rv-reaction__emoji">🙏</span>
+              <span class="rv-reaction__text">Amin</span>
+              <span class="rv-reaction__count" id="rvReactAmin">0</span>
+            </button>
+            <button class="rv-reaction" data-type="strengthened" aria-label="Menguatkan">
+              <span class="rv-reaction__emoji">✨</span>
+              <span class="rv-reaction__text">Menguatkan</span>
+              <span class="rv-reaction__count" id="rvReactStrength">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Related Devotions -->
+        <div class="rv-related" id="rvRelatedWrap" style="display:none;">
+          <h3 class="rv-related__title">Renungan Terkait</h3>
+          <div class="rv-related__grid" id="rvRelatedGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SHARE DROPDOWN ========== -->
+  <div class="rv-share-dropdown" id="rvShareDropdown" style="display:none;">
+    <button class="rv-share-dropdown__item" id="rvShareWA">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#25d366"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.64-.93-2.25-.25-.58-.5-.5-.68-.51-.18-.01-.38-.01-.58-.01s-.53.07-.8.38c-.28.3-1.06 1.03-1.06 2.52 0 1.49 1.08 2.92 1.23 3.12.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/></svg>
+      WhatsApp
+    </button>
+    <button class="rv-share-dropdown__item" id="rvShareFB2">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1877f2" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      Facebook
+    </button>
+    <button class="rv-share-dropdown__item" id="rvShareCopy">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Salin Link
+    </button>
+  </div>
+
+  <%- include('partials/footer') %>
+  <script src="js/main.min.js?v=11" defer></script>
+  <script src="js/renungan.js?v=1" defer></script>
+</body>
+</html>

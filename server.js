@@ -543,9 +543,47 @@ app.get('/', (req, res) => { res.render('index', getDB()); });
 app.get('/index.html', (req, res) => { res.redirect('/'); });
 
 // Dynamic pages
-const pages = ['visit', 'about', 'pelayanan', 'media', 'contact'];
+const pages = ['visit', 'about', 'pelayanan', 'media', 'contact', 'renungan'];
 pages.forEach(page => {
   app.get(`/${page}.html`, (req, res) => { res.render(page, getDB()); });
+});
+
+// ==================== RENUNGAN API ====================
+
+// API: Get all renungan (JSON) — for search & calendar
+app.get('/api/renungan', (req, res) => {
+  const db = getDB();
+  const renungan = (db.mediaGaleri && db.mediaGaleri.renungan) || [];
+  const published = renungan.filter(r => r.published !== false);
+  published.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+  res.json(published);
+});
+
+// API: Get single renungan by ID (JSON)
+app.get('/api/renungan/:id', (req, res) => {
+  const db = getDB();
+  const renungan = (db.mediaGaleri && db.mediaGaleri.renungan) || [];
+  const item = renungan.find(r => r.id === req.params.id);
+  if (!item) return res.status(404).json({ error: 'Renungan tidak ditemukan' });
+  res.json(item);
+});
+
+// API: Add reaction to a renungan
+app.post('/api/renungan/:id/react', (req, res) => {
+  const db = getDB();
+  const renungan = (db.mediaGaleri && db.mediaGaleri.renungan) || [];
+  const item = renungan.find(r => r.id === req.params.id);
+  if (!item) return res.status(404).json({ error: 'Renungan tidak ditemukan' });
+  
+  const type = req.body.type; // 'blessed', 'amin', 'strengthened'
+  if (!['blessed', 'amin', 'strengthened'].includes(type)) {
+    return res.status(400).json({ error: 'Tipe reaksi tidak valid' });
+  }
+  
+  if (!item.reactions) item.reactions = { blessed: 0, amin: 0, strengthened: 0 };
+  item.reactions[type] = (item.reactions[type] || 0) + 1;
+  saveDB(db);
+  res.json({ success: true, reactions: item.reactions });
 });
 
 // KomSek detail page (komisi/sektor)
@@ -622,6 +660,7 @@ app.get('/sitemap.xml', (req, res) => {
     { loc: '/about.html',    priority: '0.8', changefreq: 'monthly' },
     { loc: '/pelayanan.html', priority: '0.9', changefreq: 'weekly' },
     { loc: '/media.html',    priority: '0.7', changefreq: 'weekly' },
+    { loc: '/renungan.html', priority: '0.9', changefreq: 'daily' },
     { loc: '/contact.html',  priority: '0.6', changefreq: 'monthly' },
   ];
 
@@ -1413,7 +1452,7 @@ app.post('/admin/media/warta/delete/:id', requireAuth, (req, res) => {
   res.redirect('/admin?tab=media');
 });
 
-// Renungan add
+// Renungan add (expanded fields)
 app.post('/admin/media/renungan', requireAuth, (req, res) => {
   const db = getDB();
   if (!db.mediaGaleri.renungan) db.mediaGaleri.renungan = [];
@@ -1422,12 +1461,18 @@ app.post('/admin/media/renungan', requireAuth, (req, res) => {
     judul: req.body.judul,
     tanggal: req.body.tanggal,
     ayat: req.body.ayat,
-    isi: req.body.isi
+    ayatLengkap: req.body.ayatLengkap || '',
+    kutipan: req.body.kutipan || '',
+    isi: req.body.isi,
+    refleksi: req.body.refleksi || '',
+    aplikasi: req.body.aplikasi || '',
+    doa: req.body.doa || '',
+    penulis: req.body.penulis || '',
+    audioUrl: (req.body.audioUrl || '').trim(),
+    kategori: req.body.kategori || '',
+    published: true,
+    reactions: { blessed: 0, amin: 0, strengthened: 0 }
   };
-  // Add audio URL if provided
-  if (req.body.audioUrl && req.body.audioUrl.trim()) {
-    entry.audioUrl = req.body.audioUrl.trim();
-  }
   db.mediaGaleri.renungan.push(entry);
   saveDB(db);
   res.redirect('/admin?tab=media');

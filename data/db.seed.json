@@ -350,17 +350,54 @@
     "renungan": [
       {
         "id": "r1",
-        "tanggal": "2026-07-27",
-        "judul": "Berjalan dalam Terang",
+        "tanggal": "2026-09-05",
+        "judul": "Berjalan Dalam Terang",
         "ayat": "Mazmur 119:105",
-        "isi": "Firman-Mu itu pelita bagi kakiku dan terang bagi jalanku. Dalam dunia yang penuh dengan ketidakpastian ini, marilah kita senantiasa berpegang teguh pada kebenaran Firman Tuhan."
+        "ayatLengkap": "Firman-Mu itu pelita bagi kakiku dan terang bagi jalanku.",
+        "kutipan": "Dalam setiap langkah kehidupan, Firman Tuhan menjadi petunjuk yang tidak pernah padam.",
+        "isi": "Kehidupan ini penuh dengan persimpangan dan ketidakpastian. Namun Daud mengingatkan kita bahwa Firman Tuhan adalah pelita — bukan lampu sorot yang menerangi seluruh jalan di depan kita, tetapi pelita yang menerangi langkah demi langkah. Tuhan tidak selalu menunjukkan keseluruhan rencana-Nya, tetapi Ia selalu memberikan terang yang cukup untuk langkah berikutnya. Saat kita merasa bingung atau takut, marilah kita kembali kepada Firman-Nya. Di sanalah kita menemukan arah, penghiburan, dan kekuatan untuk terus berjalan.",
+        "refleksi": "Apakah saya sudah menjadikan Firman Tuhan sebagai panduan utama dalam setiap keputusan hidup saya? Atau masih mengandalkan hikmat dunia?",
+        "aplikasi": "Luangkan waktu 15 menit setiap pagi untuk membaca dan merenungkan satu bagian Firman Tuhan sebelum memulai aktivitas.",
+        "doa": "Tuhan Yesus, terima kasih untuk Firman-Mu yang menjadi terang di dalam kegelapan. Ajarlah aku untuk selalu berjalan dalam terang-Mu dan menjadikan Firman-Mu sebagai panduan di setiap langkahku. Dalam nama Yesus Kristus. Amin.",
+        "penulis": "Tim Renungan AMIN Hermon",
+        "audioUrl": "",
+        "kategori": "Iman",
+        "published": true,
+        "reactions": { "blessed": 0, "amin": 0, "strengthened": 0 }
       },
       {
         "id": "r2",
-        "tanggal": "2026-07-26",
+        "tanggal": "2026-09-04",
         "judul": "Kasih yang Sempurna",
         "ayat": "1 Yohanes 4:18",
-        "isi": "Di dalam kasih tidak ada ketakutan: kasih yang sempurna melenyapkan ketakutan. Mari kita bagikan kasih Kristus kepada sesama di sekitar kita."
+        "ayatLengkap": "Di dalam kasih tidak ada ketakutan: kasih yang sempurna melenyapkan ketakutan; sebab ketakutan mengandung hukuman dan barangsiapa takut, ia tidak sempurna di dalam kasih.",
+        "kutipan": "Kasih Allah yang sempurna mampu mengusir setiap ketakutan dari hati kita.",
+        "isi": "Ketakutan adalah salah satu senjata iblis yang paling efektif. Ia membuat kita ragu, cemas, dan tidak berdaya. Tetapi Firman Tuhan menegaskan bahwa kasih yang sempurna — yaitu kasih Allah — melenyapkan ketakutan. Ketika kita menyadari betapa besar kasih Bapa kepada kita, ketakutan itu kehilangan cengkeramannya. Kita tidak perlu takut akan masa depan, karena Tuhan yang menggenggam masa depan juga menggenggam kita.",
+        "refleksi": "Ketakutan apa yang masih menguasai hidupku? Sudahkah aku menyerahkannya kepada Tuhan?",
+        "aplikasi": "Tuliskan satu ketakutan terbesar Anda hari ini, lalu doakan dan serahkan kepada Tuhan. Gantilah ketakutan itu dengan janji Firman Tuhan.",
+        "doa": "Bapa yang penuh kasih, aku menyerahkan segala ketakutanku kepada-Mu. Penuhi hatiku dengan kasih-Mu yang sempurna sehingga tidak ada lagi ruang bagi ketakutan. Dalam nama Yesus. Amin.",
+        "penulis": "Tim Renungan AMIN Hermon",
+        "audioUrl": "",
+        "kategori": "Kasih",
+        "published": true,
+        "reactions": { "blessed": 0, "amin": 0, "strengthened": 0 }
+      },
+      {
+        "id": "r3",
+        "tanggal": "2026-09-03",
+        "judul": "Kekuatan di Dalam Kelemahan",
+        "ayat": "2 Korintus 12:9",
+        "ayatLengkap": "Tetapi jawab Tuhan kepadaku: Cukuplah kasih karunia-Ku bagimu, sebab justru dalam kelemahanlah kuasa-Ku menjadi sempurna.",
+        "kutipan": "Justru di saat kita paling lemah, kuasa Tuhan bekerja dengan paling sempurna.",
+        "isi": "Paulus pernah memohon tiga kali agar duri dalam dagingnya dicabut, tetapi Tuhan menjawab dengan cara yang tidak terduga. Bukan menghilangkan kelemahan, tetapi memberikan kekuatan di dalam kelemahan itu. Terkadang Tuhan tidak mengubah situasi kita, tetapi Ia mengubah kita di dalam situasi itu. Kelemahan kita menjadi panggung bagi kuasa Tuhan untuk bekerja. Jangan malu dengan kelemahanmu, karena di situlah kasih karunia Tuhan bersinar paling terang.",
+        "refleksi": "Apakah saya melihat kelemahan saya sebagai penghalang, atau sebagai kesempatan bagi Tuhan untuk menunjukkan kuasa-Nya?",
+        "aplikasi": "Bagikan kesaksian tentang bagaimana Tuhan pernah memberikan kekuatan di saat Anda merasa paling lemah kepada seseorang hari ini.",
+        "doa": "Tuhan, aku mengakui kelemahanku di hadapan-Mu. Biarlah kuasa-Mu menjadi sempurna di dalam kelemahanku. Aku percaya bahwa kasih karunia-Mu cukup bagiku. Dalam nama Yesus Kristus. Amin.",
+        "penulis": "Tim Renungan AMIN Hermon",
+        "audioUrl": "",
+        "kategori": "Pengharapan",
+        "published": true,
+        "reactions": { "blessed": 0, "amin": 0, "strengthened": 0 }
       }
     ],
     "videos": [
