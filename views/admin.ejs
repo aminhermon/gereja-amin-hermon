@@ -550,7 +550,11 @@
                 </div>
                 <div style="flex:1; min-width:260px;">
                   <div class="grid-3">
-                    <div class="form-group"><label>Nama</label><input type="text" name="name" value="<%= pg.name %>"></div>
+                    <div class="form-group">
+                      <label>Nama</label>
+                      <input type="text" name="name" value="<%= pg.name %>">
+                      <small style="color:var(--text-light); font-size:0.75rem; display:block; margin-top:2px;">Contoh: SNK. Yeremia Gea (Ama Keysa Gea)</small>
+                    </div>
                     <div class="form-group"><label>Jabatan</label><input type="text" name="role" value="<%= pg.role %>"></div>
                     <div class="form-group"><label>Ganti Foto</label><input type="file" name="image" accept="image/*"></div>
                   </div>

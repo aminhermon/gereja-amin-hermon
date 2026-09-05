@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="css/style.min.css?v=14">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -122,6 +122,24 @@
         <p>Para pelayan dan pengurus yang dipercayakan untuk menggembalakan dan melayani jemaat.</p>
       </div>
 
+      <%
+        function formatLeaderName(raw) {
+          if (!raw) return '';
+          var match = raw.match(/^(.*?)\s*(\(.*?\))\s*$/);
+          if (match) {
+            var main = match[1].trim();
+            var alias = match[2].trim();
+            alias = alias.replace(/^\(A\.\s*/i, '(Ama ').replace(/^\(I\.\s*/i, '(Ina ');
+            return '<span class="leader-name__main">' + main + '</span><span class="leader-name__alias">' + alias + '</span>';
+          }
+          if (raw.includes('\n')) {
+            var lines = raw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+            return '<span class="leader-name__main">' + lines[0] + '</span><span class="leader-name__alias">' + lines.slice(1).join(' ') + '</span>';
+          }
+          return '<span class="leader-name__main">' + raw + '</span>';
+        }
+      %>
+
       <!-- Pendeta -->
       <h3 class="sub-section-title" data-aos="fade-up">Pendeta</h3>
       <div class="leaders-grid leaders-grid--2" data-aos="fade-up">
@@ -138,7 +156,7 @@
             <% } %>
           </div>
           <div class="leader-card__info">
-            <h4><%= p.name %></h4>
+            <h4><%- formatLeaderName(p.name) %></h4>
             <span><%= p.role %></span>
           </div>
         </div>
@@ -162,7 +180,7 @@
             <% } %>
           </div>
           <div class="leader-card__info">
-            <h4><%= pg.name %></h4>
+            <h4><%- formatLeaderName(pg.name) %></h4>
             <span><%= pg.role %></span>
           </div>
         </div>
@@ -184,7 +202,7 @@
             <% } %>
           </div>
           <div class="leader-card__info">
-            <h4><%= pg.name %></h4>
+            <h4><%- formatLeaderName(pg.name) %></h4>
             <span><%= pg.role %></span>
           </div>
         </div>
@@ -206,7 +224,7 @@
             <% } %>
           </div>
           <div class="leader-card__info">
-            <h4><%= pg.name %></h4>
+            <h4><%- formatLeaderName(pg.name) %></h4>
             <span><%= pg.role %></span>
           </div>
         </div>
@@ -229,7 +247,7 @@
             <% } %>
           </div>
           <div class="leader-card__info">
-            <h4><%= m.name %></h4>
+            <h4><%- formatLeaderName(m.name) %></h4>
             <span><%= m.role || 'Majelis' %></span>
           </div>
         </div>
@@ -264,7 +282,14 @@
           var role = this.getAttribute('data-role');
           document.getElementById('photoModalImg').src = img || '';
           document.getElementById('photoModalImg').style.display = img ? 'block' : 'none';
-          document.getElementById('photoModalName').textContent = name;
+          var modalName = document.getElementById('photoModalName');
+          var match = name ? name.match(/^(.*?)\s*(\(.*?\))\s*$/) : null;
+          if (match) {
+            var alias = match[2].trim().replace(/^\(A\.\s*/i, '(Ama ').replace(/^\(I\.\s*/i, '(Ina ');
+            modalName.innerHTML = '<span class="photo-modal__main-name">' + match[1].trim() + '</span><span class="photo-modal__alias-name">' + alias + '</span>';
+          } else {
+            modalName.textContent = name;
+          }
           document.getElementById('photoModalRole').textContent = role;
           document.getElementById('photoModal').classList.add('active');
         });
