@@ -4349,6 +4349,252 @@ p {
   color: var(--navy);
 }
 
+/* ---------- Jadwal Pelayan Premium Cards ---------- */
+.pelayan-view-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2.2rem;
+}
+
+.pelayan-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border-radius: var(--radius-full);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  border: 1.5px solid rgba(27, 42, 74, 0.2);
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.pelayan-toggle-btn:hover {
+  background: var(--off-white);
+  border-color: var(--gold);
+  color: var(--navy-dark);
+}
+
+.pelayan-toggle-btn.active {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+  box-shadow: 0 4px 14px rgba(15, 29, 53, 0.2);
+}
+
+.pelayan-toggle-btn.active svg {
+  color: var(--gold);
+}
+
+.pelayan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.pelayan-card {
+  background: #0E1A30;
+  border: 1px solid rgba(200, 169, 81, 0.25);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(15, 29, 53, 0.12), 0 0 25px rgba(200, 169, 81, 0.04);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.pelayan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+  z-index: 2;
+}
+
+.pelayan-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 65px rgba(15, 29, 53, 0.22), 0 0 35px rgba(200, 169, 81, 0.12);
+  border-color: rgba(200, 169, 81, 0.45);
+}
+
+.pelayan-card__header {
+  padding: 1.8rem 2rem 1.4rem;
+  background: linear-gradient(180deg, rgba(200, 169, 81, 0.09) 0%, rgba(14, 26, 48, 0) 100%);
+  border-bottom: 1px solid rgba(200, 169, 81, 0.15);
+}
+
+.pelayan-card__badge-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+
+.pelayan-card__badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+}
+
+.pelayan-card__time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #F8E7B9;
+  background: rgba(200, 169, 81, 0.15);
+  border: 1px solid rgba(200, 169, 81, 0.35);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.pelayan-card__date {
+  font-family: var(--font-heading);
+  color: #FFFFFF;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pelayan-card__body {
+  padding: 1.5rem 1.8rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.pelayan-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.25s ease;
+}
+
+.pelayan-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(200, 169, 81, 0.25);
+}
+
+.pelayan-item--featured {
+  background: linear-gradient(135deg, rgba(200, 169, 81, 0.15) 0%, rgba(200, 169, 81, 0.04) 100%);
+  border: 1px solid rgba(200, 169, 81, 0.35);
+}
+
+.pelayan-item__icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(200, 169, 81, 0.12);
+  border: 1px solid rgba(200, 169, 81, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+}
+
+.pelayan-item--featured .pelayan-item__icon {
+  background: var(--gold);
+  color: var(--navy);
+  border-color: var(--gold);
+}
+
+.pelayan-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pelayan-item__role {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2px;
+}
+
+.pelayan-item--featured .pelayan-item__role {
+  color: var(--gold);
+}
+
+.pelayan-item__name {
+  color: #F8F6F1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.pelayan-item__name--preacher {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.pelayan-item__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.pelayan-pill {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(200, 169, 81, 0.25);
+  color: #F8F6F1;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+}
+
+.pelayan-pill:hover {
+  border-color: var(--gold);
+  background: rgba(200, 169, 81, 0.15);
+  color: #FFFFFF;
+}
+
+@media (max-width: 900px) {
+  .pelayan-grid {
+    grid-template-columns: 1fr;
+    max-width: 580px;
+  }
+}
+
 /* ---------- Warta List ---------- */
 .warta-list {
   max-width: 700px;

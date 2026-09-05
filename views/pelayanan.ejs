@@ -40,7 +40,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="css/style.min.css?v=12">
+  <link rel="stylesheet" href="css/style.min.css?v=13">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -87,7 +87,214 @@
         <p><%= pelayanan.jadwalPelayan.mingguIni ? (pelayanan.jadwalPelayan.mingguIni.toLowerCase().startsWith('minggu') || pelayanan.jadwalPelayan.mingguIni.toLowerCase().startsWith('bulan') || pelayanan.jadwalPelayan.mingguIni.toLowerCase().startsWith('periode') ? pelayanan.jadwalPelayan.mingguIni : 'Minggu, ' + pelayanan.jadwalPelayan.mingguIni) : '' %></p>
       </div>
 
-      <div class="jadwal-table-wrapper" data-aos="fade-up">
+      <!-- View Switcher -->
+      <div class="pelayan-view-toggle" data-aos="fade-up">
+        <button type="button" class="pelayan-toggle-btn active" id="btnViewCards" aria-label="Tampilan Kartu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Tampilan Kartu</span>
+        </button>
+        <button type="button" class="pelayan-toggle-btn" id="btnViewTable" aria-label="Tampilan Tabel">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3z"></path>
+            <path d="M3 9h18"></path>
+            <path d="M3 15h18"></path>
+            <path d="M9 3v18"></path>
+          </svg>
+          <span>Tampilan Tabel</span>
+        </button>
+      </div>
+
+      <%
+        function formatPelayanList(val) {
+          if (!val) return '<span class="pelayan-item__name">-</span>';
+          var arr = [];
+          if (Array.isArray(val)) {
+            arr = val;
+          } else if (typeof val === 'string') {
+            if (val.includes('\n')) {
+              arr = val.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+            } else if (val.includes(',')) {
+              arr = val.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+            } else {
+              arr = [val.trim()];
+            }
+          }
+          if (arr.length <= 1) {
+            return '<span class="pelayan-item__name">' + (arr[0] || '-') + '</span>';
+          }
+          return '<div class="pelayan-item__tags">' + arr.map(function(item) {
+            return '<span class="pelayan-pill">' + item + '</span>';
+          }).join('') + '</div>';
+        }
+
+        var services = [
+          { key: 'ibadah1', data: pelayanan.jadwalPelayan.ibadah1, badge: 'Ibadah Minggu I' },
+          { key: 'ibadah2', data: pelayanan.jadwalPelayan.ibadah2, badge: 'Ibadah Minggu II' }
+        ];
+      %>
+
+      <!-- Premium Cards Grid View -->
+      <div class="pelayan-grid" id="pelayanCardView" data-aos="fade-up">
+        <% services.forEach(function(item) { 
+             var ib = item.data;
+        %>
+          <div class="pelayan-card">
+            <div class="pelayan-card__header">
+              <div class="pelayan-card__badge-wrap">
+                <span class="pelayan-card__badge"><%= item.badge %></span>
+                <span class="pelayan-card__time">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <%= ib.jam && !ib.jam.toLowerCase().includes('pukul') ? 'Pukul ' + ib.jam : (ib.jam || 'Pukul 09.30 WIB') %>
+                </span>
+              </div>
+              <h3 class="pelayan-card__date">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span><%= ib.nama %></span>
+              </h3>
+            </div>
+
+            <div class="pelayan-card__body">
+              <!-- Pengkhotbah (Featured) -->
+              <div class="pelayan-item pelayan-item--featured">
+                <div class="pelayan-item__icon" title="Pengkhotbah">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">Pengkhotbah</span>
+                  <span class="pelayan-item__name pelayan-item__name--preacher">
+                    <%- Array.isArray(ib.pengkhotbah) ? ib.pengkhotbah.join(', ') : (ib.pengkhotbah || '-') %>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Liturgos -->
+              <div class="pelayan-item">
+                <div class="pelayan-item__icon" title="Liturgos">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M7 8h10"></path>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">Liturgos</span>
+                  <span class="pelayan-item__name">
+                    <%- Array.isArray(ib.liturgos) ? ib.liturgos.join(', ') : (ib.liturgos || '-') %>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Doa Konsistori -->
+              <div class="pelayan-item">
+                <div class="pelayan-item__icon" title="Doa Konsistori">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">Doa Konsistori</span>
+                  <span class="pelayan-item__name">
+                    <%- Array.isArray(ib.doaKonsistori) ? ib.doaKonsistori.join(', ') : (ib.doaKonsistori || '-') %>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Pemusik -->
+              <div class="pelayan-item">
+                <div class="pelayan-item__icon" title="Pemusik">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="18" cy="16" r="3"></circle>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">Pemusik</span>
+                  <%- formatPelayanList(ib.pemusik) %>
+                </div>
+              </div>
+
+              <!-- Prokantor -->
+              <div class="pelayan-item">
+                <div class="pelayan-item__icon" title="Prokantor">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">Prokantor</span>
+                  <%- formatPelayanList(ib.prokantor) %>
+                </div>
+              </div>
+
+              <!-- Penerima Jemaat -->
+              <div class="pelayan-item">
+                <div class="pelayan-item__icon" title="Penerima Jemaat">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">Penerima Jemaat</span>
+                  <%- formatPelayanList(ib.penerimaJemaat) %>
+                </div>
+              </div>
+
+              <!-- Petugas Kolekte -->
+              <div class="pelayan-item">
+                <div class="pelayan-item__icon" title="Petugas Kolekte">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">Petugas Kolekte</span>
+                  <%- formatPelayanList(ib.petugasKolekte) %>
+                </div>
+              </div>
+
+              <!-- KP2 -->
+              <div class="pelayan-item">
+                <div class="pelayan-item__icon" title="KP2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                </div>
+                <div class="pelayan-item__content">
+                  <span class="pelayan-item__role">KP2</span>
+                  <span class="pelayan-item__name">
+                    <%- Array.isArray(ib.kp2) ? ib.kp2.join(', ') : (ib.kp2 || '-') %>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+
+      <!-- Alternative Table View (initially hidden) -->
+      <div class="jadwal-table-wrapper" id="pelayanTableView" style="display: none;" data-aos="fade-up">
         <table class="jadwal-table">
           <thead>
             <tr>
@@ -146,6 +353,31 @@
           </tbody>
         </table>
       </div>
+
+      <script>
+        (function() {
+          var btnCards = document.getElementById('btnViewCards');
+          var btnTable = document.getElementById('btnViewTable');
+          var cardView = document.getElementById('pelayanCardView');
+          var tableView = document.getElementById('pelayanTableView');
+
+          if (btnCards && btnTable && cardView && tableView) {
+            btnCards.addEventListener('click', function() {
+              btnCards.classList.add('active');
+              btnTable.classList.remove('active');
+              cardView.style.display = 'grid';
+              tableView.style.display = 'none';
+            });
+
+            btnTable.addEventListener('click', function() {
+              btnTable.classList.add('active');
+              btnCards.classList.remove('active');
+              cardView.style.display = 'none';
+              tableView.style.display = 'block';
+            });
+          }
+        })();
+      </script>
     </div>
   </section>
 
