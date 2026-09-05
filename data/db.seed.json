@@ -255,10 +255,10 @@
       "subtitle": "Jadwal pelayan ibadah mingguan Gereja AMIN Hermon."
     },
     "jadwalPelayan": {
-      "mingguIni": "29 Juni 2026",
+      "mingguIni": "Bulan September 2026",
       "ibadah1": {
-        "nama": "Ibadah I (Pagi)",
-        "jam": "09.30 WIB",
+        "nama": "Minggu, 6 September 2026",
+        "jam": "Pukul 09.30 WIB",
         "pengkhotbah": "[Nama]",
         "liturgos": "[Nama]",
         "doaKonsistori": "[Nama]",
@@ -280,8 +280,8 @@
         "kp2": "[Nama]"
       },
       "ibadah2": {
-        "nama": "Ibadah II (Sore/Malam)",
-        "jam": "17.00 WIB",
+        "nama": "Minggu, 13 September 2026",
+        "jam": "Pukul 09.30 WIB",
         "pengkhotbah": "[Nama]",
         "liturgos": "[Nama]",
         "doaKonsistori": "[Nama]",

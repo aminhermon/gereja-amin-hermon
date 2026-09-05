@@ -1362,6 +1362,11 @@ app.post('/admin/delete-file/hero/pelayanan', requireAuth, (req, res) => {
 app.post('/admin/pelayanan/jadwal', requireAuth, (req, res) => {
   const db = getDB();
   db.pelayanan.jadwalPelayan.mingguIni = req.body.mingguIni;
+  if (req.body.ibadah1_nama !== undefined) db.pelayanan.jadwalPelayan.ibadah1.nama = req.body.ibadah1_nama;
+  if (req.body.ibadah1_jam !== undefined) db.pelayanan.jadwalPelayan.ibadah1.jam = req.body.ibadah1_jam;
+  if (req.body.ibadah2_nama !== undefined) db.pelayanan.jadwalPelayan.ibadah2.nama = req.body.ibadah2_nama;
+  if (req.body.ibadah2_jam !== undefined) db.pelayanan.jadwalPelayan.ibadah2.jam = req.body.ibadah2_jam;
+  
   const fields = ['pengkhotbah','liturgos','doaKonsistori','pemusik','prokantor','penerimaJemaat','petugasKolekte','kp2'];
   fields.forEach(f => {
     db.pelayanan.jadwalPelayan.ibadah1[f] = req.body['ibadah1_' + f];

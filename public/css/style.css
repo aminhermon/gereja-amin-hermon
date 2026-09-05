@@ -4300,13 +4300,34 @@ p {
   text-align: left;
   font-weight: 600;
   font-size: 0.95rem;
+  vertical-align: middle;
 }
 
 .jadwal-table th small {
   display: block;
   font-weight: 400;
-  opacity: 0.7;
-  margin-top: 2px;
+  opacity: 1;
+  margin-top: 4px;
+}
+
+.jadwal-table__date {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+
+.jadwal-table__time {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #F8E7B9;
+  background: rgba(200, 169, 81, 0.2);
+  border: 1px solid rgba(200, 169, 81, 0.35);
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.3px;
 }
 
 .jadwal-table td {

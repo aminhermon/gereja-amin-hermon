@@ -40,7 +40,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="css/style.min.css?v=10">
+  <link rel="stylesheet" href="css/style.min.css?v=12">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -84,7 +84,7 @@
       <div class="section-header" data-aos="fade-up">
         <h2>Jadwal <span class="text-gold">Pelayan Ibadah</span></h2>
         <span class="gold-line"></span>
-        <p>Minggu, <%= pelayanan.jadwalPelayan.mingguIni %></p>
+        <p><%= pelayanan.jadwalPelayan.mingguIni ? (pelayanan.jadwalPelayan.mingguIni.toLowerCase().startsWith('minggu') || pelayanan.jadwalPelayan.mingguIni.toLowerCase().startsWith('bulan') || pelayanan.jadwalPelayan.mingguIni.toLowerCase().startsWith('periode') ? pelayanan.jadwalPelayan.mingguIni : 'Minggu, ' + pelayanan.jadwalPelayan.mingguIni) : '' %></p>
       </div>
 
       <div class="jadwal-table-wrapper" data-aos="fade-up">
@@ -92,8 +92,14 @@
           <thead>
             <tr>
               <th>Tugas Pelayanan</th>
-              <th><%= pelayanan.jadwalPelayan.ibadah1.nama %><br><small><%= pelayanan.jadwalPelayan.ibadah1.jam %></small></th>
-              <th><%= pelayanan.jadwalPelayan.ibadah2.nama %><br><small><%= pelayanan.jadwalPelayan.ibadah2.jam %></small></th>
+              <th>
+                <span class="jadwal-table__date"><%= pelayanan.jadwalPelayan.ibadah1.nama %></span>
+                <small class="jadwal-table__time"><%= pelayanan.jadwalPelayan.ibadah1.jam && !pelayanan.jadwalPelayan.ibadah1.jam.toLowerCase().includes('pukul') ? 'Pukul ' + pelayanan.jadwalPelayan.ibadah1.jam : (pelayanan.jadwalPelayan.ibadah1.jam || 'Pukul 09.30 WIB') %></small>
+              </th>
+              <th>
+                <span class="jadwal-table__date"><%= pelayanan.jadwalPelayan.ibadah2.nama %></span>
+                <small class="jadwal-table__time"><%= pelayanan.jadwalPelayan.ibadah2.jam && !pelayanan.jadwalPelayan.ibadah2.jam.toLowerCase().includes('pukul') ? 'Pukul ' + pelayanan.jadwalPelayan.ibadah2.jam : (pelayanan.jadwalPelayan.ibadah2.jam || 'Pukul 09.30 WIB') %></small>
+              </th>
             </tr>
           </thead>
           <tbody>
