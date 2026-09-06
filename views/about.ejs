@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="stylesheet" href="css/style.min.css?v=17">
+  <link rel="stylesheet" href="css/style.min.css?v=18">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -130,11 +130,11 @@
             var main = match[1].trim();
             var alias = match[2].trim();
             alias = alias.replace(/^\(A\.\s*/i, '(Ama ').replace(/^\(I\.\s*/i, '(Ina ');
-            return '<span class="leader-name__main">' + main + '</span><span class="leader-name__alias">' + alias + '</span>';
+            return '<span class="leader-name__main">' + main + '</span><span class="leader-name__alias" style="color: var(--gold, #C8A951) !important;">' + alias + '</span>';
           }
           if (raw.includes('\n')) {
             var lines = raw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
-            return '<span class="leader-name__main">' + lines[0] + '</span><span class="leader-name__alias">' + lines.slice(1).join(' ') + '</span>';
+            return '<span class="leader-name__main">' + lines[0] + '</span><span class="leader-name__alias" style="color: var(--gold, #C8A951) !important;">' + lines.slice(1).join(' ') + '</span>';
           }
           return '<span class="leader-name__main">' + raw + '</span>';
         }
