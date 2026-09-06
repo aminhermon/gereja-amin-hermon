@@ -140,6 +140,7 @@
       <li><a href="/admin?tab=visit" class="<%= tab === 'visit' ? 'active' : '' %>"><span class="emoji">🆕</span> Baru di Sini?</a></li>
       <li><a href="/admin?tab=about" class="<%= tab === 'about' ? 'active' : '' %>"><span class="emoji">⛪</span> Tentang Gereja</a></li>
       <li><a href="/admin?tab=pelayanan" class="<%= tab === 'pelayanan' ? 'active' : '' %>"><span class="emoji">📋</span> Pelayanan</a></li>
+      <li><a href="/admin?tab=komsek" class="<%= tab === 'komsek' ? 'active' : '' %>"><span class="emoji">👥</span> Komisi & Sektor</a></li>
       <li><a href="/admin?tab=kalender" class="<%= tab === 'kalender' ? 'active' : '' %>"><span class="emoji">📅</span> Kalender Kegiatan</a></li>
       <li><a href="/admin?tab=media" class="<%= tab === 'media' ? 'active' : '' %>"><span class="emoji">📸</span> Media & Galeri</a></li>
       <li><a href="/admin?tab=contact" class="<%= tab === 'contact' ? 'active' : '' %>"><span class="emoji">📞</span> Hubungi Kami</a></li>
@@ -165,6 +166,7 @@
         <% } else if (tab === 'visit') { %>🆕 Kelola Baru di Sini?
         <% } else if (tab === 'about') { %>⛪ Kelola Tentang Gereja
         <% } else if (tab === 'pelayanan') { %>📋 Kelola Pelayanan
+        <% } else if (tab === 'komsek') { %>👥 Kelola Komisi & Sektor (KomSek)
         <% } else if (tab === 'kalender') { %>📅 Kelola Kalender Kegiatan
         <% } else if (tab === 'media') { %>📸 Kelola Media & Galeri
         <% } else if (tab === 'contact') { %>📞 Kelola Hubungi Kami
@@ -708,6 +710,335 @@
           </form>
           <form id="formResetHeroPelayanan" action="/admin/delete-file/hero/pelayanan" method="POST" style="display:none;"></form>
         </div>
+      </div>
+
+      <!-- ============================== TAB: KOMSEK (KOMISI & SEKTOR) ============================== -->
+      <div class="tab-content <%= tab === 'komsek' ? 'active' : '' %>">
+        
+        <!-- Header Banner & Stats -->
+        <div class="card" style="background: linear-gradient(135deg, #1B2A4A, #0F1D35); color: #fff; border: 1px solid rgba(200,169,81,0.3); margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <h2 style="color:var(--gold); font-size:1.35rem; margin:0 0 6px;">👥 Kelola Komisi & Sektor (KomSek)</h2>
+              <p style="margin:0; color:rgba(255,255,255,0.8); font-size:0.88rem;">
+                Kelola profil kategorial komisi, sektor wilayah jemaat, serta publikasi dokumentasi kegiatan & artikel.
+              </p>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(200,169,81,0.3); border-radius:var(--radius); padding:8px 16px; text-align:center;">
+                <span style="font-size:1.3rem; font-weight:700; color:var(--gold); display:block;"><%= db.komsek && db.komsek.komisi ? db.komsek.komisi.length : 0 %></span>
+                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#e2e8f0;">Komisi</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(200,169,81,0.3); border-radius:var(--radius); padding:8px 16px; text-align:center;">
+                <span style="font-size:1.3rem; font-weight:700; color:var(--gold); display:block;"><%= db.komsek && db.komsek.sektor ? db.komsek.sektor.length : 0 %></span>
+                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#e2e8f0;">Sektor</span>
+              </div>
+              <%
+                var totalArticles = 0;
+                if (db.komsek) {
+                  if (db.komsek.komisi) db.komsek.komisi.forEach(function(k){ totalArticles += (k.articles ? k.articles.length : 0); });
+                  if (db.komsek.sektor) db.komsek.sektor.forEach(function(s){ totalArticles += (s.articles ? s.articles.length : 0); });
+                }
+              %>
+              <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(200,169,81,0.3); border-radius:var(--radius); padding:8px 16px; text-align:center;">
+                <span style="font-size:1.3rem; font-weight:700; color:var(--gold); display:block;"><%= totalArticles %></span>
+                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#e2e8f0;">Dokumentasi</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter & Action Controls -->
+          <div style="display:flex; gap:8px; margin-top:1.2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="btn btn--sm komsek-filter-btn active" onclick="filterKomsekType('all', this)" style="background:var(--gold); color:#0F1D35; font-weight:600;">Semua Unit</button>
+            <button type="button" class="btn btn--sm komsek-filter-btn" onclick="filterKomsekType('komisi', this)" style="background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.25);">Komisi Kategorial (<%= db.komsek && db.komsek.komisi ? db.komsek.komisi.length : 0 %>)</button>
+            <button type="button" class="btn btn--sm komsek-filter-btn" onclick="filterKomsekType('sektor', this)" style="background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.25);">Sektor Wilayah (<%= db.komsek && db.komsek.sektor ? db.komsek.sektor.length : 0 %>)</button>
+            <button type="button" class="btn btn--sm btn--gold" onclick="toggleAddKomsekForm()" style="margin-left:auto;">➕ Tambah Unit KomSek</button>
+          </div>
+        </div>
+
+        <!-- Form Tambah Unit KomSek Baru (Collapsible) -->
+        <div class="card" id="cardAddKomsek" style="display:none; border:2px dashed var(--gold); background:#FFFDF8; margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="color:var(--navy); margin:0; font-size:1.1rem;">➕ Tambah Unit Komisi / Sektor Baru</h3>
+            <button type="button" class="btn btn--xs btn--outline" onclick="toggleAddKomsekForm()">✕ Tutup</button>
+          </div>
+          <form action="/admin/komsek/unit/add" method="POST" enctype="multipart/form-data">
+            <div class="grid-3">
+              <div class="form-group">
+                <label>Kategori Unit</label>
+                <select name="type" required>
+                  <option value="komisi">👥 Komisi Kategorial</option>
+                  <option value="sektor">🏡 Sektor Wilayah Jemaat</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Nama Unit</label>
+                <input type="text" name="nama" placeholder="Contoh: Komisi Remaja / Sektor Galilea" required>
+              </div>
+              <div class="form-group">
+                <label>Foto Sampul / Profil</label>
+                <input type="file" name="foto" accept="image/*">
+                <span class="help-text">JPG, PNG, WebP (Opsional, ada foto default)</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Deskripsi / Visi Pelayanan Unit</label>
+              <textarea name="desc" rows="2" placeholder="Jelaskan pelayanan atau profil komunitas ini..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn--gold">➕ Simpan Unit KomSek Baru</button>
+          </form>
+        </div>
+
+        <!-- Section 1: Komisi Kategorial -->
+        <div class="komsek-group komsek-group--komisi">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="color:var(--navy); margin:0; display:flex; align-items:center; gap:8px; font-size:1.15rem;">
+              <span style="background:rgba(200,169,81,0.15); color:var(--gold-dark); padding:3px 10px; border-radius:var(--radius-full); font-size:0.75rem; font-weight:700; border:1px solid rgba(200,169,81,0.3);">KOMISI</span>
+              Komisi Kategorial Gereja
+            </h3>
+            <span style="font-size:0.8rem; color:var(--text-muted);"><%= db.komsek && db.komsek.komisi ? db.komsek.komisi.length : 0 %> Komisi Terdaftar</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:1.2rem; margin-bottom:2rem;">
+            <% if (db.komsek && db.komsek.komisi) { %>
+              <% db.komsek.komisi.forEach(function(k, idx) { %>
+              <div class="item-card" style="background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+                <!-- Card Header -->
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.8rem; gap:10px;">
+                  <div>
+                    <span style="display:inline-block; font-size:0.7rem; font-weight:700; color:var(--gold-dark); background:rgba(200,169,81,0.12); padding:2px 8px; border-radius:var(--radius-full); margin-bottom:4px;">KOMISI</span>
+                    <h4 style="margin:0; color:var(--navy); font-size:1.05rem;"><%= k.nama %></h4>
+                  </div>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <a href="/komsek/<%= k.slug %>" target="_blank" class="btn btn--outline btn--xs" title="Lihat halaman publik">🌐 Lihat</a>
+                    <form action="/admin/komsek/unit/delete" method="POST" style="margin:0;" onsubmit="return confirm('Hapus unit <%= k.nama %> beserta seluruh dokumentasi artikelnya?')">
+                      <input type="hidden" name="type" value="komisi">
+                      <input type="hidden" name="slug" value="<%= k.slug %>">
+                      <button type="submit" class="btn btn--outline-danger btn--xs" title="Hapus Unit">🗑️</button>
+                    </form>
+                  </div>
+                </div>
+
+                <!-- Form Edit Unit -->
+                <form action="/admin/komsek/unit/update" method="POST" enctype="multipart/form-data" style="margin-bottom:1rem;">
+                  <input type="hidden" name="type" value="komisi">
+                  <input type="hidden" name="slug" value="<%= k.slug %>">
+                  <div class="form-group">
+                    <label style="font-size:0.78rem;">Nama Komisi</label>
+                    <input type="text" name="nama" value="<%= k.nama %>" required style="font-size:0.85rem; padding:6px 10px;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size:0.78rem;">Deskripsi / Profil Singkat</label>
+                    <textarea name="desc" rows="2" style="font-size:0.82rem; padding:6px 10px;" required><%= k.desc %></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size:0.78rem;">Foto Sampul</label>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                      <img src="/<%= k.foto %>" style="width:65px; height:45px; object-fit:cover; border-radius:4px; border:1px solid var(--border); flex-shrink:0;">
+                      <span style="font-size:0.72rem; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;"><%= k.foto %></span>
+                      <% if (k.foto && k.foto.startsWith('uploads/')) { %>
+                      <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Reset foto <%= k.nama %> ke foto default?')) document.getElementById('formResetPhotoKomisi_<%= idx %>').submit();">🗑️</button>
+                      <% } %>
+                    </div>
+                    <input type="file" name="foto" accept="image/*" style="font-size:0.75rem;">
+                  </div>
+                  <button type="submit" class="btn btn--gold btn--sm">💾 Simpan Profil</button>
+                </form>
+                <form id="formResetPhotoKomisi_<%= idx %>" action="/admin/komsek/unit/reset-photo" method="POST" style="display:none;">
+                  <input type="hidden" name="type" value="komisi">
+                  <input type="hidden" name="slug" value="<%= k.slug %>">
+                </form>
+
+                <!-- Sub-section: Dokumentasi Kegiatan & Artikel -->
+                <div style="border-top:1px dashed var(--border); padding-top:0.8rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:0.8rem; font-weight:700; color:var(--navy);">📸 Dokumentasi Kegiatan (<%= k.articles ? k.articles.length : 0 %>)</span>
+                    <button type="button" class="btn btn--outline btn--xs" onclick="toggleArtForm('<%= k.slug %>')">➕ Tambah</button>
+                  </div>
+
+                  <!-- Form Tambah Kegiatan -->
+                  <div id="artForm_<%= k.slug %>" style="display:none; background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius); padding:10px; margin-bottom:10px;">
+                    <form action="/admin/komsek/article/add" method="POST" enctype="multipart/form-data">
+                      <input type="hidden" name="type" value="komisi">
+                      <input type="hidden" name="slug" value="<%= k.slug %>">
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Judul Kegiatan</label>
+                        <input type="text" name="judul" placeholder="Contoh: Ibadah Padang Komisi Anak" required style="font-size:0.8rem; padding:4px 8px;">
+                      </div>
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Tanggal Pelaksanaan</label>
+                        <input type="date" name="tanggal" required style="font-size:0.8rem; padding:4px 8px;">
+                      </div>
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Ringkasan / Keterangan</label>
+                        <textarea name="ringkasan" rows="2" placeholder="Keterangan singkat kegiatan..." required style="font-size:0.8rem; padding:4px 8px;"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Foto Dokumentasi</label>
+                        <input type="file" name="foto" accept="image/*" style="font-size:0.75rem;">
+                      </div>
+                      <div style="display:flex; gap:6px;">
+                        <button type="submit" class="btn btn--gold btn--xs">➕ Simpan</button>
+                        <button type="button" class="btn btn--outline btn--xs" onclick="toggleArtForm('<%= k.slug %>')">Batal</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- Existing Articles -->
+                  <% if (k.articles && k.articles.length > 0) { %>
+                    <div style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto; padding-right:4px;">
+                      <% k.articles.forEach(function(art) { %>
+                      <div style="display:flex; align-items:center; justify-content:space-between; background:#F8FAFC; border:1px solid var(--border); border-radius:4px; padding:6px 8px; gap:8px;">
+                        <img src="/<%= art.foto %>" style="width:36px; height:28px; object-fit:cover; border-radius:3px; flex-shrink:0;">
+                        <div style="flex:1; min-width:0;">
+                          <span style="font-size:0.76rem; font-weight:600; color:var(--navy); display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><%= art.judul %></span>
+                          <span style="font-size:0.68rem; color:var(--text-muted);"><%= art.tanggal %></span>
+                        </div>
+                        <form action="/admin/komsek/article/delete" method="POST" style="margin:0;" onsubmit="return confirm('Hapus dokumentasi <%= art.judul %>?')">
+                          <input type="hidden" name="type" value="komisi">
+                          <input type="hidden" name="slug" value="<%= k.slug %>">
+                          <input type="hidden" name="articleId" value="<%= art.id %>">
+                          <button type="submit" class="btn btn--outline-danger btn--xs" style="padding:1px 5px;" title="Hapus">🗑️</button>
+                        </form>
+                      </div>
+                      <% }); %>
+                    </div>
+                  <% } else { %>
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-style:italic; display:block;">Belum ada dokumentasi artikel kegiatan.</span>
+                  <% } %>
+                </div>
+
+              </div>
+              <% }); %>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Section 2: Sektor Wilayah -->
+        <div class="komsek-group komsek-group--sektor">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="color:var(--navy); margin:0; display:flex; align-items:center; gap:8px; font-size:1.15rem;">
+              <span style="background:rgba(27,42,74,0.1); color:var(--navy); padding:3px 10px; border-radius:var(--radius-full); font-size:0.75rem; font-weight:700; border:1px solid rgba(27,42,74,0.25);">SEKTOR</span>
+              Sektor Wilayah Pelayanan Jemaat
+            </h3>
+            <span style="font-size:0.8rem; color:var(--text-muted);"><%= db.komsek && db.komsek.sektor ? db.komsek.sektor.length : 0 %> Sektor Terdaftar</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:1.2rem; margin-bottom:2rem;">
+            <% if (db.komsek && db.komsek.sektor) { %>
+              <% db.komsek.sektor.forEach(function(s, idx) { %>
+              <div class="item-card" style="background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+                <!-- Card Header -->
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.8rem; gap:10px;">
+                  <div>
+                    <span style="display:inline-block; font-size:0.7rem; font-weight:700; color:var(--navy); background:rgba(27,42,74,0.08); padding:2px 8px; border-radius:var(--radius-full); margin-bottom:4px;">SEKTOR</span>
+                    <h4 style="margin:0; color:var(--navy); font-size:1.05rem;"><%= s.nama %></h4>
+                  </div>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <a href="/komsek/<%= s.slug %>" target="_blank" class="btn btn--outline btn--xs" title="Lihat halaman publik">🌐 Lihat</a>
+                    <form action="/admin/komsek/unit/delete" method="POST" style="margin:0;" onsubmit="return confirm('Hapus unit <%= s.nama %> beserta seluruh dokumentasi artikelnya?')">
+                      <input type="hidden" name="type" value="sektor">
+                      <input type="hidden" name="slug" value="<%= s.slug %>">
+                      <button type="submit" class="btn btn--outline-danger btn--xs" title="Hapus Unit">🗑️</button>
+                    </form>
+                  </div>
+                </div>
+
+                <!-- Form Edit Unit -->
+                <form action="/admin/komsek/unit/update" method="POST" enctype="multipart/form-data" style="margin-bottom:1rem;">
+                  <input type="hidden" name="type" value="sektor">
+                  <input type="hidden" name="slug" value="<%= s.slug %>">
+                  <div class="form-group">
+                    <label style="font-size:0.78rem;">Nama Sektor</label>
+                    <input type="text" name="nama" value="<%= s.nama %>" required style="font-size:0.85rem; padding:6px 10px;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size:0.78rem;">Deskripsi / Profil Singkat</label>
+                    <textarea name="desc" rows="2" style="font-size:0.82rem; padding:6px 10px;" required><%= s.desc %></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size:0.78rem;">Foto Sampul</label>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                      <img src="/<%= s.foto %>" style="width:65px; height:45px; object-fit:cover; border-radius:4px; border:1px solid var(--border); flex-shrink:0;">
+                      <span style="font-size:0.72rem; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;"><%= s.foto %></span>
+                      <% if (s.foto && s.foto.startsWith('uploads/')) { %>
+                      <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Reset foto <%= s.nama %> ke foto default?')) document.getElementById('formResetPhotoSektor_<%= idx %>').submit();">🗑️</button>
+                      <% } %>
+                    </div>
+                    <input type="file" name="foto" accept="image/*" style="font-size:0.75rem;">
+                  </div>
+                  <button type="submit" class="btn btn--gold btn--sm">💾 Simpan Profil</button>
+                </form>
+                <form id="formResetPhotoSektor_<%= idx %>" action="/admin/komsek/unit/reset-photo" method="POST" style="display:none;">
+                  <input type="hidden" name="type" value="sektor">
+                  <input type="hidden" name="slug" value="<%= s.slug %>">
+                </form>
+
+                <!-- Sub-section: Dokumentasi Kegiatan & Artikel -->
+                <div style="border-top:1px dashed var(--border); padding-top:0.8rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:0.8rem; font-weight:700; color:var(--navy);">📸 Dokumentasi Kegiatan (<%= s.articles ? s.articles.length : 0 %>)</span>
+                    <button type="button" class="btn btn--outline btn--xs" onclick="toggleArtForm('<%= s.slug %>')">➕ Tambah</button>
+                  </div>
+
+                  <!-- Form Tambah Kegiatan -->
+                  <div id="artForm_<%= s.slug %>" style="display:none; background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius); padding:10px; margin-bottom:10px;">
+                    <form action="/admin/komsek/article/add" method="POST" enctype="multipart/form-data">
+                      <input type="hidden" name="type" value="sektor">
+                      <input type="hidden" name="slug" value="<%= s.slug %>">
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Judul Kegiatan</label>
+                        <input type="text" name="judul" placeholder="Contoh: Ibadah Syukur Sektor" required style="font-size:0.8rem; padding:4px 8px;">
+                      </div>
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Tanggal Pelaksanaan</label>
+                        <input type="date" name="tanggal" required style="font-size:0.8rem; padding:4px 8px;">
+                      </div>
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Ringkasan / Keterangan</label>
+                        <textarea name="ringkasan" rows="2" placeholder="Keterangan singkat kegiatan..." required style="font-size:0.8rem; padding:4px 8px;"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label style="font-size:0.75rem;">Foto Dokumentasi</label>
+                        <input type="file" name="foto" accept="image/*" style="font-size:0.75rem;">
+                      </div>
+                      <div style="display:flex; gap:6px;">
+                        <button type="submit" class="btn btn--gold btn--xs">➕ Simpan</button>
+                        <button type="button" class="btn btn--outline btn--xs" onclick="toggleArtForm('<%= s.slug %>')">Batal</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- Existing Articles -->
+                  <% if (s.articles && s.articles.length > 0) { %>
+                    <div style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto; padding-right:4px;">
+                      <% s.articles.forEach(function(art) { %>
+                      <div style="display:flex; align-items:center; justify-content:space-between; background:#F8FAFC; border:1px solid var(--border); border-radius:4px; padding:6px 8px; gap:8px;">
+                        <img src="/<%= art.foto %>" style="width:36px; height:28px; object-fit:cover; border-radius:3px; flex-shrink:0;">
+                        <div style="flex:1; min-width:0;">
+                          <span style="font-size:0.76rem; font-weight:600; color:var(--navy); display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><%= art.judul %></span>
+                          <span style="font-size:0.68rem; color:var(--text-muted);"><%= art.tanggal %></span>
+                        </div>
+                        <form action="/admin/komsek/article/delete" method="POST" style="margin:0;" onsubmit="return confirm('Hapus dokumentasi <%= art.judul %>?')">
+                          <input type="hidden" name="type" value="sektor">
+                          <input type="hidden" name="slug" value="<%= s.slug %>">
+                          <input type="hidden" name="articleId" value="<%= art.id %>">
+                          <button type="submit" class="btn btn--outline-danger btn--xs" style="padding:1px 5px;" title="Hapus">🗑️</button>
+                        </form>
+                      </div>
+                      <% }); %>
+                    </div>
+                  <% } else { %>
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-style:italic; display:block;">Belum ada dokumentasi artikel kegiatan.</span>
+                  <% } %>
+                </div>
+
+              </div>
+              <% }); %>
+            <% } %>
+          </div>
+        </div>
+
       </div>
 
       <!-- ============================== TAB: MEDIA ============================== -->
@@ -1262,6 +1593,43 @@
         container.appendChild(input);
       });
       document.getElementById('formBulkDelete').submit();
+    }
+
+    // KomSek Management Helpers
+    function filterKomsekType(type, btn) {
+      document.querySelectorAll('.komsek-filter-btn').forEach(function(b) {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.color = '#fff';
+        b.style.borderColor = 'rgba(255,255,255,0.25)';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'var(--gold)';
+      btn.style.color = '#0F1D35';
+      btn.style.borderColor = 'var(--gold)';
+
+      var komisiGrp = document.querySelector('.komsek-group--komisi');
+      var sektorGrp = document.querySelector('.komsek-group--sektor');
+      if (type === 'all') {
+        if (komisiGrp) komisiGrp.style.display = 'block';
+        if (sektorGrp) sektorGrp.style.display = 'block';
+      } else if (type === 'komisi') {
+        if (komisiGrp) komisiGrp.style.display = 'block';
+        if (sektorGrp) sektorGrp.style.display = 'none';
+      } else if (type === 'sektor') {
+        if (komisiGrp) komisiGrp.style.display = 'none';
+        if (sektorGrp) sektorGrp.style.display = 'block';
+      }
+    }
+
+    function toggleAddKomsekForm() {
+      var f = document.getElementById('cardAddKomsek');
+      if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleArtForm(slug) {
+      var f = document.getElementById('artForm_' + slug);
+      if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
     }
   </script>
 

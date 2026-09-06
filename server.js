@@ -1596,6 +1596,172 @@ app.post('/admin/kalender/delete/:id', requireAuth, (req, res) => {
   res.redirect('/admin?tab=kalender&msg=' + encodeURIComponent('Kegiatan kalender berhasil dihapus.'));
 });
 
+// ===== TAB: KOMSEK (KOMISI & SEKTOR) =====
+
+// Helper: Generate slug for KomSek unit
+function generateKomsekSlug(nama, type) {
+  let base = (nama || '').toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+  if (type === 'komisi' && !base.startsWith('komisi-')) {
+    base = 'komisi-' + base;
+  } else if (type === 'sektor' && !base.startsWith('sektor-')) {
+    base = 'sektor-' + base;
+  }
+  return base || (type + '-' + Date.now());
+}
+
+// 1. Update KomSek Unit Profile
+app.post('/admin/komsek/unit/update', requireAuth, upload.single('foto'), (req, res) => {
+  const db = getDB();
+  if (!db.komsek) db.komsek = { komisi: [], sektor: [] };
+  const type = req.body.type === 'sektor' ? 'sektor' : 'komisi';
+  const slug = req.body.slug;
+  const list = db.komsek[type] || [];
+  const unit = list.find(u => u.slug === slug);
+
+  if (unit) {
+    if (req.body.nama) unit.nama = req.body.nama.trim();
+    if (req.body.desc !== undefined) unit.desc = req.body.desc.trim();
+    if (req.file) {
+      if (unit.foto && unit.foto.startsWith('uploads/')) {
+        deleteUploadedFile(unit.foto);
+      }
+      unit.foto = 'uploads/' + req.file.filename;
+    }
+    saveDB(db);
+    return res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent('Profil ' + unit.nama + ' berhasil diperbarui!'));
+  }
+  res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent('Unit KomSek tidak ditemukan.'));
+});
+
+// 2. Add New KomSek Unit
+app.post('/admin/komsek/unit/add', requireAuth, upload.single('foto'), (req, res) => {
+  const db = getDB();
+  if (!db.komsek) db.komsek = { komisi: [], sektor: [] };
+  const type = req.body.type === 'sektor' ? 'sektor' : 'komisi';
+  if (!Array.isArray(db.komsek[type])) db.komsek[type] = [];
+
+  const nama = (req.body.nama || '').trim();
+  if (!nama) {
+    return res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent('Nama unit tidak boleh kosong.'));
+  }
+
+  let slug = generateKomsekSlug(nama, type);
+  let uniqueSlug = slug;
+  let counter = 1;
+  const allUnits = [...(db.komsek.komisi || []), ...(db.komsek.sektor || [])];
+  while (allUnits.some(u => u.slug === uniqueSlug)) {
+    uniqueSlug = `${slug}-${counter++}`;
+  }
+
+  const defaultFoto = type === 'komisi' ? 'assets/images/slider_retreat.png' : 'assets/images/slider_ibadah_raya.png';
+  const newUnit = {
+    slug: uniqueSlug,
+    nama: nama,
+    desc: (req.body.desc || '').trim(),
+    foto: req.file ? 'uploads/' + req.file.filename : defaultFoto,
+    articles: []
+  };
+
+  db.komsek[type].push(newUnit);
+  saveDB(db);
+  res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent(nama + ' berhasil ditambahkan ke ' + (type === 'komisi' ? 'Komisi' : 'Sektor') + '!'));
+});
+
+// 3. Delete KomSek Unit
+app.post('/admin/komsek/unit/delete', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.komsek) return res.redirect('/admin?tab=komsek');
+  const type = req.body.type === 'sektor' ? 'sektor' : 'komisi';
+  const slug = req.body.slug;
+  const list = db.komsek[type] || [];
+  const unit = list.find(u => u.slug === slug);
+
+  if (unit) {
+    if (unit.foto && unit.foto.startsWith('uploads/')) {
+      deleteUploadedFile(unit.foto);
+    }
+    if (Array.isArray(unit.articles)) {
+      unit.articles.forEach(a => {
+        if (a.foto && a.foto.startsWith('uploads/')) deleteUploadedFile(a.foto);
+      });
+    }
+    db.komsek[type] = list.filter(u => u.slug !== slug);
+    saveDB(db);
+    return res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent(unit.nama + ' berhasil dihapus.'));
+  }
+  res.redirect('/admin?tab=komsek');
+});
+
+// 4. Reset KomSek Unit Photo
+app.post('/admin/komsek/unit/reset-photo', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.komsek) return res.redirect('/admin?tab=komsek');
+  const type = req.body.type === 'sektor' ? 'sektor' : 'komisi';
+  const slug = req.body.slug;
+  const list = db.komsek[type] || [];
+  const unit = list.find(u => u.slug === slug);
+
+  if (unit) {
+    if (unit.foto && unit.foto.startsWith('uploads/')) {
+      deleteUploadedFile(unit.foto);
+    }
+    unit.foto = type === 'komisi' ? 'assets/images/slider_retreat.png' : 'assets/images/slider_ibadah_raya.png';
+    saveDB(db);
+    return res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent('Foto sampul ' + unit.nama + ' berhasil di-reset ke default.'));
+  }
+  res.redirect('/admin?tab=komsek');
+});
+
+// 5. Add Article/Kegiatan to KomSek Unit
+app.post('/admin/komsek/article/add', requireAuth, upload.single('foto'), (req, res) => {
+  const db = getDB();
+  if (!db.komsek) db.komsek = { komisi: [], sektor: [] };
+  const type = req.body.type === 'sektor' ? 'sektor' : 'komisi';
+  const slug = req.body.slug;
+  const list = db.komsek[type] || [];
+  const unit = list.find(u => u.slug === slug);
+
+  if (unit) {
+    if (!Array.isArray(unit.articles)) unit.articles = [];
+    const newArt = {
+      id: 'art_' + Date.now(),
+      judul: (req.body.judul || '').trim() || 'Dokumentasi Kegiatan',
+      tanggal: req.body.tanggal || new Date().toISOString().split('T')[0],
+      ringkasan: (req.body.ringkasan || '').trim(),
+      foto: req.file ? 'uploads/' + req.file.filename : 'assets/images/slider_retreat.png'
+    };
+    unit.articles.unshift(newArt);
+    saveDB(db);
+    return res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent('Dokumentasi kegiatan berhasil ditambahkan ke ' + unit.nama + '!'));
+  }
+  res.redirect('/admin?tab=komsek');
+});
+
+// 6. Delete Article/Kegiatan from KomSek Unit
+app.post('/admin/komsek/article/delete', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.komsek) return res.redirect('/admin?tab=komsek');
+  const type = req.body.type === 'sektor' ? 'sektor' : 'komisi';
+  const slug = req.body.slug;
+  const articleId = req.body.articleId;
+  const list = db.komsek[type] || [];
+  const unit = list.find(u => u.slug === slug);
+
+  if (unit && Array.isArray(unit.articles)) {
+    const art = unit.articles.find(a => a.id === articleId);
+    if (art && art.foto && art.foto.startsWith('uploads/')) {
+      deleteUploadedFile(art.foto);
+    }
+    unit.articles = unit.articles.filter(a => a.id !== articleId);
+    saveDB(db);
+    return res.redirect('/admin?tab=komsek&msg=' + encodeURIComponent('Dokumentasi kegiatan berhasil dihapus.'));
+  }
+  res.redirect('/admin?tab=komsek');
+});
+
 // ===== TAB: FILE MANAGER (UPLOAD & DELETE ALL FILES) =====
 
 // Direct upload to uploads/ folder
