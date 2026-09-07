@@ -179,9 +179,10 @@
     <div class="content">
 
       <% if (typeof msg !== 'undefined' && msg) { %>
-      <div style="background: #D1FAE5; border: 1px solid #10B981; color: #065F46; padding: 0.75rem 1.2rem; border-radius: var(--radius); margin-bottom: 1.5rem; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);">
-        <span>✅ <%= msg %></span>
-        <button onclick="this.parentElement.remove()" style="background:none; border:none; color:#065F46; cursor:pointer; font-size:1.2rem; line-height:1;">&times;</button>
+      <% const isError = msg.toLowerCase().startsWith('gagal') || msg.toLowerCase().startsWith('error'); %>
+      <div style="background: <%= isError ? '#FEE2E2' : '#D1FAE5' %>; border: 1px solid <%= isError ? '#EF4444' : '#10B981' %>; color: <%= isError ? '#991B1B' : '#065F46' %>; padding: 0.75rem 1.2rem; border-radius: var(--radius); margin-bottom: 1.5rem; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px <%= isError ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)' %>;">
+        <span><%= isError ? '❌' : '✅' %> <%= msg %></span>
+        <button onclick="this.parentElement.remove()" style="background:none; border:none; color:<%= isError ? '#991B1B' : '#065F46' %>; cursor:pointer; font-size:1.2rem; line-height:1;">&times;</button>
       </div>
       <% } %>
 
@@ -318,49 +319,113 @@
           </form>
         </div>
 
-        <!-- Berita & Kegiatan -->
+        <!-- Berita & Kegiatan (Slider Beranda) -->
         <div class="card">
-          <h2 class="card-title">📰 Berita & Kegiatan (Slider)</h2>
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:1rem; margin-bottom:1rem;">
-            <% db.home.news.forEach(function(item) { %>
-            <div class="item-card">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;">
-                <h4><%= item.title %></h4>
-                <form action="/admin/home/news/delete/<%= item.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus berita dan file gambarnya?')">
-                  <button type="submit" class="btn btn--danger btn--sm" title="Hapus berita dan file">🗑 Hapus</button>
-                </form>
-              </div>
-              <form action="/admin/home/news/<%= item.id %>" method="POST" enctype="multipart/form-data">
-                <div class="form-group"><label>Tanggal</label><input type="text" name="date" value="<%= item.date %>"></div>
-                <div class="form-group"><label>Judul</label><input type="text" name="title" value="<%= item.title %>"></div>
-                <div class="form-group"><label>Deskripsi</label><textarea name="desc" rows="2"><%= item.desc %></textarea></div>
-                <div class="form-group">
-                  <label>Gambar</label>
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                    <img src="/<%= item.image %>" class="preview">
-                    <% if (item.image && item.image.startsWith('uploads/')) { %>
-                    <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus file gambar ini dan reset ke gambar default?')) document.getElementById('formDelImgNews_<%= item.id %>').submit();">🗑️ Hapus Foto</button>
-                    <% } %>
-                  </div>
-                  <input type="file" name="image" accept="image/*">
-                </div>
-                <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
-              </form>
-              <form id="formDelImgNews_<%= item.id %>" action="/admin/home/news/delete-image/<%= item.id %>" method="POST" style="display:none;"></form>
-            </div>
-            <% }); %>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom: 2px solid var(--gold); padding-bottom:.6rem; flex-wrap:wrap; gap:8px;">
+            <h2 class="card-title" style="margin:0; border:none; padding:0;">📰 Berita & Kegiatan (Slider Beranda)</h2>
+            <% const newsList = (db.home && Array.isArray(db.home.news)) ? db.home.news : []; %>
+            <span style="background:var(--gold-light); color:var(--navy); padding:4px 10px; border-radius:12px; font-weight:700; font-size:0.75rem;">
+              Total: <%= newsList.length %> Slide
+            </span>
           </div>
+          <p class="card-subtitle" style="margin-bottom:1.2rem;">
+            Slide 1 merupakan slide utama yang pertama kali aktif di carousel beranda. Berita baru yang ditambahkan otomatis ditempatkan sebagai <strong>Slide 1 (Aktif Utama)</strong>.
+          </p>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:1.2rem; margin-bottom:1.5rem;">
+            <% if (newsList.length === 0) { %>
+              <div style="grid-column: 1/-1; padding: 2rem; text-align: center; background: var(--bg); border: 2px dashed var(--border); border-radius: var(--radius); color: var(--text-muted);">
+                <p style="font-size: 1.05rem; margin-bottom: 0.5rem; font-weight:600;">Belum ada berita atau kegiatan di slider.</p>
+                <p style="font-size: 0.85rem;">Gunakan formulir di bawah untuk menambahkan berita baru.</p>
+              </div>
+            <% } else { %>
+              <% newsList.forEach(function(item, idx) { %>
+              <div class="item-card" style="border-top: 3px solid <%= idx === 0 ? 'var(--gold)' : 'var(--navy)' %>; position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.6rem; padding-bottom:.4rem; border-bottom:1px solid var(--border);">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:10px; background:<%= idx === 0 ? 'var(--gold)' : 'rgba(27,42,74,0.1)' %>; color:<%= idx === 0 ? 'var(--navy)' : 'var(--navy)' %>;">
+                      Slide <%= idx + 1 %> <%= idx === 0 ? '★ (Slide Utama)' : '' %>
+                    </span>
+                  </div>
+                  <form action="/admin/home/news/delete/<%= item.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus berita &quot;<%= item.title.replace(/'/g, '\\\'') %>&quot; beserta file gambarnya?')">
+                    <button type="submit" class="btn btn--danger btn--xs" title="Hapus berita dan file">🗑 Hapus</button>
+                  </form>
+                </div>
+                <form action="/admin/home/news/<%= item.id %>" method="POST" enctype="multipart/form-data">
+                  <div class="form-group"><label>Tanggal</label><input type="text" name="date" value="<%= item.date %>" required></div>
+                  <div class="form-group"><label>Judul</label><input type="text" name="title" value="<%= item.title %>" required></div>
+                  <div class="form-group"><label>Deskripsi Singkat</label><textarea name="desc" rows="2" required><%= item.desc %></textarea></div>
+                  <div class="form-group">
+                    <label>Link Tujuan</label>
+                    <input type="text" name="link" value="<%= item.link || '/pelayanan.html' %>" placeholder="/pelayanan.html">
+                  </div>
+                  <div class="form-group">
+                    <label>Gambar Slide</label>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap;">
+                      <img id="previewNewsImg_<%= item.id %>" src="/<%= item.image %>" class="preview" style="max-height:55px; max-width:100px; object-fit:cover; border-radius:4px;">
+                      <% if (item.image && item.image.startsWith('uploads/')) { %>
+                      <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus foto ini dan reset ke gambar default?')) document.getElementById('formDelImgNews_<%= item.id %>').submit();">🗑️ Hapus Foto</button>
+                      <% } %>
+                    </div>
+                    <input type="file" name="image" accept="image/*" onchange="previewNewsEditImage(this, '<%= item.id %>')">
+                    <span class="help-text">Pilih file baru untuk mengganti gambar slide ini</span>
+                  </div>
+                  <button type="submit" class="btn btn--gold btn--sm" style="width:100%; justify-content:center;">💾 Simpan Perubahan</button>
+                </form>
+                <form id="formDelImgNews_<%= item.id %>" action="/admin/home/news/delete-image/<%= item.id %>" method="POST" style="display:none;"></form>
+              </div>
+              <% }); %>
+            <% } %>
+          </div>
+
           <hr class="divider">
-          <h4 style="color:var(--navy); margin-bottom:.8rem;">➕ Tambah Berita Baru</h4>
-          <form action="/admin/home/news/add" method="POST" enctype="multipart/form-data">
-            <div class="grid-3">
-              <div class="form-group"><label>Tanggal</label><input type="text" name="date" placeholder="1 Januari 2026" required></div>
-              <div class="form-group"><label>Judul</label><input type="text" name="title" placeholder="Judul Berita" required></div>
-              <div class="form-group"><label>Gambar</label><input type="file" name="image" accept="image/*"></div>
+
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:1rem;">
+              <h4 style="color:var(--navy); font-size:0.95rem; margin:0;">➕ Tambah Berita Baru</h4>
+              <span style="font-size:0.7rem; background:#10B981; color:#fff; padding:2px 8px; border-radius:10px; font-weight:600;">Otomatis jadi Slide 1</span>
             </div>
-            <div class="form-group"><label>Deskripsi</label><textarea name="desc" rows="2" placeholder="Deskripsi singkat..." required></textarea></div>
-            <button type="submit" class="btn btn--gold">➕ Tambah Berita</button>
-          </form>
+            <form action="/admin/home/news/add" method="POST" enctype="multipart/form-data" id="formAddNews" onsubmit="var b=this.querySelector('button[type=submit]'); b.disabled=true; b.innerHTML='⏳ Menyimpan...';">
+              <div class="grid-3">
+                <div class="form-group">
+                  <label>Tanggal Berita</label>
+                  <% const todayDateStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); %>
+                  <input type="text" name="date" value="<%= todayDateStr %>" placeholder="Contoh: <%= todayDateStr %>" required>
+                </div>
+                <div class="form-group">
+                  <label>Judul Berita</label>
+                  <input type="text" name="title" placeholder="Contoh: Ibadah Padang & Persekutuan Pemuda" required>
+                </div>
+                <div class="form-group">
+                  <label>Link Tombol (Opsional)</label>
+                  <input type="text" name="link" value="/pelayanan.html" placeholder="/pelayanan.html">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Foto / Gambar Slide</label>
+                <input type="file" name="image" id="inputNewsAddImage" accept="image/*" onchange="previewNewsAddImage(this)">
+                <span class="help-text">Rekomendasi rasio gambar lanskap (16:9 atau 1920x1080). Format JPG, PNG, WebP didukung. Jika dikosongkan, menggunakan foto default gereja.</span>
+                
+                <div id="newsAddImgPreview" class="img-preview-box" style="display:none; margin-top:8px;">
+                  <img id="newsAddImgTag" src="" alt="Pratinjau Foto Berita">
+                  <span id="newsAddImgInfo" class="file-info"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Deskripsi Singkat</label>
+                <textarea name="desc" rows="3" placeholder="Tuliskan keterangan singkat mengenai berita atau kegiatan..." required></textarea>
+              </div>
+
+              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <button type="submit" class="btn btn--gold" style="padding:0.6rem 1.4rem;">
+                  ➕ Tambah Berita ke Slider
+                </button>
+                <span class="help-text" style="margin:0;">Berita akan langsung tampil di slide pertama beranda website.</span>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -1630,6 +1695,35 @@
     function toggleArtForm(slug) {
       var f = document.getElementById('artForm_' + slug);
       if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function previewNewsAddImage(input) {
+      var container = document.getElementById('newsAddImgPreview');
+      var img = document.getElementById('newsAddImgTag');
+      var info = document.getElementById('newsAddImgInfo');
+      if (input.files && input.files[0]) {
+        var file = input.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          if (img) img.src = e.target.result;
+          if (info) info.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+          if (container) container.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        if (container) container.style.display = 'none';
+      }
+    }
+
+    function previewNewsEditImage(input, id) {
+      var img = document.getElementById('previewNewsImg_' + id);
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          if (img) img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
     }
   </script>
 

@@ -195,14 +195,14 @@ if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
 }
 
 // Multer storage with file validation
-const ALLOWED_FILE_TYPES = /\.(jpg|jpeg|png|gif|webp|pdf|mp4|webm|ogg|mov)$/i;
+const ALLOWED_FILE_TYPES = /\.(jpg|jpeg|png|gif|webp|pdf|mp4|webm|ogg|mov|avif|heic|heif|jfif|bmp)$/i;
 const ALLOWED_MIME_TYPES = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'application/pdf',
-  'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'
+  'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'image/avif', 'image/heic', 'image/jfif'
 ];
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
+  destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
   filename: (req, file, cb) => {
     // Sanitize original filename to prevent path injection
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
@@ -214,12 +214,14 @@ const upload = multer({
   storage,
   limits: { fileSize: 100 * 1024 * 1024 }, // Max 100 MB
   fileFilter: (req, file, cb) => {
-    const extValid = ALLOWED_FILE_TYPES.test(path.extname(file.originalname));
-    const mimeValid = ALLOWED_MIME_TYPES.includes(file.mimetype) || (file.mimetype && file.mimetype.startsWith('video/'));
-    if (extValid && mimeValid) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const extValid = ALLOWED_FILE_TYPES.test(ext);
+    const mimeValid = ALLOWED_MIME_TYPES.includes(file.mimetype) ||
+      (file.mimetype && (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')));
+    if (extValid || mimeValid) {
       cb(null, true);
     } else {
-      cb(new Error('Tipe file tidak diizinkan. Hanya JPG, PNG, GIF, WebP, PDF, dan Video (MP4, WebM, MOV) yang diterima.'));
+      cb(new Error('Tipe file tidak diizinkan. Hanya format gambar atau video yang diterima.'));
     }
   }
 });
@@ -1053,63 +1055,109 @@ app.post('/admin/home/stats', requireAuth, (req, res) => {
 
 // News/events - update
 app.post('/admin/home/news/:id', requireAuth, upload.single('image'), (req, res) => {
-  const db = getDB();
-  const idx = db.home.news.findIndex(n => n.id === req.params.id);
-  if (idx > -1) {
-    db.home.news[idx].date = req.body.date;
-    db.home.news[idx].title = req.body.title;
-    db.home.news[idx].desc = req.body.desc;
-    if (req.file) {
-      if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
-        deleteUploadedFile(db.home.news[idx].image);
+  try {
+    const db = getDB();
+    if (!db.home) db.home = {};
+    if (!Array.isArray(db.home.news)) db.home.news = [];
+
+    const idx = db.home.news.findIndex(n => n.id === req.params.id);
+    if (idx > -1) {
+      if (req.body.date) db.home.news[idx].date = req.body.date.trim();
+      if (req.body.title) db.home.news[idx].title = req.body.title.trim();
+      if (req.body.desc) db.home.news[idx].desc = req.body.desc.trim();
+      if (req.body.link) db.home.news[idx].link = req.body.link.trim();
+      if (req.file) {
+        if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
+          deleteUploadedFile(db.home.news[idx].image);
+        }
+        db.home.news[idx].image = 'uploads/' + req.file.filename;
       }
-      db.home.news[idx].image = 'uploads/' + req.file.filename;
+      saveDB(db);
+      return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita "' + db.home.news[idx].title + '" berhasil diperbarui!'));
     }
-    saveDB(db);
+    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita tidak ditemukan.'));
+  } catch (err) {
+    console.error('Error updating news:', err);
+    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal memperbarui berita: ' + err.message));
   }
-  res.redirect('/admin?tab=beranda');
 });
 
 // News/events - delete image only
 app.post('/admin/home/news/delete-image/:id', requireAuth, (req, res) => {
-  const db = getDB();
-  const idx = db.home.news.findIndex(n => n.id === req.params.id);
-  if (idx > -1) {
-    if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
-      deleteUploadedFile(db.home.news[idx].image);
+  try {
+    const db = getDB();
+    if (db.home && Array.isArray(db.home.news)) {
+      const idx = db.home.news.findIndex(n => n.id === req.params.id);
+      if (idx > -1) {
+        if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
+          deleteUploadedFile(db.home.news[idx].image);
+        }
+        db.home.news[idx].image = 'assets/images/slider_ibadah.png';
+        saveDB(db);
+        return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gambar berita berhasil di-reset ke default.'));
+      }
     }
-    db.home.news[idx].image = 'assets/images/slider_ibadah.png';
-    saveDB(db);
+    res.redirect('/admin?tab=beranda');
+  } catch (err) {
+    res.redirect('/admin?tab=beranda');
   }
-  res.redirect('/admin?tab=beranda');
 });
 
 // News/events - add new
 app.post('/admin/home/news/add', requireAuth, upload.single('image'), (req, res) => {
-  const db = getDB();
-  const newItem = {
-    id: String(Date.now()),
-    date: req.body.date,
-    title: req.body.title,
-    desc: req.body.desc,
-    image: req.file ? 'uploads/' + req.file.filename : 'assets/images/slider_ibadah.png',
-    link: '/pelayanan.html'
-  };
-  db.home.news.push(newItem);
-  saveDB(db);
-  res.redirect('/admin?tab=beranda');
+  try {
+    const db = getDB();
+    if (!db.home) db.home = {};
+    if (!Array.isArray(db.home.news)) db.home.news = [];
+
+    const date = (req.body.date || '').trim() || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const title = (req.body.title || '').trim();
+    const desc = (req.body.desc || '').trim();
+
+    if (!title) {
+      return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal: Judul berita tidak boleh kosong!'));
+    }
+
+    const newItem = {
+      id: String(Date.now()),
+      date: date,
+      title: title,
+      desc: desc,
+      image: req.file ? 'uploads/' + req.file.filename : 'assets/images/slider_ibadah.png',
+      link: req.body.link ? req.body.link.trim() : '/pelayanan.html'
+    };
+
+    // Unshift to put the newest news at the 1st position (active slide)
+    db.home.news.unshift(newItem);
+    saveDB(db);
+
+    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita baru "' + title + '" berhasil ditambahkan ke slider beranda!'));
+  } catch (err) {
+    console.error('Error adding news:', err);
+    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal menambahkan berita: ' + err.message));
+  }
 });
 
 // News/events - delete item and associated file
 app.post('/admin/home/news/delete/:id', requireAuth, (req, res) => {
-  const db = getDB();
-  const item = db.home.news.find(n => n.id === req.params.id);
-  if (item && item.image && item.image.startsWith('uploads/')) {
-    deleteUploadedFile(item.image);
+  try {
+    const db = getDB();
+    if (db.home && Array.isArray(db.home.news)) {
+      const item = db.home.news.find(n => n.id === req.params.id);
+      if (item) {
+        if (item.image && item.image.startsWith('uploads/')) {
+          deleteUploadedFile(item.image);
+        }
+        db.home.news = db.home.news.filter(n => n.id !== req.params.id);
+        saveDB(db);
+        return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita "' + item.title + '" berhasil dihapus.'));
+      }
+    }
+    res.redirect('/admin?tab=beranda');
+  } catch (err) {
+    console.error('Error deleting news:', err);
+    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal menghapus berita: ' + err.message));
   }
-  db.home.news = db.home.news.filter(n => n.id !== req.params.id);
-  saveDB(db);
-  res.redirect('/admin?tab=beranda');
 });
 
 // ===== TAB: BARU DI SINI =====
@@ -1813,14 +1861,17 @@ app.post('/admin/files/delete/:filename', requireAuth, (req, res) => {
 
 // Multer file validation error handler
 app.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).send('File terlalu besar. Maksimal 10 MB.');
-    }
-    return res.status(400).send('Error upload: ' + err.message);
+  const errMsg = (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE')
+    ? 'File terlalu besar. Maksimal 100 MB.'
+    : (err.message || 'Terjadi kesalahan saat upload.');
+
+  if (req.originalUrl && req.originalUrl.startsWith('/admin')) {
+    const referer = req.header('Referer') || '/admin?tab=beranda';
+    const sep = referer.includes('?') ? '&' : '?';
+    return res.redirect(referer + sep + 'msg=' + encodeURIComponent('Gagal: ' + errMsg));
   }
-  if (err && err.message && err.message.includes('Tipe file tidak diizinkan')) {
-    return res.status(400).send(err.message);
+  if (err instanceof multer.MulterError || (err.message && err.message.includes('Tipe file tidak diizinkan'))) {
+    return res.status(400).send(errMsg);
   }
   next(err);
 });
