@@ -4024,11 +4024,11 @@ p {
 /* Progress bar animation */
 .carousel.next .carousel__progress,
 .carousel.prev .carousel__progress {
-  animation: carouselProgress 3s linear forwards;
+  animation: carouselProgress 5s linear forwards;
 }
 @keyframes carouselProgress {
   from { width: 100%; }
-  to   { width: 0; }
+  to   { width: 0%; }
 }
 
 /* ---- Responsive ---- */

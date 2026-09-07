@@ -79,11 +79,12 @@ function initNewsSwiper() {
   const thumbs = carousel.querySelector('.carousel__thumbs');
   const nextBtn = document.getElementById('carouselNext');
   const prevBtn = document.getElementById('carouselPrev');
+  const progress = carousel.querySelector('.carousel__progress');
 
   if (!list || !thumbs || !nextBtn || !prevBtn) return;
 
   const ANIM_TIME = 500;   // matches CSS animation duration
-  const AUTO_TIME = 3000;  // autoplay 3 seconds
+  const AUTO_TIME = 5000;  // autoplay 5 seconds
 
   let animTimeout;
   let autoTimeout;
@@ -112,6 +113,11 @@ function initNewsSwiper() {
 
   function resetAutoplay() {
     clearTimeout(autoTimeout);
+    if (progress) {
+      progress.style.animation = 'none';
+      void progress.offsetWidth; // trigger reflow to restart CSS animation
+      progress.style.animation = `carouselProgress ${AUTO_TIME}ms linear forwards`;
+    }
     autoTimeout = setTimeout(() => showSlider('next'), AUTO_TIME);
   }
 
