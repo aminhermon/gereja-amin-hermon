@@ -202,7 +202,13 @@ const ALLOWED_MIME_TYPES = [
 ];
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) {}
+    }
+    cb(null, uploadDir);
+  },
   filename: (req, file, cb) => {
     // Sanitize original filename to prevent path injection
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
@@ -263,8 +269,9 @@ const legacyBackupPath = path.join(__dirname, 'data', 'db.backup.json');
 // Seed file stays in the project (it's the initial template, tracked by Git)
 const seedDbPath = path.join(__dirname, 'data', 'db.seed.json');
 
-// Global in-memory cache for ultra-reliable session consistency
+// Global in-memory cache for ultra-reliable session consistency with mtime check
 global.__CACHED_DB__ = null;
+global.__CACHED_DB_MTIME__ = 0;
 
 /**
  * ONE-TIME MIGRATION: Move existing database from inside the project to the
@@ -336,24 +343,29 @@ function enrichMissingTopLevelKeys(targetDb) {
  * 4. db.seed.json (Initial fresh install template seed ONLY — tracked by Git)
  */
 function getDB() { 
-  if (global.__CACHED_DB__) {
-    return global.__CACHED_DB__;
-  }
-
   try {
     // 1. PRIMARY: External persistent DB (OUTSIDE git directory — immune to deploys)
     if (fs.existsSync(externalDbPath)) {
       try {
+        const stats = fs.statSync(externalDbPath);
+        if (global.__CACHED_DB__ && global.__CACHED_DB_MTIME__ === stats.mtimeMs) {
+          return global.__CACHED_DB__;
+        }
         const raw = fs.readFileSync(externalDbPath, 'utf8');
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
           enrichMissingTopLevelKeys(parsed);
           global.__CACHED_DB__ = parsed;
+          global.__CACHED_DB_MTIME__ = stats.mtimeMs;
           return parsed;
         }
       } catch (e) {
         console.warn('⚠️ Gagal membaca external db.json, mencoba fallback:', e.message);
       }
+    }
+
+    if (global.__CACHED_DB__) {
+      return global.__CACHED_DB__;
     }
 
     // 2. BACKUP: External backup DB
@@ -462,6 +474,11 @@ function saveDB(data) {
 
     // 5. Update in-memory cache
     global.__CACHED_DB__ = data;
+    try {
+      if (fs.existsSync(externalDbPath)) {
+        global.__CACHED_DB_MTIME__ = fs.statSync(externalDbPath).mtimeMs;
+      }
+    } catch (e) {}
     console.log(`✅ Database berhasil disimpan permanen ke: ${PERSISTENT_DIR}`);
     return true;
   } catch (err) {
@@ -1053,57 +1070,7 @@ app.post('/admin/home/stats', requireAuth, (req, res) => {
   res.redirect('/admin?tab=beranda');
 });
 
-// News/events - update
-app.post('/admin/home/news/:id', requireAuth, upload.single('image'), (req, res) => {
-  try {
-    const db = getDB();
-    if (!db.home) db.home = {};
-    if (!Array.isArray(db.home.news)) db.home.news = [];
-
-    const idx = db.home.news.findIndex(n => n.id === req.params.id);
-    if (idx > -1) {
-      if (req.body.date) db.home.news[idx].date = req.body.date.trim();
-      if (req.body.title) db.home.news[idx].title = req.body.title.trim();
-      if (req.body.desc) db.home.news[idx].desc = req.body.desc.trim();
-      if (req.body.link) db.home.news[idx].link = req.body.link.trim();
-      if (req.file) {
-        if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
-          deleteUploadedFile(db.home.news[idx].image);
-        }
-        db.home.news[idx].image = 'uploads/' + req.file.filename;
-      }
-      saveDB(db);
-      return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita "' + db.home.news[idx].title + '" berhasil diperbarui!'));
-    }
-    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita tidak ditemukan.'));
-  } catch (err) {
-    console.error('Error updating news:', err);
-    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal memperbarui berita: ' + err.message));
-  }
-});
-
-// News/events - delete image only
-app.post('/admin/home/news/delete-image/:id', requireAuth, (req, res) => {
-  try {
-    const db = getDB();
-    if (db.home && Array.isArray(db.home.news)) {
-      const idx = db.home.news.findIndex(n => n.id === req.params.id);
-      if (idx > -1) {
-        if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
-          deleteUploadedFile(db.home.news[idx].image);
-        }
-        db.home.news[idx].image = 'assets/images/slider_ibadah.png';
-        saveDB(db);
-        return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gambar berita berhasil di-reset ke default.'));
-      }
-    }
-    res.redirect('/admin?tab=beranda');
-  } catch (err) {
-    res.redirect('/admin?tab=beranda');
-  }
-});
-
-// News/events - add new
+// News/events - add new (MUST BE DEFINED BEFORE /:id to prevent route shadowing!)
 app.post('/admin/home/news/add', requireAuth, upload.single('image'), (req, res) => {
   try {
     const db = getDB();
@@ -1131,10 +1098,32 @@ app.post('/admin/home/news/add', requireAuth, upload.single('image'), (req, res)
     db.home.news.unshift(newItem);
     saveDB(db);
 
+    console.log('✅ Berita slider baru berhasil ditambahkan:', title);
     res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita baru "' + title + '" berhasil ditambahkan ke slider beranda!'));
   } catch (err) {
     console.error('Error adding news:', err);
     res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal menambahkan berita: ' + err.message));
+  }
+});
+
+// News/events - delete image only
+app.post('/admin/home/news/delete-image/:id', requireAuth, (req, res) => {
+  try {
+    const db = getDB();
+    if (db.home && Array.isArray(db.home.news)) {
+      const idx = db.home.news.findIndex(n => n.id === req.params.id);
+      if (idx > -1) {
+        if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
+          deleteUploadedFile(db.home.news[idx].image);
+        }
+        db.home.news[idx].image = 'assets/images/slider_ibadah.png';
+        saveDB(db);
+        return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gambar berita berhasil di-reset ke default.'));
+      }
+    }
+    res.redirect('/admin?tab=beranda');
+  } catch (err) {
+    res.redirect('/admin?tab=beranda');
   }
 });
 
@@ -1157,6 +1146,36 @@ app.post('/admin/home/news/delete/:id', requireAuth, (req, res) => {
   } catch (err) {
     console.error('Error deleting news:', err);
     res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal menghapus berita: ' + err.message));
+  }
+});
+
+// News/events - update (declared AFTER specific sub-routes with guard against 'add')
+app.post('/admin/home/news/:id', requireAuth, upload.single('image'), (req, res, next) => {
+  if (req.params.id === 'add') return next();
+  try {
+    const db = getDB();
+    if (!db.home) db.home = {};
+    if (!Array.isArray(db.home.news)) db.home.news = [];
+
+    const idx = db.home.news.findIndex(n => n.id === req.params.id);
+    if (idx > -1) {
+      if (req.body.date) db.home.news[idx].date = req.body.date.trim();
+      if (req.body.title) db.home.news[idx].title = req.body.title.trim();
+      if (req.body.desc) db.home.news[idx].desc = req.body.desc.trim();
+      if (req.body.link) db.home.news[idx].link = req.body.link.trim();
+      if (req.file) {
+        if (db.home.news[idx].image && db.home.news[idx].image.startsWith('uploads/')) {
+          deleteUploadedFile(db.home.news[idx].image);
+        }
+        db.home.news[idx].image = 'uploads/' + req.file.filename;
+      }
+      saveDB(db);
+      return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita "' + db.home.news[idx].title + '" berhasil diperbarui!'));
+    }
+    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Berita tidak ditemukan.'));
+  } catch (err) {
+    console.error('Error updating news:', err);
+    res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal memperbarui berita: ' + err.message));
   }
 });
 

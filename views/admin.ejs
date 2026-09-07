@@ -385,7 +385,7 @@
               <h4 style="color:var(--navy); font-size:0.95rem; margin:0;">➕ Tambah Berita Baru</h4>
               <span style="font-size:0.7rem; background:#10B981; color:#fff; padding:2px 8px; border-radius:10px; font-weight:600;">Otomatis jadi Slide 1</span>
             </div>
-            <form action="/admin/home/news/add" method="POST" enctype="multipart/form-data" id="formAddNews" onsubmit="var b=this.querySelector('button[type=submit]'); b.disabled=true; b.innerHTML='⏳ Menyimpan...';">
+            <form action="/admin/home/news/add" method="POST" enctype="multipart/form-data" id="formAddNews" onsubmit="var b=this.querySelector('button[type=submit]'); if(b){ b.innerHTML='⏳ Menyimpan...'; setTimeout(function(){ b.disabled=true; }, 50); }">
               <div class="grid-3">
                 <div class="form-group">
                   <label>Tanggal Berita</label>
