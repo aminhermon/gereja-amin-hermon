@@ -107,69 +107,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.json({ limit: '1mb' }));
 
-// ==================== IMAGE OPTIMIZATION ====================
-app.use(async (req, res, next) => {
-  const isImageRequest = /\.(jpg|jpeg|png)$/i.test(req.path);
-  if (!isImageRequest) return next();
-
-  const accept = req.headers.accept || '';
-  let format = null;
-  let mime = null;
-  let ext = null;
-
-  if (accept.includes('image/avif')) {
-    format = 'avif'; mime = 'image/avif'; ext = 'avif';
-  } else if (accept.includes('image/webp')) {
-    format = 'webp'; mime = 'image/webp'; ext = 'webp';
-  }
-
-  // If browser doesn't support webp/avif, fallback to original file
-  if (!format) return next();
-
-  try {
-    const sharp = require('sharp');
-    let srcPath = null;
-    
-    if (req.path.startsWith('/uploads/')) {
-      srcPath = path.join(__dirname, req.path);
-    } else {
-      srcPath = path.join(__dirname, 'public', req.path);
-    }
-
-    // Path traversal protection
-    const resolvedPath = path.resolve(srcPath);
-    if (!resolvedPath.startsWith(path.resolve(__dirname))) {
-      return res.status(403).send('Akses ditolak');
-    }
-
-    if (!fs.existsSync(srcPath)) return next();
-
-    const cacheDir = path.join(__dirname, '.cache');
-    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-
-    // Build a unique cache name based on original path
-    const safePath = req.path.replace(/\//g, '_');
-    const cached = path.join(cacheDir, `${safePath}.${ext}`);
-
-    if (fs.existsSync(cached)) {
-      res.setHeader('Content-Type', mime);
-      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
-      return fs.readFile(cached, (err, data) => {
-        if (err) return next();
-        res.send(data);
-      });
-    }
-
-    const buffer = await sharp(srcPath)[format]({ quality: 80 }).toBuffer();
-    fs.writeFileSync(cached, buffer);
-    res.setHeader('Content-Type', mime);
-    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
-    res.send(buffer);
-  } catch (err) {
-    console.error('Image optimization error:', err.message);
-    next();
-  }
-});
+// ==================== IMAGE OPTIMIZATION (DISABLED) ====================
+// Sharp on-the-fly conversion was causing ALL image requests to hang on mobile
+// browsers that send Accept: image/webp headers. The sharp().toBuffer() call
+// blocks indefinitely on large images (1MB+), preventing ANY images from loading.
+// Images are now served directly through Express static middleware below.
 
 // Static files with browser caching
 app.use(express.static(path.join(__dirname, 'public'), {
