@@ -13,18 +13,26 @@ const PORT = process.env.PORT || 3000;
 
 // ==================== SECURITY ====================
 
+// Trust reverse proxy (Hostinger Passenger/Apache)
+app.set('trust proxy', 1);
+
 // Helmet: HTTP security headers (XSS, clickjacking, MIME-sniffing, etc.)
 app.use(helmet({
   contentSecurityPolicy: false,       // Disabled to allow inline styles/scripts in EJS
   crossOriginEmbedderPolicy: false,   // Allow YouTube embeds
 }));
 
-// Rate Limiting: Public routes (100 req per 15 min per IP)
+// Rate Limiting: Public routes (never throttle static assets or uploads)
 const publicLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    return /\.(css|js|jpg|jpeg|png|gif|svg|ico|webp|avif|mp4|webm|pdf|woff2?|ttf|eot)$/i.test(req.path) ||
+           req.path.startsWith('/uploads') ||
+           req.path.startsWith('/assets');
+  },
   message: 'Terlalu banyak permintaan dari IP ini. Silakan coba lagi nanti.'
 });
 app.use(publicLimiter);
@@ -37,9 +45,6 @@ const adminLimiter = rateLimit({
   legacyHeaders: false,
   message: 'Terlalu banyak percobaan. Silakan coba lagi dalam 15 menit.'
 });
-
-// Trust reverse proxy (Hostinger Passenger/Apache)
-app.set('trust proxy', 1);
 
 // Session for admin authentication
 app.use(session({

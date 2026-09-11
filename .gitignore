@@ -13,5 +13,4 @@ data/snapshots/
 
 # uploads/ is now tracked so Hostinger Git auto-deploy includes all photos
 !uploads/.gitkeep
-
-
+public/uploads/

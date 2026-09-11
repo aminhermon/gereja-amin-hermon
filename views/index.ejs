@@ -120,9 +120,9 @@
           <source src="/<%= home.hero.bgVideo %>" type="<%= home.hero.bgVideo.endsWith('.webm') ? 'video/webm' : 'video/mp4' %>">
         </video>
         <!-- Fallback image: always present, shown on mobile where video is hidden -->
-        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" class="hero-img-fallback" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;">
+        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" class="hero-img-fallback" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-hero-new.jpg';">
       <% } else { %>
-        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;">
+        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-hero-new.jpg';">
       <% } %>
     </div>
     <div class="hero__overlay"></div>
@@ -166,7 +166,7 @@
     <div class="carousel__list">
       <% home.news.forEach(function(item, idx) { %>
       <div class="carousel__item" data-idx="<%= idx %>">
-        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;">
+        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/slider_ibadah.png';">
         <div class="carousel__content">
           <span class="carousel__date"><%= item.date %></span>
           <div class="carousel__title"><%= item.title %></div>
@@ -186,7 +186,7 @@
     <div class="carousel__thumbs">
       <% home.news.forEach(function(item) { %>
       <div class="carousel__thumb">
-        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="lazy" width="160" height="220" style="width:100%;height:100%;object-fit:cover;">
+        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="lazy" width="160" height="220" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/slider_ibadah.png';">
         <div class="carousel__thumb-label"><%= item.title %></div>
       </div>
       <% }); %>

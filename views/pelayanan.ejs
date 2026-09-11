@@ -48,7 +48,7 @@
   <%- include('partials/navbar') %>
   <!-- ========== HERO ========== -->
   <section class="hero hero--sub" id="hero-pelayanan">
-    <div class="hero__bg"><img src="<%= pelayanan.hero.bgImage %>" alt="Pelayanan" loading="eager"></div>
+    <div class="hero__bg"><img src="<%= pelayanan.hero.bgImage.startsWith('/') ? pelayanan.hero.bgImage : '/' + pelayanan.hero.bgImage %>" alt="Pelayanan" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';"></div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <div class="hero__eyebrow">Pelayanan</div>
