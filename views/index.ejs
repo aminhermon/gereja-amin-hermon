@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="css/style.min.css?v=20">
+  <link rel="stylesheet" href="css/style.min.css?v=25">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -115,18 +115,20 @@
   <section class="hero hero--full" id="hero">
     <div class="hero__bg">
       <% if (home.hero.bgVideo) { %>
-        <video autoplay muted loop playsinline poster="/<%= home.hero.bgImage %>" id="hero-video">
+        <!-- Video: hidden on mobile via CSS class .hero-video-desktop, shown only on larger screens -->
+        <video autoplay muted loop playsinline poster="/<%= home.hero.bgImage %>" id="hero-video" class="hero-video-desktop">
           <source src="/<%= home.hero.bgVideo %>" type="<%= home.hero.bgVideo.endsWith('.webm') ? 'video/webm' : 'video/mp4' %>">
-          <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager">
         </video>
+        <!-- Fallback image: always present, shown on mobile where video is hidden -->
+        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" class="hero-img-fallback" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;">
       <% } else { %>
-        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager">
+        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;">
       <% } %>
     </div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <div class="hero__logo-wrap">
-        <img src="/assets/images/logo-gereja-amin-3d.png?v=10" alt="Logo Gereja AMIN" class="hero__logo">
+        <img src="/assets/images/logo-gereja-amin-3d.png?v=10" alt="Logo Gereja AMIN" class="hero__logo" width="125" height="125">
       </div>
       <h1><%- home.hero.titleHTML %></h1>
       <p class="hero__subtitle"><%= home.hero.subtitle %></p>
@@ -164,7 +166,7 @@
     <div class="carousel__list">
       <% home.news.forEach(function(item, idx) { %>
       <div class="carousel__item" data-idx="<%= idx %>">
-        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="eager">
+        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;">
         <div class="carousel__content">
           <span class="carousel__date"><%= item.date %></span>
           <div class="carousel__title"><%= item.title %></div>
@@ -184,7 +186,7 @@
     <div class="carousel__thumbs">
       <% home.news.forEach(function(item) { %>
       <div class="carousel__thumb">
-        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="lazy">
+        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="lazy" width="160" height="220" style="width:100%;height:100%;object-fit:cover;">
         <div class="carousel__thumb-label"><%= item.title %></div>
       </div>
       <% }); %>

@@ -619,6 +619,53 @@ p {
   opacity: 0.85;
 }
 
+/* Desktop: show video, hide fallback image */
+.hero__bg .hero-img-fallback {
+  display: none;
+}
+
+/* Mobile: hide heavy video (37MB), show lightweight fallback image */
+@media (max-width: 768px) {
+  .hero__bg .hero-video-desktop {
+    display: none !important;
+  }
+  .hero__bg .hero-img-fallback {
+    display: block !important;
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    opacity: 0.85;
+  }
+}
+
+/* ---- GLOBAL MOBILE IMAGE SAFETY NET ---- */
+/* Ensure ALL images always have visible dimensions on mobile */
+@media (max-width: 768px) {
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  /* Carousel images must fill their absolute-positioned container */
+  .carousel__list .carousel__item img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  /* Gallery images */
+  .gallery-item img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+}
+
 .hero__overlay {
   position: absolute;
   inset: 0;

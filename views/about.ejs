@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="stylesheet" href="css/style.min.css?v=20">
+  <link rel="stylesheet" href="css/style.min.css?v=25">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -63,7 +63,7 @@
   <%- include('partials/navbar') %>
   <!-- ========== HERO ========== -->
   <section class="hero hero--sub" id="hero-about">
-    <div class="hero__bg"><img src="<%= about.hero.bgImage %>" alt="Tentang Gereja" loading="eager"></div>
+    <div class="hero__bg"><img src="<%= about.hero.bgImage %>" alt="Tentang Gereja" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;"></div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <div class="hero__eyebrow">Tentang Gereja</div>
@@ -150,7 +150,7 @@
              data-role="<%= p.role %>">
           <div class="leader-card__img" style="background: linear-gradient(135deg, var(--navy), var(--navy-light)); display: flex; align-items: center; justify-content: center;">
             <% if (p.image) { %>
-              <img src="/<%= p.image %>" alt="<%= p.name %>">
+              <img src="/<%= p.image %>" alt="<%= p.name %>" width="200" height="200" style="width:100%;height:100%;object-fit:cover;">
             <% } else { %>
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -174,7 +174,7 @@
              data-role="<%= pg.role %>">
           <div class="leader-card__img">
             <% if (pg.image) { %>
-              <img src="/<%= pg.image %>" alt="<%= pg.name %>">
+              <img src="/<%= pg.image %>" alt="<%= pg.name %>" width="200" height="200" style="width:100%;height:100%;object-fit:cover;">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -196,7 +196,7 @@
              data-role="<%= pg.role %>">
           <div class="leader-card__img">
             <% if (pg.image) { %>
-              <img src="/<%= pg.image %>" alt="<%= pg.name %>">
+              <img src="/<%= pg.image %>" alt="<%= pg.name %>" width="200" height="200" style="width:100%;height:100%;object-fit:cover;">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -218,7 +218,7 @@
              data-role="<%= pg.role %>">
           <div class="leader-card__img">
             <% if (pg.image) { %>
-              <img src="/<%= pg.image %>" alt="<%= pg.name %>">
+              <img src="/<%= pg.image %>" alt="<%= pg.name %>" width="200" height="200" style="width:100%;height:100%;object-fit:cover;">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -241,7 +241,7 @@
              data-role="<%= m.role || 'Majelis' %>">
           <div class="leader-card__img">
             <% if (m.image) { %>
-              <img src="/<%= m.image %>" alt="<%= m.name %>">
+              <img src="/<%= m.image %>" alt="<%= m.name %>" width="200" height="200" style="width:100%;height:100%;object-fit:cover;">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
