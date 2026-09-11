@@ -9,14 +9,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="shortcut icon" href="/favicon.ico">
 
-  <meta name="description" content="Renungan Harian <%= general.churchName %> — Santapan rohani untuk menumbuhkan iman Anda setiap hari.">
+  <meta name="description" content="Renungan Harian <%= general.churchName %> â€” Santapan rohani untuk menumbuhkan iman Anda setiap hari.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.or.id' %>/renungan.html">
-  <title>Renungan Harian — <%= general.churchName %></title>
+  <title>Renungan Harian â€” <%= general.churchName %></title>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Renungan Harian — <%= general.churchName %>">
+  <meta property="og:title" content="Renungan Harian â€” <%= general.churchName %>">
   <meta property="og:description" content="Santapan rohani untuk menumbuhkan iman Anda setiap hari.">
   <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.or.id' %>/renungan.html">
   <meta property="og:site_name" content="<%= general.churchName %>">
@@ -24,7 +24,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="css/style.min.css?v=12">
+  <link rel="stylesheet" href="css/style.min.css?v=20">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -76,9 +76,9 @@
       <!-- Calendar Picker (hidden by default) -->
       <div class="rv-calendar" id="rvCalendar" style="display:none;" data-aos="fade-up">
         <div class="rv-calendar__header">
-          <button class="rv-calendar__nav" id="rvCalPrev" aria-label="Bulan sebelumnya">‹</button>
+          <button class="rv-calendar__nav" id="rvCalPrev" aria-label="Bulan sebelumnya">â€¹</button>
           <span class="rv-calendar__title" id="rvCalTitle"></span>
-          <button class="rv-calendar__nav" id="rvCalNext" aria-label="Bulan berikutnya">›</button>
+          <button class="rv-calendar__nav" id="rvCalNext" aria-label="Bulan berikutnya">â€º</button>
         </div>
         <div class="rv-calendar__days-header">
           <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
@@ -172,7 +172,7 @@
           <h2 class="rv-modal__title" id="rvModalTitle"></h2>
           <div class="rv-modal__meta">
             <span id="rvModalDate"></span>
-            <span class="rv-modal__meta-sep">·</span>
+            <span class="rv-modal__meta-sep">Â·</span>
             <span id="rvModalAuthor"></span>
           </div>
         </div>
@@ -185,17 +185,17 @@
         <div class="rv-modal__body" id="rvModalBody"></div>
 
         <div class="rv-modal__section" id="rvModalReflectionWrap" style="display:none;">
-          <h3>💭 Refleksi</h3>
+          <h3>ðŸ’­ Refleksi</h3>
           <p id="rvModalReflection"></p>
         </div>
 
         <div class="rv-modal__section" id="rvModalAppWrap" style="display:none;">
-          <h3>📋 Aplikasi Kehidupan</h3>
+          <h3>ðŸ“‹ Aplikasi Kehidupan</h3>
           <p id="rvModalApp"></p>
         </div>
 
         <div class="rv-modal__section rv-modal__prayer" id="rvModalPrayerWrap" style="display:none;">
-          <h3>🙏 Doa Penutup</h3>
+          <h3>ðŸ™ Doa Penutup</h3>
           <p id="rvModalPrayer"></p>
         </div>
 
@@ -254,17 +254,17 @@
           <p class="rv-reactions__label">Apakah renungan ini memberkati Anda?</p>
           <div class="rv-reactions__buttons">
             <button class="rv-reaction" data-type="blessed" aria-label="Saya Diberkati">
-              <span class="rv-reaction__emoji">❤️</span>
+              <span class="rv-reaction__emoji">â¤ï¸</span>
               <span class="rv-reaction__text">Diberkati</span>
               <span class="rv-reaction__count" id="rvReactBlessed">0</span>
             </button>
             <button class="rv-reaction" data-type="amin" aria-label="Amin">
-              <span class="rv-reaction__emoji">🙏</span>
+              <span class="rv-reaction__emoji">ðŸ™</span>
               <span class="rv-reaction__text">Amin</span>
               <span class="rv-reaction__count" id="rvReactAmin">0</span>
             </button>
             <button class="rv-reaction" data-type="strengthened" aria-label="Menguatkan">
-              <span class="rv-reaction__emoji">✨</span>
+              <span class="rv-reaction__emoji">âœ¨</span>
               <span class="rv-reaction__text">Menguatkan</span>
               <span class="rv-reaction__count" id="rvReactStrength">0</span>
             </button>

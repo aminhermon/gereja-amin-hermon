@@ -54,11 +54,19 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
-  window.addEventListener('load', function() {
-    var skeleton = document.getElementById('loadingSkeleton');
-    if (skeleton) {
-      skeleton.classList.add('skeleton--hidden');
-      setTimeout(function() { skeleton.remove(); }, 500);
+  (function() {
+    var done = false;
+    function hideSkeleton() {
+      if (done) return;
+      done = true;
+      var skeleton = document.getElementById('loadingSkeleton');
+      if (skeleton) {
+        skeleton.classList.add('skeleton--hidden');
+        setTimeout(function() { skeleton.remove(); }, 500);
+      }
     }
-  });
+    window.addEventListener('load', hideSkeleton);
+    // Fallback: force-hide skeleton after 1.5s even if CDN assets are slow on mobile
+    setTimeout(hideSkeleton, 1500);
+  })();
 </script>
