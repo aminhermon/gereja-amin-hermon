@@ -8296,3 +8296,89 @@ p {
   .rv-modal__content { padding: 1.5rem 1rem; }
   .rv-reaction__text { display: none; }
 }
+
+/* ---------- Sejarah Gereja Refined Typography ---------- */
+.sejarah-content-box {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--white);
+  border: 1px solid rgba(200, 169, 81, 0.3);
+  border-top: 4px solid var(--gold);
+  border-radius: var(--radius-xl);
+  padding: 3rem 3.5rem;
+  box-shadow: 0 15px 40px rgba(15, 29, 53, 0.07);
+  position: relative;
+}
+
+.sejarah-content-box::before {
+  content: '“';
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-family: var(--font-heading);
+  font-size: 5.5rem;
+  line-height: 1;
+  color: rgba(200, 169, 81, 0.12);
+  pointer-events: none;
+  user-select: none;
+}
+
+.sejarah-p {
+  font-size: 1.08rem;
+  line-height: 1.95;
+  color: #374151;
+  text-align: justify;
+  text-justify: inter-word;
+  margin-bottom: 1.5rem;
+}
+
+.sejarah-p:first-of-type {
+  font-size: 1.15rem;
+  color: #1F2937;
+  font-weight: 500;
+}
+
+.sejarah-p:first-of-type::first-letter {
+  font-family: var(--font-heading);
+  font-size: 2.8rem;
+  float: left;
+  line-height: 0.85;
+  margin-right: 0.65rem;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.sejarah-p:last-of-type {
+  margin-bottom: 0;
+}
+
+.sejarah-footer-note {
+  margin-top: 2rem;
+  padding-top: 1.4rem;
+  border-top: 1px dashed rgba(200, 169, 81, 0.3);
+  text-align: center;
+  font-family: var(--font-heading);
+  font-style: italic;
+  color: var(--gold-dark);
+  font-size: 0.98rem;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 768px) {
+  .sejarah-content-box {
+    padding: 2rem 1.4rem;
+    border-radius: var(--radius-lg);
+  }
+  .sejarah-p {
+    font-size: 1rem;
+    line-height: 1.85;
+    text-align: left;
+  }
+  .sejarah-p:first-of-type {
+    font-size: 1.05rem;
+  }
+  .sejarah-p:first-of-type::first-letter {
+    font-size: 2.3rem;
+    margin-right: 0.45rem;
+  }
+}

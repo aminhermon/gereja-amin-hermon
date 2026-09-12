@@ -79,9 +79,9 @@
         <h2><%= about.sejarah.title %></h2>
         <span class="gold-line"></span>
       </div>
-      <div data-aos="fade-up" style="max-width: 800px; margin: 0 auto;">
+      <div class="sejarah-content-box" data-aos="fade-up">
         <% about.sejarah.content.split('\n\n').forEach(function(p) { %>
-          <p style="font-size: 1.05rem; line-height: 1.9; color: var(--text-light); text-align: center; margin-bottom: 1.2rem;"><%= p %></p>
+          <p class="sejarah-p"><%= p %></p>
         <% }); %>
       </div>
     </div>
