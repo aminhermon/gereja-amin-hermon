@@ -5911,17 +5911,27 @@ p {
 }
 
 .cal-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.8);
   font-family: inherit;
   font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1.2;
   padding: 8px 18px;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.25s ease;
   user-select: none;
+}
+
+.cal-filter-btn:focus-visible {
+  outline: 2px solid #C8A951;
+  outline-offset: 2px;
 }
 
 .cal-filter-btn:hover {
@@ -6839,6 +6849,19 @@ p {
 }
 
 @media (max-width: 768px) {
+  .cal-main-wrapper {
+    padding: 1.25rem 0.85rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+  }
+  .cal-filters {
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .cal-filter-btn {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+  }
   .komsek-articles__grid {
     grid-template-columns: 1fr;
   }
