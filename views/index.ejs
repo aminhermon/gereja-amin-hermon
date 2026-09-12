@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="css/style.min.css?v=25">
+  <link rel="stylesheet" href="/css/style.min.css?v=25">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -70,9 +70,9 @@
       </a>
       <div class="navbar__menu" id="nav-menu">
         <a href="/" class="navbar__link active">Beranda</a>
-        <a href="/visit.html" class="navbar__link">Baru di Sini?</a>
-        <a href="/about.html" class="navbar__link">Tentang Gereja</a>
-        <a href="/pelayanan.html" class="navbar__link">Pelayanan</a>
+        <a href="/visit" class="navbar__link">Baru di Sini?</a>
+        <a href="/about" class="navbar__link">Tentang Gereja</a>
+        <a href="/pelayanan" class="navbar__link">Pelayanan</a>
 
         <!-- KomSek Dropdown -->
         <div class="navbar__dropdown" id="komsek-dropdown">
@@ -96,8 +96,8 @@
           </div>
         </div>
 
-        <a href="/media.html" class="navbar__link">Media</a>
-        <a href="/contact.html" class="navbar__link">Hubungi Kami</a>
+        <a href="/media" class="navbar__link">Media</a>
+        <a href="/contact" class="navbar__link">Hubungi Kami</a>
         <form action="/search" method="GET" class="navbar__search">
           <input type="text" name="q" placeholder="Cari..." aria-label="Search" required>
           <button type="submit" aria-label="Submit Search">
@@ -347,7 +347,7 @@
         <span class="news-modal__date" id="newsModalDate"></span>
         <h2 class="news-modal__title" id="newsModalTitle"></h2>
         <p class="news-modal__desc" id="newsModalDesc"></p>
-        <a href="/media.html" class="btn btn--gold" style="margin-top: 1rem;">
+        <a href="/media" class="btn btn--gold" style="margin-top: 1rem;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           Lihat Galeri Foto
         </a>
@@ -358,7 +358,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="js/main.min.js?v=12" defer></script>
+  <script src="/js/main.min.js?v=12" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;

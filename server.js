@@ -508,11 +508,18 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => { res.render('index', getDB()); });
 app.get('/index.html', (req, res) => { res.redirect('/'); });
 
-// Dynamic pages
+// Dynamic pages — support both clean URL (/about) and .html (/about.html)
 const pages = ['visit', 'about', 'pelayanan', 'media', 'contact', 'renungan'];
 pages.forEach(page => {
-  app.get(`/${page}.html`, (req, res) => { res.render(page, getDB()); });
+  app.get(`/${page}`, (req, res) => { res.render(page, getDB()); });
+  app.get(`/${page}.html`, (req, res) => { res.redirect(`/${page}`); });
 });
+
+// Alias: /admin-login redirects to /admin/login
+app.get('/admin-login', (req, res) => { res.redirect('/admin/login'); });
+
+// Alias: /jadwal redirects to /pelayanan (jadwal is part of pelayanan page)
+app.get('/jadwal', (req, res) => { res.redirect('/pelayanan'); });
 
 // ==================== RENUNGAN API ====================
 
@@ -550,6 +557,43 @@ app.post('/api/renungan/:id/react', (req, res) => {
   item.reactions[type] = (item.reactions[type] || 0) + 1;
   saveDB(db);
   res.json({ success: true, reactions: item.reactions });
+});
+
+// ==================== ADDITIONAL API ENDPOINTS ====================
+
+// API: Get jadwal pelayan (jadwal ibadah / pelayanan)
+app.get('/api/jadwal', (req, res) => {
+  const db = getDB();
+  const jadwal = (db.pelayanan && db.pelayanan.jadwalPelayan) || [];
+  res.json(jadwal);
+});
+
+// API: Get calendar events
+app.get('/api/events', (req, res) => {
+  const db = getDB();
+  const events = db.kalender || [];
+  res.json(events);
+});
+
+// API: Get pengurus (leaders/committee)
+app.get('/api/pengurus', (req, res) => {
+  const db = getDB();
+  const pengurus = (db.about && db.about.pengurus) || [];
+  res.json(pengurus);
+});
+
+// API: Get komsek (komisi/sektor)
+app.get('/api/komsek', (req, res) => {
+  const db = getDB();
+  const komsek = db.komsek || { komisi: [], sektor: [] };
+  res.json(komsek);
+});
+
+// API: Get contact info
+app.get('/api/kontak', (req, res) => {
+  const db = getDB();
+  const kontak = db.contactFaq || {};
+  res.json(kontak);
 });
 
 // KomSek detail page (komisi/sektor)
@@ -622,12 +666,12 @@ app.get('/sitemap.xml', (req, res) => {
 
   const staticPages = [
     { loc: '/',              priority: '1.0', changefreq: 'weekly' },
-    { loc: '/visit.html',    priority: '0.8', changefreq: 'monthly' },
-    { loc: '/about.html',    priority: '0.8', changefreq: 'monthly' },
-    { loc: '/pelayanan.html', priority: '0.9', changefreq: 'weekly' },
-    { loc: '/media.html',    priority: '0.7', changefreq: 'weekly' },
-    { loc: '/renungan.html', priority: '0.9', changefreq: 'daily' },
-    { loc: '/contact.html',  priority: '0.6', changefreq: 'monthly' },
+    { loc: '/visit',         priority: '0.8', changefreq: 'monthly' },
+    { loc: '/about',         priority: '0.8', changefreq: 'monthly' },
+    { loc: '/pelayanan',     priority: '0.9', changefreq: 'weekly' },
+    { loc: '/media',         priority: '0.7', changefreq: 'weekly' },
+    { loc: '/renungan',      priority: '0.9', changefreq: 'daily' },
+    { loc: '/contact',       priority: '0.6', changefreq: 'monthly' },
   ];
 
   // Dynamic komsek pages

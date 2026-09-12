@@ -11,14 +11,14 @@
 
   <meta name="description" content="Profil, sejarah, visi misi, dan pemimpin <%= general.churchName %>.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/about.html">
+  <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/about">
   <title>Tentang Gereja â€” <%= general.churchName %></title>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Tentang Gereja â€” <%= general.churchName %>">
   <meta property="og:description" content="Profil, sejarah, visi misi, dan pemimpin <%= general.churchName %>.">
-  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/about.html">
+  <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/about">
   <meta property="og:image" content="<%= general.siteUrl || 'https://aminhermon.org' %>/<%= about.hero.bgImage %>">
   <meta property="og:site_name" content="<%= general.churchName %>">
   <meta property="og:locale" content="id_ID">
@@ -36,7 +36,7 @@
     "@type": "AboutPage",
     "name": "Tentang <%= general.churchName %>",
     "description": "<%= about.sejarah.content.split('\\n')[0] %>",
-    "url": "<%= general.siteUrl || 'https://aminhermon.org' %>/about.html",
+    "url": "<%= general.siteUrl || 'https://aminhermon.org' %>/about",
     "mainEntity": {
       "@type": "Church",
       "name": "<%= general.churchName %>",
@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="stylesheet" href="css/style.min.css?v=25">
+  <link rel="stylesheet" href="/css/style.min.css?v=25">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -310,7 +310,7 @@
   </script>
 
   <%- include('partials/footer') %>
-  <script src="js/main.min.js?v=10" defer></script>
+  <script src="/js/main.min.js?v=10" defer></script>
 </body>
 </html>
 
