@@ -72,18 +72,129 @@
     </div>
   </section>
 
-  <!-- ========== SEJARAH ========== -->
-  <section class="section" id="sejarah">
+  <!-- ========== SEJARAH (HERITAGE & JOURNEY) ========== -->
+  <section class="section-sejarah" id="sejarah">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
-        <h2><%= about.sejarah.title %></h2>
+        <span class="sejarah-tag">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Perjalanan Iman & Kasih
+        </span>
+        <h2><%= about.sejarah.title || 'Sejarah Gereja' %></h2>
         <span class="gold-line"></span>
+        <p style="color: rgba(255,255,255,0.7); max-width: 680px; margin: 0.8rem auto 0; font-size: 1.05rem;">Melihat jejak anugerah Tuhan yang menuntun langkah kami dari sebuah persekutuan sederhana hingga menjadi rumah bagi setiap jiwa.</p>
       </div>
-      <div class="" data-aos="fade-up" style="max-width: 800px; margin: 0 auto;">
-        <% about.sejarah.content.split('\n\n').forEach(function(p) { %>
-          <p style="font-size: 1.05rem; line-height: 1.9; color: var(--text-light); text-align: center; margin-bottom: 1rem;"><%= p %></p>
-        <% }); %>
+
+      <!-- Story Grid: Primary Narrative & Visual Card -->
+      <div class="sejarah-story-grid">
+        <!-- Left: Storytelling Card -->
+        <div class="sejarah-story-card" data-aos="fade-right">
+          <h3>Dari Sebuah Kerinduan Kecil Menjadi Berkat bagi Kota</h3>
+          <% about.sejarah.content.split('\n\n').forEach(function(p) { %>
+            <p class="sejarah-story-para"><%= p %></p>
+          <% }); %>
+
+          <div class="sejarah-verse-box">
+            <blockquote>"Bukan karena kuat dan bukan karena gagah, melainkan oleh Roh-Ku, firman TUHAN semesta alam."</blockquote>
+            <cite>Zakharia 4:6</cite>
+          </div>
+        </div>
+
+        <!-- Right: Visual Heritage Showcase -->
+        <div class="sejarah-visual" data-aos="fade-left">
+          <img src="/assets/images/church-interior.png" alt="<%= general.churchName %>" class="sejarah-visual-img" onerror="this.onerror=null; this.src='/assets/images/church-hero.png';">
+          <div class="sejarah-visual-overlay"></div>
+          
+          <div class="sejarah-floating-badge">
+            <div class="sejarah-stat-item">
+              <div class="sejarah-stat-num">13+</div>
+              <div class="sejarah-stat-label">Wadah KomSek</div>
+            </div>
+            <div class="sejarah-stat-sep"></div>
+            <div class="sejarah-stat-item">
+              <div class="sejarah-stat-num">100%</div>
+              <div class="sejarah-stat-label">Bagi Kristus</div>
+            </div>
+            <div class="sejarah-stat-sep"></div>
+            <div class="sejarah-stat-item">
+              <div class="sejarah-stat-num">Kasih</div>
+              <div class="sejarah-stat-label">Semua Jiwa</div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Timeline: Jejak Langkah Pelayanan -->
+      <div class="sejarah-timeline">
+        <div class="sejarah-timeline-header" data-aos="fade-up">
+          <span class="sejarah-tag" style="margin-bottom: 0.8rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Tonggak Sejarah
+          </span>
+          <h3>Jejak Langkah Anugerah Tuhan</h3>
+          <p>Bagaimana Tuhan merajut setiap babak pertumbuhan jemaat kami dalam kasih, doa, dan kesetiaan.</p>
+        </div>
+
+        <div class="sejarah-timeline-grid">
+          <!-- Milestone 1 -->
+          <div class="sejarah-milestone-card" data-aos="fade-up" data-aos-delay="50">
+            <div class="sejarah-milestone-icon">🌱</div>
+            <span class="sejarah-milestone-tag">Awal Mula</span>
+            <h4 class="sejarah-milestone-heading">Benih Doa & Persekutuan</h4>
+            <p class="sejarah-milestone-desc">Berawal dari persekutuan doa keluarga sederhana yang rindu berakar dalam kebenaran Firman dan saling melayani dalam ketulusan kasih.</p>
+          </div>
+
+          <!-- Milestone 2 -->
+          <div class="sejarah-milestone-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="sejarah-milestone-icon">👥</div>
+            <span class="sejarah-milestone-tag">Pertumbuhan</span>
+            <h4 class="sejarah-milestone-heading">Wadah Komisi & Sektor</h4>
+            <p class="sejarah-milestone-desc">Tuhan melipatgandakan jemaat sehingga dibentuk Komisi Kategorial (Anak, Pemuda, Perempuan, Bapak) serta pemekaran sektor pelayanan wilayah.</p>
+          </div>
+
+          <!-- Milestone 3 -->
+          <div class="sejarah-milestone-card" data-aos="fade-up" data-aos-delay="150">
+            <div class="sejarah-milestone-icon">⛪</div>
+            <span class="sejarah-milestone-tag">Penetapan</span>
+            <h4 class="sejarah-milestone-heading">Gedung Ibadah di Bekasi</h4>
+            <p class="sejarah-milestone-desc">Berdirinya rumah peribadahan di Jatimelati, Pondok Melati, Bekasi sebagai altar penyembahan bersama dan pusat pelayanan kasih bagi masyarakat.</p>
+          </div>
+
+          <!-- Milestone 4 -->
+          <div class="sejarah-milestone-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="sejarah-milestone-icon">🕊️</div>
+            <span class="sejarah-milestone-tag">Masa Depan</span>
+            <h4 class="sejarah-milestone-heading">Terus Berdampak bagi Jiwa</h4>
+            <p class="sejarah-milestone-desc">Terus melangkah dengan visi inklusif, relevan dengan generasi muda, serta menjadi saluran berkat dan harapan bagi kota dan bangsa.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heritage Pillars: Nilai yang Diwarisi -->
+      <div class="sejarah-pillars" data-aos="fade-up" data-aos-delay="100">
+        <div class="sejarah-pillar-card">
+          <div class="sejarah-pillar-icon">📖</div>
+          <div class="sejarah-pillar-text">
+            <h4>Alkitabiah & Berpusat pada Kristus</h4>
+            <p>Setiap pengajaran dan ibadah berakar teguh pada Firman Allah yang hidup dan berkuasa mengubahkan.</p>
+          </div>
+        </div>
+        <div class="sejarah-pillar-card">
+          <div class="sejarah-pillar-icon">🤝</div>
+          <div class="sejarah-pillar-text">
+            <h4>Keluarga yang Menyambut Siapa Saja</h4>
+            <p>Bukan sekadar institusi, tetapi rumah dan persekutuan hangat di mana setiap orang diterima apa adanya.</p>
+          </div>
+        </div>
+        <div class="sejarah-pillar-card">
+          <div class="sejarah-pillar-icon">✨</div>
+          <div class="sejarah-pillar-text">
+            <h4>Garam & Terang bagi Masyarakat</h4>
+            <p>Menghadirkan kasih nyata Kristus lewat aksi kepedulian sosial, doa, dan pelayanan bagi sesama.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
