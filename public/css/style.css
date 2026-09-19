@@ -2531,7 +2531,15 @@ p {
   }
 
   .leader-card--featured .leader-card__img {
-    min-height: 280px;
+    aspect-ratio: auto;
+    min-height: auto;
+  }
+
+  .leader-card--featured .leader-card__img img {
+    object-fit: contain;
+    object-position: center;
+    width: 100%;
+    height: auto;
   }
 
   .leader-card--sm .leader-card__img {
