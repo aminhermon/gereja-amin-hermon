@@ -56,7 +56,7 @@
     $('#rvFeaturedExcerpt').textContent = item.kutipan || (item.isi || '').substring(0, 160) + '...';
 
     const authorEl = $('#rvFeaturedAuthor');
-    if (item.penulis) { authorEl.textContent = '✍️ ' + item.penulis; authorEl.style.display = ''; }
+    if (item.penulis) { authorEl.textContent = '\u270D\uFE0F ' + item.penulis; authorEl.style.display = ''; }
     else { authorEl.style.display = 'none'; }
 
     // Audio state
@@ -106,7 +106,7 @@
         <h3 class="rv-card__title">${r.judul}</h3>
         <span class="rv-card__verse">${r.ayat}</span>
         <p class="rv-card__excerpt">${(r.kutipan || r.isi || '').substring(0, 100)}...</p>
-        ${r.audioUrl ? '<span class="rv-card__audio-badge">🎧 Audio</span>' : ''}
+        ${r.audioUrl ? '<span class="rv-card__audio-badge">\uD83C\uDFA7 Audio</span>' : ''}
         <span class="rv-card__read">Baca →</span>
       </div>
     `).join('');
@@ -228,7 +228,7 @@
     $('#rvModalAuthor').textContent = item.penulis || 'Anonim';
     $('#rvModalCategory').textContent = item.kategori || '';
     $('#rvModalCategory').style.display = item.kategori ? '' : 'none';
-    $('#rvModalVerseRef').textContent = '📖 ' + item.ayat;
+    $('#rvModalVerseRef').textContent = '\uD83D\uDCD6 ' + item.ayat;
     $('#rvModalVerseText').textContent = item.ayatLengkap || '';
     $('#rvModalVerseText').style.display = item.ayatLengkap ? '' : 'none';
     $('#rvModalBody').innerHTML = '<p>' + (item.isi || '').replace(/\n/g, '</p><p>') + '</p>';
@@ -421,7 +421,7 @@
 
     // WhatsApp share
     const shareWA = (item) => {
-      const msg = encodeURIComponent(`🙏 Renungan Harian ${CHURCH}\n\n*${item.judul}*\n\n📖 ${item.ayat}\n"${item.ayatLengkap || item.kutipan || ''}"\n\nBaca selengkapnya:\n${SITE}/renungan.html`);
+      const msg = encodeURIComponent(`\uD83D\uDE4F Renungan Harian ${CHURCH}\n\n*${item.judul}*\n\n\uD83D\uDCD6 ${item.ayat}\n"${item.ayatLengkap || item.kutipan || ''}"\n\nBaca selengkapnya:\n${SITE}/renungan.html`);
       window.open('https://wa.me/?text=' + msg, '_blank');
     };
 

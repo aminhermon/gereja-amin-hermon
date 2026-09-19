@@ -1431,11 +1431,14 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
+  aspect-ratio: 3 / 4;
 }
 
 .leader-card__img img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
   display: block;
   transition: transform var(--transition-slow);
 }
@@ -1459,6 +1462,53 @@ p {
   font-size: 0.85rem;
   color: var(--navy);
   font-weight: 600;
+}
+
+/* Featured leader card (Pendeta) — larger, full photo */
+.leader-card--featured .leader-card__img {
+  aspect-ratio: 3 / 4;
+  min-height: 320px;
+}
+
+.leader-card--featured .leader-card__img img {
+  object-fit: cover;
+  object-position: top center;
+}
+
+.leader-card--featured .leader-card__info h4 {
+  font-size: 1.2rem;
+}
+
+/* Small leader card (Pengurus Harian) */
+.leader-card--sm .leader-card__img {
+  aspect-ratio: 1 / 1;
+  max-height: 220px;
+}
+
+/* 2-column grid for Pendeta */
+.leaders-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Pengurus row layouts */
+.pengurus-row {
+  display: grid;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.pengurus-row--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pengurus-row--2 {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* =========================================
@@ -2270,6 +2320,10 @@ p {
   .sermon-list {
     grid-template-columns: 1fr;
   }
+
+  .pengurus-row--3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -2461,6 +2515,27 @@ p {
     grid-template-columns: 1fr;
     max-width: 350px;
     margin: 0 auto;
+  }
+
+  .leaders-grid--2 {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+  }
+
+  .pengurus-row--3,
+  .pengurus-row--2 {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .leader-card--featured .leader-card__img {
+    min-height: 280px;
+  }
+
+  .leader-card--sm .leader-card__img {
+    max-height: 200px;
   }
 
   /* Hero */
