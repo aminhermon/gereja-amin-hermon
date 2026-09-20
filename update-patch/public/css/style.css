@@ -2531,15 +2531,7 @@ p {
   }
 
   .leader-card--featured .leader-card__img {
-    aspect-ratio: auto;
-    min-height: auto;
-  }
-
-  .leader-card--featured .leader-card__img img {
-    object-fit: contain;
-    object-position: center;
-    width: 100%;
-    height: auto;
+    min-height: 280px;
   }
 
   .leader-card--sm .leader-card__img {
@@ -4405,6 +4397,7 @@ p {
 
 .leader-card--featured .leader-card__img {
   min-height: 200px;
+  max-height: 320px;
 }
 
 .leader-card--compact {
@@ -5191,15 +5184,14 @@ p {
 
 .leader-card--featured .leader-card__img {
   min-height: 200px;
+  max-height: 320px;
   overflow: hidden;
   background: linear-gradient(135deg, #0a1628, #162d50);
 }
 
 .leader-card--featured .leader-card__img img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  height: auto;
   display: block;
 }
 
