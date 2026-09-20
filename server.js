@@ -112,11 +112,81 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.json({ limit: '1mb' }));
 
-// ==================== IMAGE OPTIMIZATION (DISABLED) ====================
-// Sharp on-the-fly conversion was causing ALL image requests to hang on mobile
-// browsers that send Accept: image/webp headers. The sharp().toBuffer() call
-// blocks indefinitely on large images (1MB+), preventing ANY images from loading.
-// Images are now served directly through Express static middleware below.
+// Helper middleware: Safe image URL formatter for EJS views
+// Normalizes URLs, removes double slashes (preventing // protocol-relative bugs), and provides elegant fallbacks
+app.use((req, res, next) => {
+  res.locals.imgUrl = function(url, fallback = '/assets/images/church-interior.png') {
+    if (!url || typeof url !== 'string' || url.trim() === '') return fallback;
+    const clean = url.trim();
+    if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
+    return '/' + clean.replace(/^\/+/, '');
+  };
+  next();
+});
+
+// ==================== ROCK-SOLID CMS PERSISTENCE (DB & UPLOADS) ====================
+// CRITICAL ARCHITECTURE: Store database & uploaded files OUTSIDE the Git project directory.
+// When Hostinger does a Git auto-deploy, it wipes/replaces the entire project folder.
+// Files in .gitignore are NOT preserved — they simply don't exist in the repo.
+// By storing the master DB and uploaded media in ~/persistent-data/, Git deploys can NEVER touch them.
+
+const os = require('os');
+const isProduction = process.env.NODE_ENV === 'production' || !process.env.NODE_ENV;
+const isWindows = os.platform() === 'win32';
+
+// On Linux/Hostinger: ~/persistent-data/gereja-amin-hermon/
+// On Windows dev: ./data/ (for convenience)
+const PERSISTENT_DIR = isWindows
+  ? path.join(__dirname, 'data')
+  : path.join(os.homedir(), 'persistent-data', 'gereja-amin-hermon');
+
+// Persistent Uploads Directory (survives all Git auto-deploys on Hostinger)
+const PERSISTENT_UPLOADS_DIR = isWindows
+  ? path.join(__dirname, 'uploads')
+  : path.join(PERSISTENT_DIR, 'uploads');
+
+// Ensure persistent directories exist
+if (!fs.existsSync(PERSISTENT_DIR)) {
+  fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
+  console.log(`📁 Created persistent data directory: ${PERSISTENT_DIR}`);
+}
+if (!fs.existsSync(PERSISTENT_UPLOADS_DIR)) {
+  fs.mkdirSync(PERSISTENT_UPLOADS_DIR, { recursive: true });
+  console.log(`📁 Created persistent uploads directory: ${PERSISTENT_UPLOADS_DIR}`);
+}
+
+// Auto-sync: copy git-bundled uploads to persistent directory so all photos are available
+const repoUploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(repoUploadsDir)) {
+  fs.mkdirSync(repoUploadsDir, { recursive: true });
+}
+if (fs.existsSync(repoUploadsDir) && repoUploadsDir !== PERSISTENT_UPLOADS_DIR) {
+  try {
+    const bundledFiles = fs.readdirSync(repoUploadsDir);
+    let synced = 0;
+    for (const f of bundledFiles) {
+      if (f === '.gitkeep') continue;
+      const srcFile = path.join(repoUploadsDir, f);
+      const destFile = path.join(PERSISTENT_UPLOADS_DIR, f);
+      if (!fs.existsSync(destFile)) {
+        try {
+          fs.copyFileSync(srcFile, destFile);
+          synced++;
+        } catch (e) {}
+      }
+    }
+    if (synced > 0) {
+      console.log(`✅ Synced ${synced} photos from repo to persistent uploads`);
+    }
+  } catch (err) {
+    console.warn('⚠️ Error during uploads sync:', err.message);
+  }
+}
+
+// Database file paths (stored OUTSIDE git project on production)
+const externalDbPath = path.join(PERSISTENT_DIR, 'db.json');
+const externalBackupPath = path.join(PERSISTENT_DIR, 'db.backup.json');
+const externalSnapshotsDir = path.join(PERSISTENT_DIR, 'snapshots');
 
 // Static files with browser caching
 app.use(express.static(path.join(__dirname, 'public'), {
@@ -129,16 +199,21 @@ app.use(express.static(path.join(__dirname, 'public'), {
     }
   }
 }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+
+// Uploads Static Serving: First from persistent storage, then fallback to repo uploads
+app.use('/uploads', express.static(PERSISTENT_UPLOADS_DIR, {
   maxAge: '30d',
   setHeaders: (res) => {
     res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
   }
 }));
-
-// Ensure uploads dir exists
-if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
-  fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
+if (repoUploadsDir !== PERSISTENT_UPLOADS_DIR) {
+  app.use('/uploads', express.static(repoUploadsDir, {
+    maxAge: '30d',
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    }
+  }));
 }
 
 // Multer storage with file validation
@@ -150,11 +225,10 @@ const ALLOWED_MIME_TYPES = [
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) {}
+    if (!fs.existsSync(PERSISTENT_UPLOADS_DIR)) {
+      try { fs.mkdirSync(PERSISTENT_UPLOADS_DIR, { recursive: true }); } catch (e) {}
     }
-    cb(null, uploadDir);
+    cb(null, PERSISTENT_UPLOADS_DIR);
   },
   filename: (req, file, cb) => {
     // Sanitize original filename to prevent path injection
@@ -178,35 +252,6 @@ const upload = multer({
     }
   }
 });
-
-// ==================== ROCK-SOLID CMS DATABASE PERSISTENCE ====================
-// CRITICAL FIX: Store database OUTSIDE the Git project directory.
-// When Hostinger does a Git auto-deploy, it wipes/replaces the entire project folder.
-// Files in .gitignore are NOT preserved — they simply don't exist in the repo.
-// By storing the master DB in ~/persistent-data/, Git deploys can NEVER touch it.
-
-const os = require('os');
-
-// Determine the persistent storage directory OUTSIDE the git project
-const isProduction = process.env.NODE_ENV === 'production' || !process.env.NODE_ENV;
-const isWindows = os.platform() === 'win32';
-
-// On Linux/Hostinger: ~/persistent-data/gereja-amin-hermon/
-// On Windows dev: ./data/ (for convenience)
-const PERSISTENT_DIR = isWindows
-  ? path.join(__dirname, 'data')
-  : path.join(os.homedir(), 'persistent-data', 'gereja-amin-hermon');
-
-// Ensure the persistent directory exists
-if (!fs.existsSync(PERSISTENT_DIR)) {
-  fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
-  console.log(`📁 Created persistent data directory: ${PERSISTENT_DIR}`);
-}
-
-// Database file paths (stored OUTSIDE git project on production)
-const externalDbPath = path.join(PERSISTENT_DIR, 'db.json');
-const externalBackupPath = path.join(PERSISTENT_DIR, 'db.backup.json');
-const externalSnapshotsDir = path.join(PERSISTENT_DIR, 'snapshots');
 
 // Legacy paths inside the project (for migration only)
 const legacyDbPath = path.join(__dirname, 'data', 'db.json');
@@ -857,19 +902,30 @@ function deleteUploadedFile(filePath) {
     const filename = path.basename(filePath);
     if (!filename || filename === '.' || filename === '..') return false;
 
-    const fullPath = path.join(__dirname, 'uploads', filename);
     let deleted = false;
-    if (fs.existsSync(fullPath)) {
+    // 1. Check in PERSISTENT_UPLOADS_DIR
+    const persistentPath = path.join(PERSISTENT_UPLOADS_DIR, filename);
+    if (fs.existsSync(persistentPath)) {
       try {
-        fs.unlinkSync(fullPath);
+        fs.unlinkSync(persistentPath);
         deleted = true;
-        console.log('✅ File berhasil dihapus:', fullPath);
+        console.log('✅ File dihapus dari persistent uploads:', persistentPath);
       } catch (e) {
-        console.error('❌ Gagal unlink file:', fullPath, e.message);
+        console.error('❌ Gagal unlink file persistent:', persistentPath, e.message);
       }
     }
 
-    // Also remove any optimized versions in .cache directory
+    // 2. Also check in repo uploads directory if different
+    const repoPath = path.join(__dirname, 'uploads', filename);
+    if (fs.existsSync(repoPath) && repoPath !== persistentPath) {
+      try {
+        fs.unlinkSync(repoPath);
+        deleted = true;
+        console.log('✅ File dihapus dari repo uploads:', repoPath);
+      } catch (e) {}
+    }
+
+    // 3. Remove any cached versions in .cache directory
     const cacheDir = path.join(__dirname, '.cache');
     if (fs.existsSync(cacheDir)) {
       try {
@@ -1015,33 +1071,49 @@ function cleanDbFileReferences(filePath) {
 
 // Helper: Get list of all uploaded files in uploads/ directory
 function getUploadedFiles() {
-  const uploadsDir = path.join(__dirname, 'uploads');
-  if (!fs.existsSync(uploadsDir)) return [];
-  try {
-    const files = fs.readdirSync(uploadsDir);
-    return files.map(file => {
-      const fullPath = path.join(uploadsDir, file);
-      const stat = fs.statSync(fullPath);
-      const isImg = /\.(jpg|jpeg|png|gif|webp|svg|avif)$/i.test(file);
-      const isPdf = /\.pdf$/i.test(file);
-      const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(file);
-      return {
-        name: file,
-        path: 'uploads/' + file,
-        size: stat.size,
-        sizeFormatted: stat.size >= 1024 * 1024 
-          ? (stat.size / (1024 * 1024)).toFixed(2) + ' MB'
-          : (stat.size / 1024).toFixed(1) + ' KB',
-        isImage: isImg,
-        isPdf: isPdf,
-        isVideo: isVideo,
-        createdAt: stat.birthtime || stat.mtime
-      };
-    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  } catch (err) {
-    console.error('Error reading uploads folder:', err.message);
-    return [];
+  const seenFiles = new Set();
+  const results = [];
+
+  const scanDir = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    try {
+      const files = fs.readdirSync(dir);
+      for (const file of files) {
+        if (file === '.gitkeep' || seenFiles.has(file)) continue;
+        const fullPath = path.join(dir, file);
+        try {
+          const stat = fs.statSync(fullPath);
+          if (!stat.isFile()) continue;
+          seenFiles.add(file);
+          const isImg = /\.(jpg|jpeg|png|gif|webp|svg|avif)$/i.test(file);
+          const isPdf = /\.pdf$/i.test(file);
+          const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(file);
+          results.push({
+            name: file,
+            path: 'uploads/' + file,
+            size: stat.size,
+            sizeFormatted: stat.size >= 1024 * 1024 
+              ? (stat.size / (1024 * 1024)).toFixed(2) + ' MB'
+              : (stat.size / 1024).toFixed(1) + ' KB',
+            isImage: isImg,
+            isPdf: isPdf,
+            isVideo: isVideo,
+            createdAt: stat.birthtime || stat.mtime
+          });
+        } catch (e) {}
+      }
+    } catch (err) {
+      console.error('Error reading uploads folder:', dir, err.message);
+    }
+  };
+
+  // Scan persistent directory first, then fallback to repo directory
+  scanDir(PERSISTENT_UPLOADS_DIR);
+  if (path.join(__dirname, 'uploads') !== PERSISTENT_UPLOADS_DIR) {
+    scanDir(path.join(__dirname, 'uploads'));
   }
+
+  return results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
 // ---------- Admin Dashboard (tabbed) ----------
@@ -1169,17 +1241,27 @@ app.post('/admin/delete-file/hero/home', requireAuth, (req, res) => {
   res.redirect('/admin?tab=beranda');
 });
 
-// Delete / reset home hero video to default
+// Disable / remove home hero video (so hero image banner displays on all devices)
 app.post('/admin/delete-file/hero/video', requireAuth, (req, res) => {
   const db = getDB();
-  if (db.home && db.home.hero && db.home.hero.bgVideo) {
-    if (db.home.hero.bgVideo.startsWith('uploads/')) {
+  if (db.home && db.home.hero) {
+    if (db.home.hero.bgVideo && db.home.hero.bgVideo.startsWith('uploads/')) {
       deleteUploadedFile(db.home.hero.bgVideo);
     }
+    db.home.hero.bgVideo = '';
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Video latar dinonaktifkan. Gambar hero banner kini tampil penuh di semua perangkat.'));
+});
+
+// Restore default home hero video
+app.post('/admin/reset-default/hero/video', requireAuth, (req, res) => {
+  const db = getDB();
+  if (db.home && db.home.hero) {
     db.home.hero.bgVideo = 'assets/videos/hero-video.mp4';
     saveDB(db);
   }
-  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Video hero berhasil direset ke video default.'));
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Video latar default berhasil diaktifkan kembali.'));
 });
 
 // Home stats

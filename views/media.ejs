@@ -48,7 +48,7 @@
   <%- include('partials/navbar') %>
   <!-- ========== HERO ========== -->
   <section class="hero hero--sub" id="hero-media">
-    <div class="hero__bg"><img src="<%= mediaGaleri.hero.bgImage.startsWith('/') ? mediaGaleri.hero.bgImage : '/' + mediaGaleri.hero.bgImage %>" alt="Galeri Media" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';"></div>
+    <div class="hero__bg"><img src="<%= imgUrl(mediaGaleri.hero.bgImage, '/assets/images/church-interior.png') %>" alt="Galeri Media" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';"></div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <div class="hero__eyebrow">Dokumentasi</div>
@@ -135,7 +135,7 @@
       <div class="gallery-grid" data-aos="fade-up">
         <% mediaGaleri.photos.forEach(function(photo, idx) { %>
         <div class="gallery-item" data-idx="<%= idx %>">
-          <img src="/<%= photo.src %>" alt="<%= photo.caption %>" loading="lazy" width="400" height="300" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';">
+          <img src="<%= imgUrl(photo.src, '/assets/images/church-interior.png') %>" alt="<%= photo.caption %>" loading="lazy" width="400" height="300" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';">
           <div class="gallery-item__overlay">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
             <span><%= photo.caption %></span>
@@ -171,7 +171,7 @@
             <span><%= w.tanggal %></span>
           </div>
           <% if (w.file) { %>
-          <a href="/<%= w.file %>" target="_blank" class="btn btn--gold btn--sm" download>
+          <a href="<%= imgUrl(w.file) %>" target="_blank" class="btn btn--gold btn--sm" download>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Unduh PDF
           </a>

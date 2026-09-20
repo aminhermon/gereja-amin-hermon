@@ -63,7 +63,7 @@
   <%- include('partials/navbar') %>
   <!-- ========== HERO ========== -->
   <section class="hero hero--sub" id="hero-about">
-    <div class="hero__bg"><img src="<%= about.hero.bgImage.startsWith('/') ? about.hero.bgImage : '/' + about.hero.bgImage %>" alt="Tentang Gereja" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';"></div>
+    <div class="hero__bg"><img src="<%= imgUrl(about.hero.bgImage, '/assets/images/church-interior.png') %>" alt="Tentang Gereja" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';"></div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <div class="hero__eyebrow">Tentang Gereja</div>
@@ -145,12 +145,12 @@
       <div class="leaders-grid leaders-grid--2" data-aos="fade-up">
         <% about.pemimpin.pendeta.forEach(function(p) { %>
         <div class="leader-card leader-card--featured leader-card--clickable"
-             data-img="<%= p.image || '' %>"
+             data-img="<%= p.image ? imgUrl(p.image) : '' %>"
              data-name="<%= p.name %>"
              data-role="<%= p.role %>">
           <div class="leader-card__img">
             <% if (p.image) { %>
-              <img src="/<%= p.image %>" alt="<%= p.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
+              <img src="<%= imgUrl(p.image) %>" alt="<%= p.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -169,12 +169,12 @@
       <div class="pengurus-row pengurus-row--3" data-aos="fade-up">
         <% about.pemimpin.pengurus.slice(0, 3).forEach(function(pg) { %>
         <div class="leader-card leader-card--sm leader-card--clickable"
-             data-img="<%= pg.image ? '/' + pg.image : '' %>"
+             data-img="<%= pg.image ? imgUrl(pg.image) : '' %>"
              data-name="<%= pg.name %>"
              data-role="<%= pg.role %>">
           <div class="leader-card__img">
             <% if (pg.image) { %>
-              <img src="/<%= pg.image %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
+              <img src="<%= imgUrl(pg.image) %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -191,12 +191,12 @@
       <div class="pengurus-row pengurus-row--2" data-aos="fade-up">
         <% about.pemimpin.pengurus.slice(3, 5).forEach(function(pg) { %>
         <div class="leader-card leader-card--sm leader-card--clickable"
-             data-img="<%= pg.image ? '/' + pg.image : '' %>"
+             data-img="<%= pg.image ? imgUrl(pg.image) : '' %>"
              data-name="<%= pg.name %>"
              data-role="<%= pg.role %>">
           <div class="leader-card__img">
             <% if (pg.image) { %>
-              <img src="/<%= pg.image %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
+              <img src="<%= imgUrl(pg.image) %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -213,12 +213,12 @@
       <div class="pengurus-row pengurus-row--2" data-aos="fade-up">
         <% about.pemimpin.pengurus.slice(5, 7).forEach(function(pg) { %>
         <div class="leader-card leader-card--sm leader-card--clickable"
-             data-img="<%= pg.image ? '/' + pg.image : '' %>"
+             data-img="<%= pg.image ? imgUrl(pg.image) : '' %>"
              data-name="<%= pg.name %>"
              data-role="<%= pg.role %>">
           <div class="leader-card__img">
             <% if (pg.image) { %>
-              <img src="/<%= pg.image %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
+              <img src="<%= imgUrl(pg.image) %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>
@@ -236,12 +236,12 @@
       <div class="majelis-photo-grid" data-aos="fade-up">
         <% about.pemimpin.majelis.forEach(function(m, i) { %>
         <div class="leader-card leader-card--sm leader-card--clickable"
-             data-img="<%= m.image ? '/' + m.image : '' %>"
+             data-img="<%= m.image ? imgUrl(m.image) : '' %>"
              data-name="<%= m.name %>"
              data-role="<%= m.role || 'Majelis' %>">
           <div class="leader-card__img">
             <% if (m.image) { %>
-              <img src="/<%= m.image %>" alt="<%= m.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
+              <img src="<%= imgUrl(m.image) %>" alt="<%= m.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <% } %>

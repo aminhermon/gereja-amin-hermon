@@ -114,15 +114,16 @@
   <!-- ========== HERO SECTION (Full Screen) ========== -->
   <section class="hero hero--full" id="hero">
     <div class="hero__bg">
-      <% if (home.hero.bgVideo) { %>
+      <% if (home.hero.bgVideo && home.hero.bgVideo.trim() !== '') { %>
         <!-- Video: hidden on mobile via CSS class .hero-video-desktop, shown only on larger screens -->
-        <video autoplay muted loop playsinline poster="/<%= home.hero.bgImage %>" id="hero-video" class="hero-video-desktop">
-          <source src="/<%= home.hero.bgVideo %>" type="<%= home.hero.bgVideo.endsWith('.webm') ? 'video/webm' : 'video/mp4' %>">
+        <video autoplay muted loop playsinline poster="<%= imgUrl(home.hero.bgImage, '/assets/images/church-hero-new.jpg') %>" id="hero-video" class="hero-video-desktop" onerror="this.style.display='none'; const fb = document.querySelector('.hero-img-fallback'); if(fb) fb.style.display='block';">
+          <source src="<%= imgUrl(home.hero.bgVideo) %>" type="<%= home.hero.bgVideo.endsWith('.webm') ? 'video/webm' : 'video/mp4' %>">
         </video>
-        <!-- Fallback image: always present, shown on mobile where video is hidden -->
-        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" class="hero-img-fallback" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-hero-new.jpg';">
+        <!-- Fallback image: always present, shown on mobile where video is hidden or when video fails to load -->
+        <img src="<%= imgUrl(home.hero.bgImage, '/assets/images/church-hero-new.jpg') %>" alt="<%= general.churchName %>" loading="eager" class="hero-img-fallback" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-hero-new.jpg';">
       <% } else { %>
-        <img src="/<%= home.hero.bgImage %>" alt="<%= general.churchName %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-hero-new.jpg';">
+        <!-- Image Banner mode: shown full on both desktop and mobile -->
+        <img src="<%= imgUrl(home.hero.bgImage, '/assets/images/church-hero-new.jpg') %>" alt="<%= general.churchName %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-hero-new.jpg';">
       <% } %>
     </div>
     <div class="hero__overlay"></div>
@@ -166,7 +167,7 @@
     <div class="carousel__list">
       <% home.news.forEach(function(item, idx) { %>
       <div class="carousel__item" data-idx="<%= idx %>">
-        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/slider_ibadah.png';">
+        <img src="<%= imgUrl(item.image, '/assets/images/slider_ibadah.png') %>" alt="<%= item.title %>" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/slider_ibadah.png';">
         <div class="carousel__content">
           <span class="carousel__date"><%= item.date %></span>
           <div class="carousel__title"><%= item.title %></div>
@@ -186,7 +187,7 @@
     <div class="carousel__thumbs">
       <% home.news.forEach(function(item) { %>
       <div class="carousel__thumb">
-        <img src="/<%= item.image %>" alt="<%= item.title %>" loading="lazy" width="160" height="220" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/slider_ibadah.png';">
+        <img src="<%= imgUrl(item.image, '/assets/images/slider_ibadah.png') %>" alt="<%= item.title %>" loading="lazy" width="160" height="220" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/slider_ibadah.png';">
         <div class="carousel__thumb-label"><%= item.title %></div>
       </div>
       <% }); %>
@@ -366,7 +367,13 @@
     function openNewsDetail(idx) {
       const item = newsData[idx];
       if (!item) return;
-      document.getElementById('newsModalImg').src = '/' + item.image;
+      const rawImg = item.image ? (item.image.startsWith('/') ? item.image : '/' + item.image) : '/assets/images/slider_ibadah.png';
+      const modalImg = document.getElementById('newsModalImg');
+      modalImg.src = rawImg;
+      modalImg.onerror = function() {
+        this.onerror = null;
+        this.src = '/assets/images/slider_ibadah.png';
+      };
       document.getElementById('newsModalDate').textContent = item.date;
       document.getElementById('newsModalTitle').textContent = item.title;
       document.getElementById('newsModalDesc').textContent = item.desc;

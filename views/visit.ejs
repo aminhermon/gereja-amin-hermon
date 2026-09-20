@@ -37,7 +37,7 @@
   <%- include('partials/navbar') %>
   <!-- ========== HERO ========== -->
   <section class="hero hero--sub" id="hero-visit">
-    <div class="hero__bg"><img src="<%= visit.hero.bgImage %>" alt="Selamat Datang" loading="eager"></div>
+    <div class="hero__bg"><img src="<%= imgUrl(visit.hero.bgImage, '/assets/images/welcome-visitors.png') %>" alt="Selamat Datang" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/welcome-visitors.png';"></div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <div class="hero__eyebrow">Plan Your Visit</div>

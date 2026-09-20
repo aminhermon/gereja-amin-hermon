@@ -33,7 +33,7 @@
 
   <!-- ========== RENUNGAN HERO ========== -->
   <section class="hero hero--sub" id="hero-renungan">
-    <div class="hero__bg"><img src="<%= mediaGaleri.hero.bgImage %>" alt="Renungan Harian" loading="eager"></div>
+    <div class="hero__bg"><img src="<%= imgUrl(mediaGaleri.hero.bgImage, '/assets/images/church-interior.png') %>" alt="Renungan Harian" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';"></div>
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <div class="hero__eyebrow">Santapan Rohani</div>
