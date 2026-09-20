@@ -189,6 +189,39 @@
       <!-- ============================== TAB: BERANDA ============================== -->
       <div class="tab-content <%= tab === 'beranda' ? 'active' : '' %>">
 
+        <!-- Statistik Pengunjung (Real Visitor) -->
+        <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--gold);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1rem;">
+            <div>
+              <h2 class="card-title" style="margin-bottom:4px;">👥 Statistik Pengunjung (Real Visitor)</h2>
+              <span style="font-size:0.8rem; color:var(--text-muted);">Data pengunjung asli website yang mengakses secara real-time.</span>
+            </div>
+            <form action="/admin/visitors/reset" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin me-reset total pengunjung kembali ke 0? Data kunjungan akan mulai dihitung dari 0.');" style="margin:0;">
+              <button type="submit" class="btn btn--outline-danger btn--sm" style="display:flex; align-items:center; gap:6px;">
+                🔄 Reset Pengunjung ke 0
+              </button>
+            </form>
+          </div>
+          <div class="grid-2">
+            <div style="background:var(--bg); padding:1rem; border-radius:var(--radius); border:1px solid var(--border); display:flex; align-items:center; gap:15px;">
+              <div style="font-size:2rem;">🌐</div>
+              <div>
+                <div style="font-size:1.5rem; font-weight:700; color:var(--navy);"><%= (db._visitors && typeof db._visitors.total === 'number') ? db._visitors.total.toLocaleString('id-ID') : 0 %></div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Total Pengunjung Nyata</div>
+              </div>
+            </div>
+            <div style="background:var(--bg); padding:1rem; border-radius:var(--radius); border:1px solid var(--border); display:flex; align-items:center; gap:15px;">
+              <div style="font-size:2rem;">🕒</div>
+              <div>
+                <div style="font-size:0.95rem; font-weight:600; color:var(--navy);">
+                  <%= (db._visitors && db._visitors.resetAt) ? new Date(db._visitors.resetAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Baru di-reset' %>
+                </div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Waktu Reset Terakhir</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Pengaturan Umum -->
         <div class="card">
           <h2 class="card-title">⚙️ Pengaturan Umum</h2>

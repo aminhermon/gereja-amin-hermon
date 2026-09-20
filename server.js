@@ -436,53 +436,166 @@ function saveDB(data) {
 }
 
 // ==================== REAL-TIME VISITOR TRACKING ====================
-// In-memory active visitor tracking (session-based, auto-expires after 5 min)
+// Bot & Crawler patterns to exclude fake traffic, web crawlers, and automated scanners
+const BOT_USER_AGENTS = /bot|spider|crawl|slurp|facebookexternalhit|whatsapp|telegram|twitterbot|discordbot|applebot|bingbot|googlebot|yandex|baidu|semrush|ahrefs|uptime|petalbot|headless|phantomjs|puppeteer|wget|curl|python|axios|go-http-client|node-fetch|lighthouse|scanner|scan|nikto|sqlmap|masscan|zgrab/i;
+
+function isBotRequest(req) {
+  const ua = req.headers['user-agent'] || '';
+  if (!ua || ua.trim().length < 8) return true;
+  return BOT_USER_AGENTS.test(ua);
+}
+
+function getClientIp(req) {
+  return (
+    req.headers['cf-connecting-ip'] ||
+    (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : null) ||
+    req.headers['x-real-ip'] ||
+    req.socket?.remoteAddress ||
+    req.ip ||
+    '127.0.0.1'
+  );
+}
+
+function parseCookie(req, name) {
+  const header = req.headers.cookie;
+  if (!header) return null;
+  const match = header.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+// In-memory active visitors (online heartbeat): key -> timestamp
 global.__ACTIVE_VISITORS__ = global.__ACTIVE_VISITORS__ || new Map();
-const VISITOR_TTL = 5 * 60 * 1000; // 5 minutes
+const VISITOR_ONLINE_TTL = 3 * 60 * 1000; // 3 minutes without ping = offline
 
-// Middleware: track every unique session as an active visitor
-app.use((req, res, next) => {
-  // Skip static assets and API calls from counting
-  const skip = /\.(jpg|jpeg|png|gif|webp|svg|ico|pdf|mp4|webm|css|js|woff2?|map)$/i.test(req.path)
-    || req.path.startsWith('/api/');
-  if (!skip && req.session) {
-    const sid = req.sessionID || req.session.id || 'anon_' + (req.ip || 'unknown');
-    global.__ACTIVE_VISITORS__.set(sid, Date.now());
+// In-memory set of unique visitor hashes for current day (WIB UTC+7)
+global.__DAILY_VISITORS__ = global.__DAILY_VISITORS__ || { date: '', hashes: new Set() };
 
-    // Increment total visitor count (only once per session)
-    if (!req.session._counted) {
-      req.session._counted = true;
-      try {
-        const db = getDB();
-        if (!db._visitors) db._visitors = { total: 0 };
-        db._visitors.total = (db._visitors.total || 0) + 1;
-        saveDB(db);
-      } catch (e) { /* silent */ }
+// Debounced save for visitor counter to avoid thrashing disk
+let visitorSaveDebounceTimer = null;
+function scheduleVisitorSave() {
+  if (visitorSaveDebounceTimer) return;
+  visitorSaveDebounceTimer = setTimeout(() => {
+    visitorSaveDebounceTimer = null;
+    try {
+      const db = getDB();
+      saveDB(db);
+    } catch (e) {
+      console.warn('Gagal menyimpan counter pengunjung:', e.message);
     }
+  }, 3000);
+}
+
+// Ensure visitor counter reset to 0 as requested by church administrator
+const RESET_VISITOR_FLAG = '2026-09-20-reset-v1';
+try {
+  const currentDb = getDB();
+  if (!currentDb._visitors || currentDb._visitors.resetFlag !== RESET_VISITOR_FLAG) {
+    currentDb._visitors = {
+      total: 0,
+      resetFlag: RESET_VISITOR_FLAG,
+      resetAt: new Date().toISOString()
+    };
+    saveDB(currentDb);
+    global.__ACTIVE_VISITORS__.clear();
+    global.__DAILY_VISITORS__.hashes.clear();
+    console.log('🔄 Visitor counter berhasil di-reset ke 0 (Flag: ' + RESET_VISITOR_FLAG + ')');
   }
+} catch (e) {
+  console.warn('Inisialisasi visitor reset:', e.message);
+}
+
+// Middleware: track real unique human visitors visiting public HTML pages
+app.use((req, res, next) => {
+  // Only track GET requests for web pages
+  if (req.method !== 'GET') return next();
+
+  // Skip static assets, uploads, and APIs
+  const skip = /\.(jpg|jpeg|png|gif|webp|svg|ico|pdf|mp4|webm|css|js|woff2?|map|txt|xml|json)$/i.test(req.path)
+    || req.path.startsWith('/api/')
+    || req.path.startsWith('/admin')
+    || req.path.startsWith('/uploads/')
+    || req.path.startsWith('/assets/')
+    || req.path === '/favicon.ico'
+    || req.path === '/robots.txt'
+    || req.path === '/sitemap.xml';
+  if (skip) return next();
+
+  // Only count if client requests HTML (browser webpage navigation)
+  const acceptHeader = req.headers.accept || '';
+  if (!acceptHeader.includes('text/html')) return next();
+
+  // Filter out bots, crawlers, spiders, automated tools
+  if (isBotRequest(req)) return next();
+
+  // Current date in WIB (UTC+7)
+  const todayWIB = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+  if (global.__DAILY_VISITORS__.date !== todayWIB) {
+    global.__DAILY_VISITORS__.date = todayWIB;
+    global.__DAILY_VISITORS__.hashes.clear();
+  }
+
+  const clientIp = getClientIp(req);
+  const ua = req.headers['user-agent'] || '';
+  const visitorHash = crypto.createHash('sha256').update(clientIp + '|' + ua + '|' + todayWIB).digest('hex');
+
+  const cookieVisited = parseCookie(req, 'ah_uv_date');
+  const alreadyVisitedToday = cookieVisited === todayWIB || global.__DAILY_VISITORS__.hashes.has(visitorHash);
+
+  // Set / refresh cookie for this visitor (valid for 24 hours)
+  res.cookie('ah_uv_date', todayWIB, {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'Lax',
+    path: '/'
+  });
+
+  if (!alreadyVisitedToday) {
+    global.__DAILY_VISITORS__.hashes.add(visitorHash);
+    const db = getDB();
+    if (!db._visitors) db._visitors = { total: 0 };
+    db._visitors.total = (db._visitors.total || 0) + 1;
+    scheduleVisitorSave();
+    console.log(`👤 Pengunjung nyata baru tercatat! Total: ${db._visitors.total} (IP: ${clientIp.slice(0, 10)}...)`);
+  }
+
   next();
 });
 
-// Cleanup expired visitors every 60 seconds
+// Periodic cleanup of expired online visitors (every 60 seconds)
 setInterval(() => {
   const now = Date.now();
-  for (const [sid, ts] of global.__ACTIVE_VISITORS__) {
-    if (now - ts > VISITOR_TTL) {
-      global.__ACTIVE_VISITORS__.delete(sid);
+  for (const [key, ts] of global.__ACTIVE_VISITORS__) {
+    if (now - ts > VISITOR_ONLINE_TTL) {
+      global.__ACTIVE_VISITORS__.delete(key);
     }
   }
 }, 60 * 1000);
 
-// API endpoint: get real-time visitor stats
+// API endpoint: get real-time visitor stats & register online heartbeat from browser
 app.get('/api/visitors', (req, res) => {
-  // Clean expired before responding
   const now = Date.now();
-  for (const [sid, ts] of global.__ACTIVE_VISITORS__) {
-    if (now - ts > VISITOR_TTL) global.__ACTIVE_VISITORS__.delete(sid);
+
+  // Clean expired visitors
+  for (const [key, ts] of global.__ACTIVE_VISITORS__) {
+    if (now - ts > VISITOR_ONLINE_TTL) {
+      global.__ACTIVE_VISITORS__.delete(key);
+    }
   }
+
+  // Register heartbeat if not a bot
+  if (!isBotRequest(req)) {
+    const clientIp = getClientIp(req);
+    const ua = req.headers['user-agent'] || '';
+    const activeKey = crypto.createHash('sha256').update(clientIp + '|' + ua).digest('hex');
+    global.__ACTIVE_VISITORS__.set(activeKey, now);
+  }
+
   const db = getDB();
-  const total = (db._visitors && db._visitors.total) || 0;
-  res.json({ online: global.__ACTIVE_VISITORS__.size, total });
+  const total = (db._visitors && typeof db._visitors.total === 'number') ? db._visitors.total : 0;
+  res.json({
+    online: global.__ACTIVE_VISITORS__.size,
+    total: total
+  });
 });
 
 // ==================== NO-CACHE FOR DYNAMIC HTML ====================
@@ -967,6 +1080,25 @@ app.post('/admin/db/import', requireAuth, upload.single('dbFile'), (req, res) =>
     }
   }
   res.redirect('/admin');
+});
+
+// Reset Visitor Counter
+app.post('/admin/visitors/reset', requireAuth, (req, res) => {
+  try {
+    const db = getDB();
+    db._visitors = {
+      total: 0,
+      resetFlag: 'manual-' + Date.now(),
+      resetAt: new Date().toISOString()
+    };
+    saveDB(db);
+    global.__ACTIVE_VISITORS__.clear();
+    global.__DAILY_VISITORS__.hashes.clear();
+    console.log('🔄 Admin mereset counter pengunjung ke 0');
+    return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Statistik pengunjung berhasil di-reset kembali ke 0.'));
+  } catch (err) {
+    return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Gagal me-reset statistik pengunjung: ' + err.message));
+  }
 });
 
 // ===== TAB: BERANDA =====

@@ -419,14 +419,18 @@ function initGlobalLightbox() {
 function initVisitorCounter() {
   const onlineEl = document.getElementById('visitorOnline');
   const totalEl = document.getElementById('visitorTotal');
-  if (!onlineEl || !totalEl) return;
+  if (!onlineEl && !totalEl) return;
 
   function fetchVisitors() {
     fetch('/api/visitors')
       .then(r => r.json())
       .then(data => {
-        if (onlineEl) onlineEl.textContent = (data.online || 0).toLocaleString('id-ID');
-        if (totalEl) totalEl.textContent = (data.total || 0).toLocaleString('id-ID');
+        if (onlineEl && typeof data.online === 'number') {
+          onlineEl.textContent = data.online.toLocaleString('id-ID');
+        }
+        if (totalEl && typeof data.total === 'number') {
+          totalEl.textContent = data.total.toLocaleString('id-ID');
+        }
       })
       .catch(() => {});
   }
