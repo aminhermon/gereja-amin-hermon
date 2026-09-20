@@ -9,6 +9,7 @@ data/db.json
 data/db.backup.json
 data/db.persisted.json
 data/snapshots/
+data/visitors.json
 !data/db.seed.json
 
 # uploads/ is now tracked so Hostinger Git auto-deploy includes all photos

@@ -155,6 +155,63 @@ if (!fs.existsSync(PERSISTENT_UPLOADS_DIR)) {
   console.log(`📁 Created persistent uploads directory: ${PERSISTENT_UPLOADS_DIR}`);
 }
 
+// Persistent visitor storage (separate from db.json so hits don't touch cms db)
+const VISITOR_FILE = path.join(PERSISTENT_DIR, 'visitors.json');
+
+function getVisitorData() {
+  try {
+    if (fs.existsSync(VISITOR_FILE)) {
+      const raw = fs.readFileSync(VISITOR_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      if (data && typeof data.total === 'number') {
+        return data;
+      }
+    }
+  } catch (e) {
+    console.warn('⚠️ Gagal membaca visitors.json:', e.message);
+  }
+
+  // Fallback: migrate from legacy location if available
+  const legacyVisitorFile = path.join(__dirname, 'data', 'visitors.json');
+  if (fs.existsSync(legacyVisitorFile)) {
+    try {
+      const raw = fs.readFileSync(legacyVisitorFile, 'utf8');
+      const data = JSON.parse(raw);
+      if (data && typeof data.total === 'number') {
+        saveVisitorData(data);
+        return data;
+      }
+    } catch (e) {}
+  }
+
+  const initial = {
+    total: 0,
+    resetAt: new Date().toISOString()
+  };
+  saveVisitorData(initial);
+  return initial;
+}
+
+function saveVisitorData(data) {
+  if (!data || typeof data !== 'object') return false;
+  try {
+    if (!fs.existsSync(PERSISTENT_DIR)) {
+      fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
+    }
+    fs.writeFileSync(VISITOR_FILE, JSON.stringify(data, null, 2), 'utf8');
+    if (global.__CACHED_DB__) {
+      global.__CACHED_DB__._visitors = {
+        total: data.total,
+        resetAt: data.resetAt
+      };
+    }
+    return true;
+  } catch (err) {
+    console.error('❌ Gagal menyimpan visitor data:', err.message);
+    return false;
+  }
+}
+
 // Auto-sync: copy git-bundled uploads to persistent directory so all photos are available
 const repoUploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(repoUploadsDir)) {
@@ -336,32 +393,35 @@ function enrichMissingTopLevelKeys(targetDb) {
  */
 function getDB() { 
   try {
+    let result = null;
+
     // 1. PRIMARY: External persistent DB (OUTSIDE git directory — immune to deploys)
     if (fs.existsSync(externalDbPath)) {
       try {
         const stats = fs.statSync(externalDbPath);
         if (global.__CACHED_DB__ && global.__CACHED_DB_MTIME__ === stats.mtimeMs) {
-          return global.__CACHED_DB__;
-        }
-        const raw = fs.readFileSync(externalDbPath, 'utf8');
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-          enrichMissingTopLevelKeys(parsed);
-          global.__CACHED_DB__ = parsed;
-          global.__CACHED_DB_MTIME__ = stats.mtimeMs;
-          return parsed;
+          result = global.__CACHED_DB__;
+        } else {
+          const raw = fs.readFileSync(externalDbPath, 'utf8');
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+            enrichMissingTopLevelKeys(parsed);
+            global.__CACHED_DB__ = parsed;
+            global.__CACHED_DB_MTIME__ = stats.mtimeMs;
+            result = parsed;
+          }
         }
       } catch (e) {
         console.warn('⚠️ Gagal membaca external db.json, mencoba fallback:', e.message);
       }
     }
 
-    if (global.__CACHED_DB__) {
-      return global.__CACHED_DB__;
+    if (!result && global.__CACHED_DB__) {
+      result = global.__CACHED_DB__;
     }
 
     // 2. BACKUP: External backup DB
-    if (fs.existsSync(externalBackupPath)) {
+    if (!result && fs.existsSync(externalBackupPath)) {
       try {
         const raw = fs.readFileSync(externalBackupPath, 'utf8');
         const parsed = JSON.parse(raw);
@@ -369,31 +429,34 @@ function getDB() {
           enrichMissingTopLevelKeys(parsed);
           global.__CACHED_DB__ = parsed;
           saveDB(parsed);
-          return parsed;
+          result = parsed;
         }
       } catch (e) {}
     }
 
     // 3. LEGACY FALLBACK: Try old locations inside project (handles edge cases)
-    const legacySources = [legacyPersistedPath, legacyDbPath, legacyBackupPath];
-    for (const src of legacySources) {
-      if (fs.existsSync(src)) {
-        try {
-          const raw = fs.readFileSync(src, 'utf8');
-          const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-            enrichMissingTopLevelKeys(parsed);
-            global.__CACHED_DB__ = parsed;
-            saveDB(parsed); // Migrate to external storage
-            console.log(`🔄 Dimigrasikan dari legacy ${path.basename(src)} ke external storage`);
-            return parsed;
-          }
-        } catch (e) {}
+    if (!result) {
+      const legacySources = [legacyPersistedPath, legacyDbPath, legacyBackupPath];
+      for (const src of legacySources) {
+        if (fs.existsSync(src)) {
+          try {
+            const raw = fs.readFileSync(src, 'utf8');
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+              enrichMissingTopLevelKeys(parsed);
+              global.__CACHED_DB__ = parsed;
+              saveDB(parsed); // Migrate to external storage
+              console.log(`🔄 Dimigrasikan dari legacy ${path.basename(src)} ke external storage`);
+              result = parsed;
+              break;
+            }
+          } catch (e) {}
+        }
       }
     }
 
     // 4. SEED: db.seed.json (Initial installation template — first-time only)
-    if (fs.existsSync(seedDbPath)) {
+    if (!result && fs.existsSync(seedDbPath)) {
       try {
         const raw = fs.readFileSync(seedDbPath, 'utf8');
         const parsed = JSON.parse(raw);
@@ -401,15 +464,23 @@ function getDB() {
           global.__CACHED_DB__ = parsed;
           saveDB(parsed); // Initialize external storage for the first time
           console.log('🌱 Database baru diinisialisasi dari db.seed.json (instalasi pertama)');
-          return parsed;
+          result = parsed;
         }
       } catch (e) {}
     }
 
-    return {};
+    const finalDb = result || global.__CACHED_DB__ || {};
+    if (typeof getVisitorData === 'function') {
+      finalDb._visitors = getVisitorData();
+    }
+    return finalDb;
   } catch (err) {
     console.error('❌ Error reading db:', err.message);
-    return global.__CACHED_DB__ || {};
+    const fallbackDb = global.__CACHED_DB__ || {};
+    if (typeof getVisitorData === 'function') {
+      fallbackDb._visitors = getVisitorData();
+    }
+    return fallbackDb;
   }
 }
 
@@ -480,7 +551,7 @@ function saveDB(data) {
   }
 }
 
-// ==================== REAL-TIME VISITOR TRACKING ====================
+// ==================== ROCK-SOLID REAL-TIME VISITOR TRACKING ====================
 // Bot & Crawler patterns to exclude fake traffic, web crawlers, and automated scanners
 const BOT_USER_AGENTS = /bot|spider|crawl|slurp|facebookexternalhit|whatsapp|telegram|twitterbot|discordbot|applebot|bingbot|googlebot|yandex|baidu|semrush|ahrefs|uptime|petalbot|headless|phantomjs|puppeteer|wget|curl|python|axios|go-http-client|node-fetch|lighthouse|scanner|scan|nikto|sqlmap|masscan|zgrab/i;
 
@@ -508,49 +579,50 @@ function parseCookie(req, name) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-// In-memory active visitors (online heartbeat): key -> timestamp
+// In-memory active visitors (online heartbeat): clientKey -> lastActiveTimestamp
 global.__ACTIVE_VISITORS__ = global.__ACTIVE_VISITORS__ || new Map();
 const VISITOR_ONLINE_TTL = 3 * 60 * 1000; // 3 minutes without ping = offline
 
-// In-memory set of unique visitor hashes for current day (WIB UTC+7)
-global.__DAILY_VISITORS__ = global.__DAILY_VISITORS__ || { date: '', hashes: new Set() };
+// In-memory 30-minute session cache (prevents duplicate increments on rapid page navigation)
+global.__VISITOR_SESSIONS__ = global.__VISITOR_SESSIONS__ || new Map();
+const SESSION_TTL = 30 * 60 * 1000; // 30 minutes session duration
 
-// Debounced save for visitor counter to avoid thrashing disk
-let visitorSaveDebounceTimer = null;
-function scheduleVisitorSave() {
-  if (visitorSaveDebounceTimer) return;
-  visitorSaveDebounceTimer = setTimeout(() => {
-    visitorSaveDebounceTimer = null;
-    try {
-      const db = getDB();
-      saveDB(db);
-    } catch (e) {
-      console.warn('Gagal menyimpan counter pengunjung:', e.message);
+// Prune expired active visitors and sessions
+function pruneActiveVisitors() {
+  const now = Date.now();
+  for (const [key, ts] of global.__ACTIVE_VISITORS__) {
+    if (now - ts > VISITOR_ONLINE_TTL) {
+      global.__ACTIVE_VISITORS__.delete(key);
     }
-  }, 3000);
-}
-
-// Ensure visitor counter reset to 0 as requested by church administrator
-const RESET_VISITOR_FLAG = '2026-09-20-reset-v1';
-try {
-  const currentDb = getDB();
-  if (!currentDb._visitors || currentDb._visitors.resetFlag !== RESET_VISITOR_FLAG) {
-    currentDb._visitors = {
-      total: 0,
-      resetFlag: RESET_VISITOR_FLAG,
-      resetAt: new Date().toISOString()
-    };
-    saveDB(currentDb);
-    global.__ACTIVE_VISITORS__.clear();
-    global.__DAILY_VISITORS__.hashes.clear();
-    console.log('🔄 Visitor counter berhasil di-reset ke 0 (Flag: ' + RESET_VISITOR_FLAG + ')');
   }
-} catch (e) {
-  console.warn('Inisialisasi visitor reset:', e.message);
+  for (const [key, ts] of global.__VISITOR_SESSIONS__) {
+    if (now - ts > SESSION_TTL) {
+      global.__VISITOR_SESSIONS__.delete(key);
+    }
+  }
+  return global.__ACTIVE_VISITORS__.size;
 }
 
-// Middleware: track real unique human visitors visiting public HTML pages
+// Periodic cleanup of expired online visitors (every 30 seconds)
+setInterval(() => {
+  pruneActiveVisitors();
+}, 30 * 1000);
+
+// Middleware: track real unique human visitors and provide live stats to templates
 app.use((req, res, next) => {
+  // Prune expired active visitors
+  pruneActiveVisitors();
+  const visitorData = getVisitorData();
+  const activeCount = Math.max(1, global.__ACTIVE_VISITORS__.size);
+
+  // Always expose visitor data to res.locals for EJS views (footer, etc.)
+  res.locals._visitors = {
+    total: visitorData.total || 0,
+    online: activeCount,
+    resetAt: visitorData.resetAt
+  };
+  res.locals._onlineVisitors = activeCount;
+
   // Only track GET requests for web pages
   if (req.method !== 'GET') return next();
 
@@ -572,74 +644,57 @@ app.use((req, res, next) => {
   // Filter out bots, crawlers, spiders, automated tools
   if (isBotRequest(req)) return next();
 
-  // Current date in WIB (UTC+7)
-  const todayWIB = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
-  if (global.__DAILY_VISITORS__.date !== todayWIB) {
-    global.__DAILY_VISITORS__.date = todayWIB;
-    global.__DAILY_VISITORS__.hashes.clear();
-  }
-
   const clientIp = getClientIp(req);
   const ua = req.headers['user-agent'] || '';
-  const visitorHash = crypto.createHash('sha256').update(clientIp + '|' + ua + '|' + todayWIB).digest('hex');
+  const clientKey = crypto.createHash('sha256').update(clientIp + '|' + ua).digest('hex');
 
-  const cookieVisited = parseCookie(req, 'ah_uv_date');
-  const alreadyVisitedToday = cookieVisited === todayWIB || global.__DAILY_VISITORS__.hashes.has(visitorHash);
+  // Register real-time online status immediately
+  const now = Date.now();
+  global.__ACTIVE_VISITORS__.set(clientKey, now);
+  const updatedActive = Math.max(1, global.__ACTIVE_VISITORS__.size);
+  res.locals._visitors.online = updatedActive;
+  res.locals._onlineVisitors = updatedActive;
 
-  // Set / refresh cookie for this visitor (valid for 24 hours)
-  res.cookie('ah_uv_date', todayWIB, {
-    maxAge: 24 * 60 * 60 * 1000,
+  // Session check: cookie or in-memory session (30-min window)
+  const cookieSession = parseCookie(req, 'ah_v_session');
+  const lastSessionTime = global.__VISITOR_SESSIONS__.get(clientKey) || 0;
+  const isSessionActive = cookieSession && (now - lastSessionTime < SESSION_TTL);
+
+  // Set / refresh sliding session cookie (30 minutes)
+  const sessionId = cookieSession || (now + '-' + Math.random().toString(36).slice(2, 8));
+  res.cookie('ah_v_session', sessionId, {
+    maxAge: 30 * 60 * 1000,
     httpOnly: true,
     sameSite: 'Lax',
     path: '/'
   });
+  global.__VISITOR_SESSIONS__.set(clientKey, now);
 
-  if (!alreadyVisitedToday) {
-    global.__DAILY_VISITORS__.hashes.add(visitorHash);
-    const db = getDB();
-    if (!db._visitors) db._visitors = { total: 0 };
-    db._visitors.total = (db._visitors.total || 0) + 1;
-    scheduleVisitorSave();
-    console.log(`👤 Pengunjung nyata baru tercatat! Total: ${db._visitors.total} (IP: ${clientIp.slice(0, 10)}...)`);
+  // If this is a new visit / new session, increment and save immediately!
+  if (!isSessionActive) {
+    visitorData.total = (visitorData.total || 0) + 1;
+    saveVisitorData(visitorData);
+    res.locals._visitors.total = visitorData.total;
+    console.log(`👤 Pengunjung nyata baru tercatat! Total: ${visitorData.total} (IP: ${clientIp.slice(0, 10)}...)`);
   }
 
   next();
 });
 
-// Periodic cleanup of expired online visitors (every 60 seconds)
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, ts] of global.__ACTIVE_VISITORS__) {
-    if (now - ts > VISITOR_ONLINE_TTL) {
-      global.__ACTIVE_VISITORS__.delete(key);
-    }
-  }
-}, 60 * 1000);
-
 // API endpoint: get real-time visitor stats & register online heartbeat from browser
 app.get('/api/visitors', (req, res) => {
-  const now = Date.now();
-
-  // Clean expired visitors
-  for (const [key, ts] of global.__ACTIVE_VISITORS__) {
-    if (now - ts > VISITOR_ONLINE_TTL) {
-      global.__ACTIVE_VISITORS__.delete(key);
-    }
-  }
-
-  // Register heartbeat if not a bot
   if (!isBotRequest(req)) {
     const clientIp = getClientIp(req);
     const ua = req.headers['user-agent'] || '';
-    const activeKey = crypto.createHash('sha256').update(clientIp + '|' + ua).digest('hex');
-    global.__ACTIVE_VISITORS__.set(activeKey, now);
+    const clientKey = crypto.createHash('sha256').update(clientIp + '|' + ua).digest('hex');
+    global.__ACTIVE_VISITORS__.set(clientKey, Date.now());
   }
 
-  const db = getDB();
-  const total = (db._visitors && typeof db._visitors.total === 'number') ? db._visitors.total : 0;
+  const activeCount = pruneActiveVisitors();
+  const visitorData = getVisitorData();
   res.json({
-    online: global.__ACTIVE_VISITORS__.size,
-    total: total
+    online: Math.max(1, activeCount),
+    total: visitorData.total || 0
   });
 });
 
@@ -1157,15 +1212,13 @@ app.post('/admin/db/import', requireAuth, upload.single('dbFile'), (req, res) =>
 // Reset Visitor Counter
 app.post('/admin/visitors/reset', requireAuth, (req, res) => {
   try {
-    const db = getDB();
-    db._visitors = {
+    const fresh = {
       total: 0,
-      resetFlag: 'manual-' + Date.now(),
       resetAt: new Date().toISOString()
     };
-    saveDB(db);
+    saveVisitorData(fresh);
     global.__ACTIVE_VISITORS__.clear();
-    global.__DAILY_VISITORS__.hashes.clear();
+    global.__VISITOR_SESSIONS__.clear();
     console.log('🔄 Admin mereset counter pengunjung ke 0');
     return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Statistik pengunjung berhasil di-reset kembali ke 0.'));
   } catch (err) {

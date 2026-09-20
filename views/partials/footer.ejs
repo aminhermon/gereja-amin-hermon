@@ -102,7 +102,7 @@
         </div>
         <div class="visitor-live-badge" id="visitorBadge">
           <span class="pulse-dot"></span>
-          <span id="visitorOnline">0</span> online
+          <span id="visitorOnline"><%= (typeof _visitors !== 'undefined' && _visitors && typeof _visitors.online === 'number') ? _visitors.online : (typeof _onlineVisitors === 'number' ? _onlineVisitors : 1) %></span> online
           <span class="visitor-sep">•</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           <span id="visitorTotal"><%= (typeof _visitors !== 'undefined' && _visitors && typeof _visitors.total === 'number') ? _visitors.total.toLocaleString('id-ID') : 0 %></span> kunjungan
