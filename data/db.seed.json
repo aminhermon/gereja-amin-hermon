@@ -134,12 +134,6 @@
           "role": "Pendeta Jemaat",
           "image": "uploads/1785503223559.png",
           "bio": ""
-        },
-        {
-          "name": "[Pendeta 2]",
-          "role": "Pendeta",
-          "image": "",
-          "bio": ""
         }
       ],
       "pengurus": [
@@ -363,7 +357,11 @@
         "audioUrl": "",
         "kategori": "Iman",
         "published": true,
-        "reactions": { "blessed": 0, "amin": 0, "strengthened": 0 }
+        "reactions": {
+          "blessed": 0,
+          "amin": 0,
+          "strengthened": 0
+        }
       },
       {
         "id": "r2",
@@ -380,7 +378,11 @@
         "audioUrl": "",
         "kategori": "Kasih",
         "published": true,
-        "reactions": { "blessed": 0, "amin": 0, "strengthened": 0 }
+        "reactions": {
+          "blessed": 0,
+          "amin": 0,
+          "strengthened": 0
+        }
       },
       {
         "id": "r3",
@@ -397,7 +399,11 @@
         "audioUrl": "",
         "kategori": "Pengharapan",
         "published": true,
-        "reactions": { "blessed": 0, "amin": 0, "strengthened": 0 }
+        "reactions": {
+          "blessed": 0,
+          "amin": 0,
+          "strengthened": 0
+        }
       }
     ],
     "videos": [

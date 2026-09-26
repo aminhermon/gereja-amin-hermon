@@ -140,116 +140,152 @@
         }
       %>
 
-      <!-- Pendeta -->
+      <!-- Pendeta — Premium Hero Card -->
       <h3 class="sub-section-title" data-aos="fade-up">Pendeta</h3>
-      <div class="leaders-grid leaders-grid--2" data-aos="fade-up">
-        <% about.pemimpin.pendeta.forEach(function(p) { %>
-        <div class="leader-card leader-card--featured leader-card--clickable"
-             data-img="<%= p.image ? imgUrl(p.image) : '' %>"
-             data-name="<%= p.name %>"
-             data-role="<%= p.role %>">
-          <div class="leader-card__img">
-            <% if (p.image) { %>
-              <img src="<%= imgUrl(p.image) %>" alt="<%= p.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
-            <% } else { %>
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <% } %>
+      <% var pastor = about.pemimpin.pendeta[0]; %>
+      <% if (pastor) { %>
+      <div class="pastor-hero" data-aos="fade-up">
+        <div class="pastor-hero__card leader-card--clickable"
+             data-img="<%= pastor.image ? imgUrl(pastor.image) : '' %>"
+             data-name="<%= pastor.name %>"
+             data-role="<%= pastor.role %>">
+          <!-- Decorative corner accents -->
+          <span class="pastor-hero__corner pastor-hero__corner--tl"></span>
+          <span class="pastor-hero__corner pastor-hero__corner--tr"></span>
+          <span class="pastor-hero__corner pastor-hero__corner--bl"></span>
+          <span class="pastor-hero__corner pastor-hero__corner--br"></span>
+
+          <div class="pastor-hero__photo">
+            <div class="pastor-hero__photo-frame">
+              <% if (pastor.image) { %>
+                <img src="<%= imgUrl(pastor.image) %>" alt="<%= pastor.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
+              <% } else { %>
+                <div class="pastor-hero__placeholder">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+              <% } %>
+            </div>
           </div>
-          <div class="leader-card__info">
-            <h4><%- formatLeaderName(p.name) %></h4>
-            <span><%= p.role %></span>
+
+          <div class="pastor-hero__info">
+            <div class="pastor-hero__badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.09 8.26L21 9.27L16.18 14.14L17.18 21.02L12 18.27L6.82 21.02L7.82 14.14L3 9.27L9.91 8.26L12 2Z"/></svg>
+              Gembala Jemaat
+            </div>
+            <h4 class="pastor-hero__name"><%- formatLeaderName(pastor.name) %></h4>
+            <span class="pastor-hero__role"><%= pastor.role %></span>
+            <div class="pastor-hero__divider"></div>
+            <p class="pastor-hero__verse">"Akulah gembala yang baik. Gembala yang baik memberikan nyawanya bagi domba-dombanya."</p>
+            <span class="pastor-hero__verse-ref">— Yohanes 10:11</span>
           </div>
         </div>
-        <% }); %>
       </div>
+      <% } %>
 
       <!-- Pengurus Harian -->
       <h3 class="sub-section-title" data-aos="fade-up">Pengurus Harian</h3>
+
       <!-- Baris 1: Ketua (3 kartu) -->
-      <div class="pengurus-row pengurus-row--3" data-aos="fade-up">
+      <div class="prem-grid prem-grid--3" data-aos="fade-up">
         <% about.pemimpin.pengurus.slice(0, 3).forEach(function(pg) { %>
-        <div class="leader-card leader-card--sm leader-card--clickable"
+        <div class="prem-card leader-card--clickable"
              data-img="<%= pg.image ? imgUrl(pg.image) : '' %>"
              data-name="<%= pg.name %>"
              data-role="<%= pg.role %>">
-          <div class="leader-card__img">
+          <span class="prem-card__accent"></span>
+          <div class="prem-card__photo">
             <% if (pg.image) { %>
               <img src="<%= imgUrl(pg.image) %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <div class="prem-card__avatar">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
             <% } %>
           </div>
-          <div class="leader-card__info">
-            <h4><%- formatLeaderName(pg.name) %></h4>
-            <span><%= pg.role %></span>
+          <div class="prem-card__body">
+            <span class="prem-card__badge"><%= pg.role %></span>
+            <h4 class="prem-card__name"><%- formatLeaderName(pg.name) %></h4>
           </div>
+          <div class="prem-card__shimmer"></div>
         </div>
         <% }); %>
       </div>
 
       <!-- Baris 2: Sekretaris (2 kartu) -->
-      <div class="pengurus-row pengurus-row--2" data-aos="fade-up">
+      <div class="prem-grid prem-grid--2" data-aos="fade-up">
         <% about.pemimpin.pengurus.slice(3, 5).forEach(function(pg) { %>
-        <div class="leader-card leader-card--sm leader-card--clickable"
+        <div class="prem-card leader-card--clickable"
              data-img="<%= pg.image ? imgUrl(pg.image) : '' %>"
              data-name="<%= pg.name %>"
              data-role="<%= pg.role %>">
-          <div class="leader-card__img">
+          <span class="prem-card__accent"></span>
+          <div class="prem-card__photo">
             <% if (pg.image) { %>
               <img src="<%= imgUrl(pg.image) %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <div class="prem-card__avatar">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
             <% } %>
           </div>
-          <div class="leader-card__info">
-            <h4><%- formatLeaderName(pg.name) %></h4>
-            <span><%= pg.role %></span>
+          <div class="prem-card__body">
+            <span class="prem-card__badge"><%= pg.role %></span>
+            <h4 class="prem-card__name"><%- formatLeaderName(pg.name) %></h4>
           </div>
+          <div class="prem-card__shimmer"></div>
         </div>
         <% }); %>
       </div>
 
       <!-- Baris 3: Bendahara (2 kartu) -->
-      <div class="pengurus-row pengurus-row--2" data-aos="fade-up">
+      <div class="prem-grid prem-grid--2" data-aos="fade-up">
         <% about.pemimpin.pengurus.slice(5, 7).forEach(function(pg) { %>
-        <div class="leader-card leader-card--sm leader-card--clickable"
+        <div class="prem-card leader-card--clickable"
              data-img="<%= pg.image ? imgUrl(pg.image) : '' %>"
              data-name="<%= pg.name %>"
              data-role="<%= pg.role %>">
-          <div class="leader-card__img">
+          <span class="prem-card__accent"></span>
+          <div class="prem-card__photo">
             <% if (pg.image) { %>
               <img src="<%= imgUrl(pg.image) %>" alt="<%= pg.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <div class="prem-card__avatar">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
             <% } %>
           </div>
-          <div class="leader-card__info">
-            <h4><%- formatLeaderName(pg.name) %></h4>
-            <span><%= pg.role %></span>
+          <div class="prem-card__body">
+            <span class="prem-card__badge"><%= pg.role %></span>
+            <h4 class="prem-card__name"><%- formatLeaderName(pg.name) %></h4>
           </div>
+          <div class="prem-card__shimmer"></div>
         </div>
         <% }); %>
       </div>
 
       <!-- Majelis Jemaat -->
       <h3 class="sub-section-title" data-aos="fade-up">Majelis Jemaat</h3>
-      <div class="majelis-photo-grid" data-aos="fade-up">
+      <div class="prem-grid prem-grid--auto" data-aos="fade-up">
         <% about.pemimpin.majelis.forEach(function(m, i) { %>
-        <div class="leader-card leader-card--sm leader-card--clickable"
+        <div class="prem-card prem-card--compact leader-card--clickable"
              data-img="<%= m.image ? imgUrl(m.image) : '' %>"
              data-name="<%= m.name %>"
              data-role="<%= m.role || 'Majelis' %>">
-          <div class="leader-card__img">
+          <span class="prem-card__accent"></span>
+          <div class="prem-card__photo">
             <% if (m.image) { %>
               <img src="<%= imgUrl(m.image) %>" alt="<%= m.name %>" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/logo-gereja-amin-3d.png';">
             <% } else { %>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <div class="prem-card__avatar">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="1" opacity="0.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
             <% } %>
           </div>
-          <div class="leader-card__info">
-            <h4><%- formatLeaderName(m.name) %></h4>
-            <span><%= m.role || 'Majelis' %></span>
+          <div class="prem-card__body">
+            <span class="prem-card__badge prem-card__badge--sm"><%= m.role || 'Majelis' %></span>
+            <h4 class="prem-card__name"><%- formatLeaderName(m.name) %></h4>
           </div>
+          <div class="prem-card__shimmer"></div>
         </div>
         <% }); %>
       </div>
