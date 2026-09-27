@@ -158,6 +158,46 @@ if (!fs.existsSync(PERSISTENT_UPLOADS_DIR)) {
 // Persistent visitor storage (separate from db.json so hits don't touch cms db)
 const VISITOR_FILE = path.join(PERSISTENT_DIR, 'visitors.json');
 
+// Persistent deleted-files blacklist (prevents auto-sync from resurrecting deleted files)
+const DELETED_FILES_PATH = path.join(PERSISTENT_DIR, 'deleted-files.json');
+
+function getDeletedFilesBlacklist() {
+  try {
+    if (fs.existsSync(DELETED_FILES_PATH)) {
+      return JSON.parse(fs.readFileSync(DELETED_FILES_PATH, 'utf8'));
+    }
+  } catch (e) {
+    console.warn('⚠️ Error reading deleted-files blacklist:', e.message);
+  }
+  return [];
+}
+
+function addToDeletedBlacklist(filename) {
+  try {
+    const list = getDeletedFilesBlacklist();
+    const baseName = path.basename(filename);
+    if (!list.includes(baseName)) {
+      list.push(baseName);
+      fs.writeFileSync(DELETED_FILES_PATH, JSON.stringify(list, null, 2), 'utf8');
+      console.log('📋 Added to deleted-files blacklist:', baseName);
+    }
+  } catch (e) {
+    console.warn('⚠️ Error updating deleted-files blacklist:', e.message);
+  }
+}
+
+function removeFromDeletedBlacklist(filename) {
+  try {
+    const list = getDeletedFilesBlacklist();
+    const baseName = path.basename(filename);
+    const idx = list.indexOf(baseName);
+    if (idx !== -1) {
+      list.splice(idx, 1);
+      fs.writeFileSync(DELETED_FILES_PATH, JSON.stringify(list, null, 2), 'utf8');
+    }
+  } catch (e) {}
+}
+
 function getVisitorData() {
   try {
     if (fs.existsSync(VISITOR_FILE)) {
@@ -213,6 +253,8 @@ function saveVisitorData(data) {
 }
 
 // Auto-sync: copy git-bundled uploads to persistent directory so all photos are available
+// IMPORTANT: Respects the deleted-files blacklist — files intentionally removed via admin
+// will NOT be resurrected by git deploys.
 const repoUploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(repoUploadsDir)) {
   fs.mkdirSync(repoUploadsDir, { recursive: true });
@@ -220,9 +262,16 @@ if (!fs.existsSync(repoUploadsDir)) {
 if (fs.existsSync(repoUploadsDir) && repoUploadsDir !== PERSISTENT_UPLOADS_DIR) {
   try {
     const bundledFiles = fs.readdirSync(repoUploadsDir);
+    const deletedBlacklist = getDeletedFilesBlacklist();
     let synced = 0;
+    let skipped = 0;
     for (const f of bundledFiles) {
       if (f === '.gitkeep') continue;
+      // Skip files that were intentionally deleted via admin CMS
+      if (deletedBlacklist.includes(f)) {
+        skipped++;
+        continue;
+      }
       const srcFile = path.join(repoUploadsDir, f);
       const destFile = path.join(PERSISTENT_UPLOADS_DIR, f);
       if (!fs.existsSync(destFile)) {
@@ -234,6 +283,9 @@ if (fs.existsSync(repoUploadsDir) && repoUploadsDir !== PERSISTENT_UPLOADS_DIR) 
     }
     if (synced > 0) {
       console.log(`✅ Synced ${synced} photos from repo to persistent uploads`);
+    }
+    if (skipped > 0) {
+      console.log(`🚫 Skipped ${skipped} blacklisted (deleted) files during sync`);
     }
   } catch (err) {
     console.warn('⚠️ Error during uploads sync:', err.message);
@@ -951,6 +1003,7 @@ app.get('/admin/logout', (req, res) => {
 });
 
 // Helper: Safely delete physical file in uploads/ directory and any cached versions
+// Also adds file to the deleted-files blacklist to prevent auto-sync resurrection
 function deleteUploadedFile(filePath) {
   if (!filePath || typeof filePath !== 'string') return false;
   try {
@@ -995,6 +1048,11 @@ function deleteUploadedFile(filePath) {
           }
         });
       } catch (e) {}
+    }
+
+    // 4. Add to deleted-files blacklist so auto-sync won't resurrect this file
+    if (deleted) {
+      addToDeletedBlacklist(filename);
     }
 
     return deleted;
