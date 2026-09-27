@@ -563,10 +563,24 @@ function initGallery() {
       var img = this.querySelector('img');
       var caption = this.querySelector('.gallery-item__overlay span');
       if (img) {
-        openLightbox(img.src, caption ? caption.textContent : '', galleryItems, this);
+        openLightbox(img.src, caption ? caption.textContent.trim() : (img.alt || ''), galleryItems, this);
       }
     });
   });
+
+  // Profile image on KomSek page
+  var profileImg = document.querySelector('.komsek-profile__img');
+  if (profileImg) {
+    profileImg.style.cursor = 'pointer';
+    profileImg.addEventListener('click', function(e) {
+      e.preventDefault();
+      var img = this.querySelector('img');
+      var title = document.querySelector('.komsek-profile__text h2');
+      if (img) {
+        openLightbox(img.src, title ? title.textContent.trim() : (img.alt || ''), null, null, false);
+      }
+    });
+  }
 
   // Collect komsek article card images
   var komsekCards = document.querySelectorAll('.komsek-article-card');
@@ -580,7 +594,7 @@ function initGallery() {
         var img = this.querySelector('img');
         var title = card.querySelector('.komsek-article-card__title');
         if (img) {
-          openLightbox(img.src, title ? title.textContent : '', komsekCards, card, true);
+          openLightbox(img.src, title ? title.textContent.trim() : '', komsekCards, card, true);
         }
       });
     }
@@ -598,15 +612,15 @@ function openLightbox(src, caption, items, activeItem, isKomsek) {
   _lightboxState.items = [];
   _lightboxState.isKomsek = !!isKomsek;
   if (items && items.length > 0) {
-    items.forEach(function(item, idx) {
+    items.forEach(function(item) {
       var img = item.querySelector('img');
       var cap = '';
       if (isKomsek) {
         var titleEl = item.querySelector('.komsek-article-card__title');
-        cap = titleEl ? titleEl.textContent : '';
+        cap = titleEl ? titleEl.textContent.trim() : '';
       } else {
         var capEl = item.querySelector('.gallery-item__overlay span');
-        cap = capEl ? capEl.textContent : '';
+        cap = capEl ? capEl.textContent.trim() : '';
       }
       if (img) {
         _lightboxState.items.push({ src: img.src, caption: cap });
@@ -636,10 +650,14 @@ function showLightboxImage() {
 
   if (img) {
     img.style.opacity = '0';
-    img.src = item.src;
     img.onload = function() { img.style.opacity = '1'; };
+    img.src = item.src;
+    if (img.complete) { img.style.opacity = '1'; }
   }
-  if (cap) cap.textContent = item.caption || '';
+  if (cap) {
+    cap.textContent = item.caption || '';
+    cap.style.display = item.caption ? 'block' : 'none';
+  }
   if (counter) {
     counter.textContent = (_lightboxState.currentIdx + 1) + ' / ' + _lightboxState.items.length;
     counter.style.display = _lightboxState.items.length > 1 ? 'block' : 'none';
@@ -676,12 +694,16 @@ function initGlobalLightbox() {
   var lb = document.getElementById('lightbox');
   if (!lb) return;
 
-  // Close on backdrop click
-  var backdrop = lb.querySelector('.lightbox__backdrop');
-  if (backdrop) backdrop.addEventListener('click', closeLightbox);
+  // Close on backdrop or outside click
+  lb.addEventListener('click', function(e) {
+    if (e.target === lb || e.target.classList.contains('lightbox__backdrop')) {
+      closeLightbox();
+    }
+  });
 
   // Close button
   var closeBtn = lb.querySelector('.lightbox__close');
+  if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
   if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
 
   // Prev/Next buttons

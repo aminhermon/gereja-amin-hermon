@@ -9101,16 +9101,66 @@ p {
   transform: translateY(0);
 }
 
+/* Komsek profile image hover - zoom cursor & overlay */
+.komsek-profile__img {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.komsek-profile__img img {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.komsek-profile__img:hover img {
+  transform: scale(1.05);
+}
+
+.komsek-profile__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,22,40,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.komsek-profile__img:hover .komsek-profile__overlay {
+  opacity: 1;
+}
+
+.komsek-profile__overlay svg {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  transform: scale(0.85);
+  transition: transform 0.3s ease;
+}
+
+.komsek-profile__img:hover .komsek-profile__overlay svg {
+  transform: scale(1);
+}
+
 /* Komsek article card image hover - zoom cursor */
 .komsek-article-card__img {
   cursor: pointer;
   position: relative;
+  overflow: hidden;
+}
+
+.komsek-article-card__img img {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.komsek-article-card__img:hover img {
+  transform: scale(1.06);
 }
 
 .komsek-article-card__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(10,22,40,0.4);
+  background: rgba(10,22,40,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9125,6 +9175,12 @@ p {
 .komsek-article-card__overlay svg {
   color: white;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+  transform: scale(0.85);
+  transition: transform 0.3s ease;
+}
+
+.komsek-article-card__img:hover .komsek-article-card__overlay svg {
+  transform: scale(1);
 }
 
 /* ========== LIGHTBOX ========== */
