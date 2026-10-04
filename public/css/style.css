@@ -2336,7 +2336,7 @@ p {
   .navbar__menu {
     position: fixed;
     inset: 0;
-    background: rgba(11, 19, 32, 0.98);
+    background: rgb(11, 19, 32);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     display: flex;
