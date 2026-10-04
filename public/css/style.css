@@ -9463,7 +9463,7 @@ p {
     width: 100vw !important;
     height: 100vh !important;
     height: 100dvh !important;
-    background: rgba(8, 15, 28, 0.98) !important;
+    background: rgb(8, 15, 28) !important;
     backdrop-filter: blur(30px) saturate(1.5) !important;
     -webkit-backdrop-filter: blur(30px) saturate(1.5) !important;
     padding: 80px 24px 40px;
