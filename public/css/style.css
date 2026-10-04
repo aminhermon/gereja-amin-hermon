@@ -9347,3 +9347,1262 @@ p {
     font-size: 1.3rem;
   }
 }
+
+/* =====================================================================
+   PREMIUM MOBILE REDESIGN — COMPREHENSIVE OVERHAUL
+   Targets: 768px and below (phones & small tablets)
+   Goal: Ultra-premium, polished, modern church mobile experience
+   ===================================================================== */
+
+/* ---------- MOBILE: Root & Typography ---------- */
+@media (max-width: 768px) {
+  :root {
+    --nav-height: 64px;
+  }
+
+  body {
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.55rem; }
+  h3 { font-size: 1.2rem; }
+
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  /* Section spacing */
+  .section {
+    padding: 3rem 0;
+  }
+
+  .section-header {
+    margin-bottom: 1.75rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.55rem;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .section-header p {
+    font-size: 0.9rem;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+    color: var(--text-light);
+  }
+
+  .gold-line {
+    width: 45px;
+    height: 3px;
+    margin: 0.6rem auto 0;
+    border-radius: 2px;
+  }
+
+  .text-gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* ---------- MOBILE: Premium Navbar ---------- */
+@media (max-width: 768px) {
+  .navbar {
+    height: var(--nav-height);
+    padding: 0 1rem;
+    background: rgba(11, 19, 32, 0.92) !important;
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border-bottom: 1px solid rgba(200, 169, 81, 0.12);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .navbar__inner {
+    height: var(--nav-height);
+  }
+
+  /* Hamburger - modern 3-line icon */
+  .navbar__hamburger {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(200, 169, 81, 0.08);
+    border: 1px solid rgba(200, 169, 81, 0.15);
+    transition: all 0.25s ease;
+    z-index: 1001;
+  }
+
+  .navbar__hamburger:active {
+    transform: scale(0.92);
+    background: rgba(200, 169, 81, 0.18);
+  }
+
+  .navbar__hamburger span {
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--gold-light);
+    transition: all 0.3s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  }
+
+  /* Mobile menu - glassmorphism overlay */
+  .navbar__menu {
+    background: rgba(8, 15, 28, 0.97) !important;
+    backdrop-filter: blur(30px) saturate(1.5) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(1.5) !important;
+    padding: 80px 24px 40px;
+    gap: 6px;
+  }
+
+  .navbar__link {
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.88);
+    letter-spacing: 0.3px;
+    transition: all 0.25s ease;
+  }
+
+  .navbar__link:hover,
+  .navbar__link.active {
+    background: linear-gradient(135deg, rgba(200, 169, 81, 0.12), rgba(200, 169, 81, 0.06));
+    border-color: rgba(200, 169, 81, 0.35);
+    color: var(--gold-light);
+    transform: translateX(4px);
+  }
+
+  .navbar__search {
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .navbar__search input {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    background: transparent;
+    border: none;
+    color: var(--white);
+  }
+
+  .navbar__search input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .navbar__search button {
+    padding: 12px 16px;
+    background: rgba(200, 169, 81, 0.15);
+  }
+}
+
+/* ---------- MOBILE: Premium Hero ---------- */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 85vh;
+  }
+
+  .hero--sub {
+    min-height: 45vh;
+  }
+
+  .hero--mini {
+    min-height: 40vh;
+  }
+
+  .hero__overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(10, 18, 32, 0.15) 0%,
+      rgba(10, 18, 32, 0.35) 35%,
+      rgba(10, 18, 32, 0.75) 70%,
+      rgba(10, 18, 32, 0.92) 100%
+    ) !important;
+  }
+
+  .hero__content {
+    padding: 2rem 1.25rem 3rem;
+    justify-content: flex-end;
+  }
+
+  .hero--sub .hero__content {
+    padding: 2rem 1.25rem 2.5rem;
+  }
+
+  .hero__logo {
+    width: 90px;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero__logo-wrap {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .hero__eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 2.5px;
+    margin-bottom: 0.75rem;
+    gap: 8px;
+  }
+
+  .hero__eyebrow::before,
+  .hero__eyebrow::after {
+    width: 22px;
+  }
+
+  .hero__subtitle {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.75);
+    max-width: 100%;
+  }
+
+  .hero__verse {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    padding: 0 0.5rem;
+    opacity: 0.75;
+  }
+
+  .hero__verse cite {
+    font-size: 0.72rem;
+  }
+
+  .hero__actions {
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero__actions .btn {
+    padding: 12px 28px;
+    font-size: 0.88rem;
+    border-radius: 50px;
+    max-width: 280px;
+  }
+}
+
+/* ---------- MOBILE: Premium Buttons ---------- */
+@media (max-width: 768px) {
+  .btn {
+    font-size: 0.88rem;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    max-width: 300px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    transition: all 0.25s ease;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+
+  .btn--gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    box-shadow: 0 4px 20px rgba(200, 169, 81, 0.25);
+  }
+
+  .btn--outline-gold {
+    border-width: 1.5px;
+  }
+}
+
+/* ---------- MOBILE: Premium Cards ---------- */
+@media (max-width: 768px) {
+  .schedule-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 0.5px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .schedule-card__time {
+    font-size: 1.5rem;
+  }
+
+  .schedule-card__name {
+    font-size: 0.9rem;
+  }
+
+  .schedule-card__detail {
+    font-size: 0.8rem;
+  }
+
+  /* Feature cards */
+  .feature-card,
+  .expect-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 14px;
+  }
+
+  .feature-card__icon,
+  .expect-card__icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 0.75rem;
+    border-radius: 12px;
+  }
+
+  .feature-card h3,
+  .expect-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-card p,
+  .expect-card p {
+    font-size: 0.85rem;
+    line-height: 1.55;
+  }
+
+  /* Contact cards */
+  .contact-card {
+    padding: 1.5rem;
+    border-radius: 14px;
+  }
+}
+
+/* ---------- MOBILE: Ayat Hari Ini (Daily Verse) ---------- */
+@media (max-width: 768px) {
+  .verse-card {
+    padding: 2rem 1.5rem;
+    margin: 0 0.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(200, 169, 81, 0.2);
+  }
+
+  .verse-card__text {
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+
+  .verse-card__ref {
+    font-size: 0.82rem;
+    margin-top: 0.75rem;
+  }
+}
+
+/* ---------- MOBILE: Data Jemaat (Stats Counter) ---------- */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem 0.75rem;
+    border-radius: 14px;
+    text-align: center;
+  }
+
+  .stat-card__icon {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-card__number {
+    font-size: 1.8rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .stat-card__label {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 0.25rem;
+  }
+}
+
+/* ---------- MOBILE: News Carousel ---------- */
+@media (max-width: 768px) {
+  .carousel {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .carousel__list {
+    height: 320px;
+  }
+
+  .carousel__item {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .carousel__item-body {
+    padding: 1rem 1.25rem;
+  }
+
+  .carousel__item-title {
+    font-size: 0.95rem;
+    line-height: 1.35;
+    -webkit-line-clamp: 2;
+  }
+
+  .carousel__item-subtitle {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    -webkit-line-clamp: 2;
+  }
+
+  /* Thumbnail list at bottom */
+  .carousel__thumbnails {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .carousel__thumb {
+    border-radius: 8px;
+    height: 56px;
+    min-width: 72px;
+    border: 2px solid transparent;
+  }
+
+  .carousel__thumb.active {
+    border-color: var(--gold);
+    box-shadow: 0 0 12px rgba(200, 169, 81, 0.3);
+  }
+}
+
+/* ---------- MOBILE: Calendar ---------- */
+@media (max-width: 768px) {
+  .calendar-wrap {
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin: 0;
+  }
+
+  .calendar-controls {
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+  }
+
+  .calendar-controls__month {
+    font-size: 1.2rem;
+    min-width: 160px;
+  }
+
+  .calendar-controls__btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .calendar-grid {
+    gap: 2px;
+  }
+
+  .calendar-cell {
+    padding: 8px 2px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+    min-height: 38px;
+  }
+
+  .calendar-cell--header {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 6px 2px;
+    color: var(--gold);
+  }
+
+  .calendar-cell--has-event {
+    font-weight: 700;
+  }
+
+  .calendar-cell--today {
+    border-radius: 10px;
+  }
+
+  /* Calendar filter tabs */
+  .cal-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .cal-filter-btn {
+    font-size: 0.75rem;
+    padding: 7px 14px;
+    border-radius: 50px;
+    white-space: nowrap;
+  }
+
+  /* Event modal */
+  .calendar-modal__body {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+}
+
+/* ---------- MOBILE: Jadwal Pelayan Cards ---------- */
+@media (max-width: 768px) {
+  .pelayan-card {
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+
+  .pelayan-card__header {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .pelayan-card__title {
+    font-size: 0.95rem;
+  }
+
+  .pelayan-card__date {
+    font-size: 0.78rem;
+  }
+
+  .pelayan-card__row {
+    padding: 6px 0;
+    font-size: 0.82rem;
+  }
+}
+
+/* ---------- MOBILE: Premium Pastor Card ---------- */
+@media (max-width: 768px) {
+  .pastor-hero__card {
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 0 0.25rem;
+  }
+
+  .pastor-hero__photo {
+    min-height: 280px;
+    max-height: 380px;
+  }
+
+  .pastor-hero__info {
+    padding: 1.75rem 1.5rem;
+  }
+}
+
+/* ---------- MOBILE: Premium Pengurus Cards ---------- */
+@media (max-width: 768px) {
+  .prem-card {
+    border-radius: 14px;
+    padding: 1.25rem 1rem;
+  }
+
+  .prem-card__photo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+
+  .prem-card__name {
+    font-size: 0.88rem;
+    line-height: 1.3;
+  }
+
+  .prem-card__role {
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+  }
+
+  .prem-grid--3,
+  .prem-grid--2 {
+    grid-template-columns: 1fr !important;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ---------- MOBILE: Majelis Cards ---------- */
+@media (max-width: 768px) {
+  .leader-card {
+    border-radius: 14px;
+  }
+
+  .leader-card__img {
+    border-radius: 14px 14px 0 0;
+  }
+
+  .leader-card__body {
+    padding: 1rem;
+  }
+
+  .leader-card__name {
+    font-size: 0.92rem;
+  }
+
+  .leader-card__role {
+    font-size: 0.78rem;
+  }
+}
+
+/* ---------- MOBILE: KomSek Pages ---------- */
+@media (max-width: 768px) {
+  .komsek-profile {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .komsek-profile__text h2 {
+    font-size: 1.3rem;
+  }
+
+  .komsek-article-card {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .komsek-article-card__body {
+    padding: 1rem;
+  }
+
+  .komsek-article-card__title {
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .komsek-article-card__desc {
+    font-size: 0.82rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .komsek-article-card__date {
+    font-size: 0.72rem;
+  }
+}
+
+/* ---------- MOBILE: Devotional / Renungan ---------- */
+@media (max-width: 768px) {
+  .devotional-featured {
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+
+  .devotional-card {
+    border-radius: 14px;
+  }
+
+  .devotional-card__body {
+    padding: 1.25rem;
+  }
+
+  .devotional-card__title {
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .devotional-card__excerpt {
+    font-size: 0.82rem;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* ---------- MOBILE: Gallery Grid ---------- */
+@media (max-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .gallery-item {
+    border-radius: 10px;
+    aspect-ratio: 1;
+  }
+
+  .gallery-item__overlay {
+    padding: 0.75rem;
+    opacity: 0;
+  }
+
+  .gallery-item__overlay span {
+    font-size: 0.72rem;
+  }
+
+  .gallery-item__overlay svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* ---------- MOBILE: Warta & Sermon ---------- */
+@media (max-width: 768px) {
+  .warta-item {
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+
+  .sermon-card {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .sermon-card__thumb {
+    height: 160px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .sermon-card__body {
+    padding: 1.25rem;
+  }
+}
+
+/* ---------- MOBILE: Contact Form ---------- */
+@media (max-width: 768px) {
+  .contact-form {
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border: 1.5px solid var(--border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(200, 169, 81, 0.12);
+    outline: none;
+  }
+
+  .form-group label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    letter-spacing: 0.2px;
+  }
+}
+
+/* ---------- MOBILE: FAQ Accordion ---------- */
+@media (max-width: 768px) {
+  .faq-item {
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+
+  .faq-item__question {
+    padding: 1rem 1.25rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .faq-item__answer {
+    padding: 0 1.25rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+}
+
+/* ---------- MOBILE: Premium Footer ---------- */
+@media (max-width: 768px) {
+  .footer {
+    padding-top: 0;
+  }
+
+  .footer__inner {
+    padding: 2.5rem 0 1.5rem;
+  }
+
+  .footer__grid {
+    gap: 2rem;
+  }
+
+  .footer__brand {
+    text-align: center;
+  }
+
+  .footer__logo-text {
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+  }
+
+  .footer__desc {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    max-width: 320px;
+    margin: 0.5rem auto 0;
+    opacity: 0.75;
+  }
+
+  .footer__socials {
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 10px;
+  }
+
+  .footer__social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+  }
+
+  .footer__social-link:active {
+    transform: scale(0.92);
+    background: rgba(200, 169, 81, 0.2);
+    border-color: var(--gold);
+  }
+
+  .footer__social-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .footer__heading {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .footer__links li {
+    margin-bottom: 6px;
+  }
+
+  .footer__links a {
+    font-size: 0.82rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    padding: 2px 0;
+    display: inline-block;
+  }
+
+  .footer__links a:active {
+    opacity: 1;
+    color: var(--gold-light);
+  }
+
+  .footer__contact-item {
+    margin-bottom: 1rem;
+  }
+
+  .footer__contact-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 8px;
+  }
+
+  .footer__contact-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .footer__contact-text {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .footer__contact-text strong {
+    font-size: 0.78rem;
+    letter-spacing: 0.3px;
+  }
+
+  .footer__schedule-box {
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .footer__schedule-row {
+    font-size: 0.85rem;
+  }
+
+  .footer__schedule-desc {
+    font-size: 0.78rem;
+    opacity: 0.65;
+  }
+
+  .footer__schedule-link {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gold);
+    margin-top: 0.5rem;
+    display: inline-block;
+  }
+
+  .footer__bottom {
+    padding: 1rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .footer__bottom-inner {
+    gap: 8px;
+  }
+
+  .footer__copyright {
+    font-size: 0.72rem;
+    opacity: 0.5;
+  }
+
+  .footer__legal a {
+    font-size: 0.72rem;
+    opacity: 0.5;
+  }
+
+  .footer__separator {
+    opacity: 0.3;
+  }
+}
+
+/* ---------- MOBILE: Floating Widgets (WhatsApp + Renungan) ---------- */
+@media (max-width: 768px) {
+  /* WhatsApp button */
+  .wa-float-btn {
+    bottom: 20px !important;
+    right: 16px !important;
+    width: 52px !important;
+    height: 52px !important;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35) !important;
+    border-radius: 14px !important;
+    z-index: 990 !important;
+  }
+
+  .wa-float-btn svg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  /* Renungan button */
+  .renungan-float-btn {
+    bottom: 20px !important;
+    left: 16px !important;
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    border-radius: 14px !important;
+    gap: 6px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+    z-index: 990 !important;
+    border-width: 1.5px !important;
+  }
+
+  .renungan-float-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Back to top */
+  .back-to-top {
+    bottom: 80px !important;
+    right: 16px !important;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+}
+
+/* ---------- MOBILE: Visitor Badge ---------- */
+@media (max-width: 768px) {
+  .visitor-live-badge {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    gap: 4px;
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* ---------- MOBILE: Premium Lightbox ---------- */
+@media (max-width: 768px) {
+  .lightbox__content {
+    max-width: 96vw;
+    max-height: 90vh;
+    padding: 0.5rem;
+  }
+
+  .lightbox__content img {
+    max-width: 96vw;
+    max-height: 80vh;
+    border-radius: 6px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+  }
+
+  .lightbox__caption {
+    font-size: 0.82rem;
+    padding: 0 0.5rem;
+    max-width: 90vw;
+  }
+
+  .lightbox__close {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+  }
+
+  .lightbox__nav {
+    display: flex !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+  }
+
+  .lightbox__nav--prev { left: 8px; }
+  .lightbox__nav--next { right: 8px; }
+
+  .lightbox__counter {
+    top: 14px;
+    font-size: 0.7rem;
+    padding: 3px 12px;
+    border-radius: 8px;
+  }
+}
+
+/* ---------- MOBILE: Sejarah (History) Page ---------- */
+@media (max-width: 768px) {
+  .sejarah-p {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .sejarah-p:first-of-type {
+    font-size: 0.95rem;
+  }
+
+  .sejarah-p:first-of-type::first-letter {
+    font-size: 2.2rem;
+    margin-right: 0.35rem;
+  }
+}
+
+/* ---------- MOBILE: Registration / Visit Page ---------- */
+@media (max-width: 768px) {
+  .reg-info-card {
+    border-radius: 14px;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .reg-timeline-item {
+    padding-left: 50px;
+    margin-bottom: 1.5rem;
+  }
+
+  .reg-timeline-item__dot {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ---------- MOBILE 480px: Extra small refinements ---------- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .section {
+    padding: 2.5rem 0;
+  }
+
+  .section-header h2 {
+    font-size: 1.35rem;
+  }
+
+  h1 { font-size: 1.55rem; }
+  h2 { font-size: 1.35rem; }
+
+  .hero h1 {
+    font-size: 1.55rem;
+  }
+
+  .hero__subtitle {
+    font-size: 0.82rem;
+  }
+
+  .hero__logo {
+    width: 80px;
+  }
+
+  .stats-grid {
+    gap: 0.5rem;
+  }
+
+  .stat-card {
+    padding: 1rem 0.5rem;
+  }
+
+  .stat-card__number {
+    font-size: 1.5rem;
+  }
+
+  .stat-card__label {
+    font-size: 0.62rem;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .gallery-item {
+    border-radius: 8px;
+  }
+
+  /* Floating widgets smaller */
+  .wa-float-btn {
+    width: 46px !important;
+    height: 46px !important;
+    bottom: 16px !important;
+    right: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .renungan-float-btn {
+    bottom: 16px !important;
+    left: 12px !important;
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .back-to-top {
+    bottom: 70px !important;
+    right: 12px !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  /* Footer extra-tight */
+  .footer__logo-text {
+    font-size: 1.15rem;
+  }
+
+  .footer__inner {
+    padding: 2rem 0 1rem;
+  }
+}
+
+/* ---------- MOBILE 360px: Ultra-compact ---------- */
+@media (max-width: 360px) {
+  .container {
+    padding: 0 0.85rem;
+  }
+
+  .hero h1 {
+    font-size: 1.35rem;
+  }
+
+  .hero__subtitle {
+    font-size: 0.78rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .hero__actions .btn {
+    padding: 10px 24px;
+    font-size: 0.82rem;
+    max-width: 250px;
+  }
+
+  .stat-card__number {
+    font-size: 1.35rem;
+  }
+
+  .calendar-cell {
+    font-size: 0.72rem;
+    padding: 6px 1px;
+    min-height: 32px;
+  }
+}
+
+/* ---------- MOBILE: Smooth Transitions & Touch Feedback ---------- */
+@media (max-width: 768px) {
+  /* Smooth card touch feedback */
+  .schedule-card:active,
+  .feature-card:active,
+  .expect-card:active,
+  .contact-card:active,
+  .leader-card:active,
+  .komsek-article-card:active,
+  .devotional-card:active,
+  .komsek-others__card:active,
+  .stat-card:active,
+  .prem-card:active {
+    transform: scale(0.97);
+    transition: transform 0.15s ease;
+  }
+
+  /* Disable hover effects - mobile only touch */
+  .schedule-card:hover,
+  .feature-card:hover,
+  .expect-card:hover {
+    transform: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 0.5px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Smooth page transitions */
+  .section,
+  .hero {
+    will-change: auto;
+  }
+
+  /* Remove complex hover animations on mobile */
+  .schedule-card::before {
+    display: none;
+  }
+
+  /* Smooth scrolling improvements */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better image rendering */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
