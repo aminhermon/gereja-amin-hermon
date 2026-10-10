@@ -9526,11 +9526,22 @@ p {
   }
 
   .hero--sub {
-    min-height: 45vh;
+    min-height: 60vh;
   }
 
   .hero--mini {
-    min-height: 40vh;
+    min-height: 50vh;
+  }
+
+  /* Ensure banner images show more content on mobile */
+  .hero__bg img,
+  .hero__bg video {
+    object-position: center 30%;
+  }
+
+  .hero--sub .hero__bg img,
+  .hero--sub .hero__bg video {
+    object-position: center 25%;
   }
 
   .hero__overlay {
