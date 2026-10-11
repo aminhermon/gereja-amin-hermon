@@ -1051,9 +1051,8 @@ function deleteUploadedFile(filePath) {
     }
 
     // 4. Add to deleted-files blacklist so auto-sync won't resurrect this file
-    if (deleted) {
-      addToDeletedBlacklist(filename);
-    }
+    // ALWAYS blacklist, even if physical delete failed (e.g. read-only repo dir)
+    addToDeletedBlacklist(filename);
 
     return deleted;
   } catch (err) {
@@ -1183,9 +1182,11 @@ function cleanDbFileReferences(filePath) {
 }
 
 // Helper: Get list of all uploaded files in uploads/ directory
+// Respects deleted-files blacklist so intentionally removed files stay gone
 function getUploadedFiles() {
   const seenFiles = new Set();
   const results = [];
+  const deletedBlacklist = getDeletedFilesBlacklist();
 
   const scanDir = (dir) => {
     if (!fs.existsSync(dir)) return;
@@ -1193,6 +1194,8 @@ function getUploadedFiles() {
       const files = fs.readdirSync(dir);
       for (const file of files) {
         if (file === '.gitkeep' || seenFiles.has(file)) continue;
+        // Skip files that were intentionally deleted via admin CMS
+        if (deletedBlacklist.includes(file)) continue;
         const fullPath = path.join(dir, file);
         try {
           const stat = fs.statSync(fullPath);
@@ -2150,6 +2153,10 @@ app.post('/admin/komsek/article/delete', requireAuth, (req, res) => {
 // Direct upload to uploads/ folder
 app.post('/admin/files/upload', requireAuth, upload.array('files', 20), (req, res) => {
   const count = req.files ? req.files.length : 0;
+  // Remove newly uploaded files from blacklist (in case they were re-uploaded)
+  if (req.files) {
+    req.files.forEach(f => removeFromDeletedBlacklist(f.filename));
+  }
   res.redirect('/admin?tab=files&msg=' + encodeURIComponent(count + ' file berhasil diunggah.'));
 });
 
