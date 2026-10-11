@@ -28,6 +28,11 @@
   --shadow-lg: rgba(15, 29, 53, 0.15);
   --overlay: rgba(15, 29, 53, 0.65);
 
+  /* Nias Cultural Accent Colors */
+  --nias-red: #8B1A1A;
+  --nias-red-light: #A52D2D;
+  --nias-red-glow: rgba(139, 26, 26, 0.2);
+
   /* Typography */
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -10636,5 +10641,311 @@ p {
   /* Better image rendering */
   img {
     image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* =========================================
+   NIAS CULTURAL ORNAMENT SYSTEM
+   Inspired by Ni'okindrö (diamond/belah ketupat),
+   Ni'ohulayo (triangle/tombak), and Omo Hada architecture
+   Colors: Traditional Nias red, gold, and dark
+   ========================================= */
+
+/* --- Nias Diamond Divider (Ni'okindrö) --- */
+/* Used between sections to add traditional Nias flavor */
+.nias-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 1.5rem 0;
+  position: relative;
+}
+
+.nias-divider::before,
+.nias-divider::after {
+  content: '';
+  flex: 1;
+  max-width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.nias-divider__diamond {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nias-divider__diamond::before,
+.nias-divider__diamond::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--nias-red);
+  transform: rotate(45deg);
+  opacity: 0.7;
+}
+
+.nias-divider__diamond-center {
+  width: 10px;
+  height: 10px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  border: 1px solid var(--nias-red);
+}
+
+/* --- Hero Eyebrow: Nias Diamond Accents --- */
+/* Replaces simple lines with diamond + line pattern */
+.hero__eyebrow::before,
+.hero__eyebrow::after {
+  content: '';
+  display: flex;
+  align-items: center;
+  width: 30px;
+  height: 1px;
+  background: var(--gold);
+  position: relative;
+}
+
+/* --- Nias Geometric Border Strip --- */
+/* A horizontal strip of repeating diamond pattern */
+.nias-border-strip {
+  width: 100%;
+  height: 16px;
+  background-image:
+    linear-gradient(45deg, var(--gold) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--gold) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--gold) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--gold) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, 8px 0;
+  opacity: 0.15;
+}
+
+/* Variant: Red + Gold dual color (traditional Nias) */
+.nias-border-strip--dual {
+  height: 8px;
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--nias-red) 10%,
+    var(--gold) 30%,
+    var(--nias-red) 50%,
+    var(--gold) 70%,
+    var(--nias-red) 90%,
+    transparent 100%
+  );
+  opacity: 0.3;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8'%3E%3Cpath d='M0 8L6 0l6 8M12 8l6-8 6 8' fill='%23000'/%3E%3C/svg%3E");
+  mask-size: 24px 8px;
+  mask-repeat: repeat-x;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8'%3E%3Cpath d='M0 8L6 0l6 8M12 8l6-8 6 8' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 24px 8px;
+  -webkit-mask-repeat: repeat-x;
+}
+
+/* --- Nias Zigzag Section Separator (Ni'ohulayo) --- */
+.nias-zigzag {
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(135deg, var(--gold) 33.33%, transparent 33.33%) 0 0,
+              var(--navy-dark) linear-gradient(225deg, var(--gold) 33.33%, transparent 33.33%) 0 0;
+  background-size: 12px 12px;
+  background-repeat: repeat-x;
+  opacity: 0.2;
+}
+
+/* --- Footer Nias Ornamental Strip --- */
+.footer .nias-ornament-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+}
+
+.footer .nias-ornament-strip .nias-diamond {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.footer .nias-ornament-strip .nias-diamond--red {
+  background: var(--nias-red-light);
+  width: 6px;
+  height: 6px;
+}
+
+.footer .nias-ornament-strip .nias-diamond--lg {
+  width: 10px;
+  height: 10px;
+  opacity: 0.7;
+  border: 1px solid var(--nias-red);
+}
+
+.footer .nias-ornament-strip .nias-line {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+}
+
+/* --- Hero Section Nias Bottom Border --- */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 5;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--nias-red) 15%,
+    var(--gold) 35%,
+    var(--nias-red) 50%,
+    var(--gold) 65%,
+    var(--nias-red) 85%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+/* --- Section Title Nias Diamond Decoration --- */
+/* Adds small diamond accent below section titles */
+.section h2::after,
+.section h3.section-title::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  margin: 1rem auto 0;
+  border: 1.5px solid var(--nias-red);
+  opacity: 0.7;
+}
+
+/* Specifically target the gold underline dividers — add diamond */
+.section h2 + .gold-underline::after,
+.section h2 + hr::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: var(--nias-red);
+  transform: rotate(45deg);
+  margin: 0.5rem auto 0;
+  opacity: 0.5;
+}
+
+/* --- Stats Section Nias Pattern Overlay --- */
+.section--stats-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 0L30 10L20 20L10 10Z' fill='none' stroke='%23C8A951' stroke-width='0.5' opacity='0.06'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --- Nias Pattern on Navy Sections --- */
+.section--navy::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5L40 15L30 25L20 15Z' fill='none' stroke='%23C8A951' stroke-width='0.3' opacity='0.04'/%3E%3Cpath d='M10 25L15 30L10 35L5 30Z' fill='none' stroke='%238B1A1A' stroke-width='0.3' opacity='0.04'/%3E%3Cpath d='M50 25L55 30L50 35L45 30Z' fill='none' stroke='%238B1A1A' stroke-width='0.3' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure content stays above pattern */
+.section--navy > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Carousel (News) Nias Corner Ornaments --- */
+.carousel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold) 20%,
+    var(--nias-red) 40%,
+    var(--gold) 50%,
+    var(--nias-red) 60%,
+    var(--gold) 80%,
+    transparent
+  );
+  opacity: 0.25;
+  z-index: 2;
+}
+
+/* --- Schedule Card Nias Accent --- */
+.schedule-card {
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(
+    90deg,
+    var(--nias-red) 0%,
+    var(--gold) 50%,
+    var(--nias-red) 100%
+  ) 1;
+}
+
+/* --- Footer Bottom Nias Accent Line --- */
+.footer__bottom::before {
+  content: '';
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: 2px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--nias-red) 20%,
+    var(--gold) 40%,
+    var(--nias-red) 50%,
+    var(--gold) 60%,
+    var(--nias-red) 80%,
+    transparent
+  );
+  opacity: 0.3;
+}
+
+/* --- Nias Mobile Adjustments --- */
+@media (max-width: 768px) {
+  .hero::after {
+    height: 3px;
+    opacity: 0.5;
+  }
+  .section h2::after,
+  .section h3.section-title::after {
+    width: 8px;
+    height: 8px;
+  }
+  .nias-divider::before,
+  .nias-divider::after {
+    max-width: 80px;
   }
 }
