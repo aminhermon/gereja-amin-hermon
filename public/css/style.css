@@ -648,6 +648,13 @@ p {
     height: auto;
     display: block;
   }
+  /* Hero banner images must fill their container, not collapse */
+  .hero__bg img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 30%;
+  }
   /* Carousel images must fill their absolute-positioned container */
   .carousel__list .carousel__item img {
     width: 100% !important;
@@ -9533,9 +9540,12 @@ p {
     min-height: 50vh;
   }
 
-  /* Ensure banner images show more content on mobile */
+  /* Ensure banner images fill container and show key content */
   .hero__bg img,
   .hero__bg video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
     object-position: center 30%;
   }
 
