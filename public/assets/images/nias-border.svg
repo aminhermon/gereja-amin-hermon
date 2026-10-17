@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="266" viewBox="0 0 72 266">
+  <defs>
+    <!-- Single 4-petal flower with dark center dot (Ni'obowo) -->
+    <g id="flower">
+      <circle cx="0" cy="-2.5" r="2.1" fill="#FFDE00" />
+      <circle cx="0" cy="2.5" r="2.1" fill="#FFDE00" />
+      <circle cx="-2.5" cy="0" r="2.1" fill="#FFDE00" />
+      <circle cx="2.5" cy="0" r="2.1" fill="#FFDE00" />
+      <circle cx="0" cy="0" r="0.8" fill="#141414" />
+    </g>
+
+    <!-- Cluster of 3 flowers in a V (upper notch) -->
+    <g id="flower-v-upper">
+      <use href="#flower" x="0" y="0"/>
+      <use href="#flower" x="-5.5" y="-6.5"/>
+      <use href="#flower" x="5.5" y="-6.5"/>
+    </g>
+
+    <!-- Cluster of 3 flowers in inverted V (lower notch) -->
+    <g id="flower-v-lower">
+      <use href="#flower" x="0" y="0"/>
+      <use href="#flower" x="-5.5" y="6.5"/>
+      <use href="#flower" x="5.5" y="6.5"/>
+    </g>
+  </defs>
+
+  <!-- ==================== BAND 1: TOP WAVE ==================== -->
+  <rect x="0" y="0" width="72" height="30" fill="#FFDE00"/>
+  <path d="
+      M 0 20
+      C 5 21.5, 11 20, 16 14.5
+      C 18.5 11.5, 19.5 8, 21.5 8.5
+      C 23 9.2, 23 11.5, 21 13.5
+      C 19 15.5, 16.5 15, 15 13
+      C 14 11.5, 15 9.5, 17 9.5
+      C 18.5 9.5, 19 10.8, 18 11.8
+      C 17 12.5, 15.8 12, 15.5 11
+      C 15 9.5, 17 7, 20 7.5
+      C 23 8, 25 12, 21.5 15
+      C 18 18.5, 12 21, 5 21
+      L 0 20.5 Z
+      M 0 20
+      C 6 21.5, 14 19.5, 18.5 15.5
+      C 21.5 13, 23 15, 24 20
+      L 24 23.5
+      C 22.5 20, 20 18, 17 19.5
+      C 13 21.5, 6 23.5, 0 23.5 Z
+    " fill="#EE1C25"/>
+  <path d="
+      M 24 20
+      C 29 21.5, 35 20, 40 14.5
+      C 42.5 11.5, 43.5 8, 45.5 8.5
+      C 47 9.2, 47 11.5, 45 13.5
+      C 43 15.5, 40.5 15, 39 13
+      C 38 11.5, 39 9.5, 41 9.5
+      C 42.5 9.5, 43 10.8, 42 11.8
+      C 41 12.5, 39.8 12, 39.5 11
+      C 39 9.5, 41 7, 44 7.5
+      C 47 8, 49 12, 45.5 15
+      C 42 18.5, 36 21, 29 21
+      L 24 20.5 Z
+      M 24 20
+      C 30 21.5, 38 19.5, 42.5 15.5
+      C 45.5 13, 47 15, 48 20
+      L 48 23.5
+      C 46.5 20, 44 18, 41 19.5
+      C 37 21.5, 30 23.5, 24 23.5 Z
+    " fill="#EE1C25"/>
+  <path d="
+      M 48 20
+      C 53 21.5, 59 20, 64 14.5
+      C 66.5 11.5, 67.5 8, 69.5 8.5
+      C 71 9.2, 71 11.5, 69 13.5
+      C 67 15.5, 64.5 15, 63 13
+      C 62 11.5, 63 9.5, 65 9.5
+      C 66.5 9.5, 67 10.8, 66 11.8
+      C 65 12.5, 63.8 12, 63.5 11
+      C 63 9.5, 65 7, 68 7.5
+      C 71 8, 73 12, 69.5 15
+      C 66 18.5, 60 21, 53 21
+      L 48 20.5 Z
+      M 48 20
+      C 54 21.5, 62 19.5, 66.5 15.5
+      C 69.5 13, 71 15, 72 20
+      L 72 23.5
+      C 70.5 20, 68 18, 65 19.5
+      C 61 21.5, 54 23.5, 48 23.5 Z
+    " fill="#EE1C25"/>
+  <rect x="0" y="29.5" width="72" height="1" fill="#141414"/>
+  <!-- Band 2: Upper Diamond Band -->
+  <rect x="0" y="30" width="72" height="58" fill="#141414"/>
+  <polygon points="-72,59 -36,32 0,59 -36,86" fill="#EE1C25" stroke="#FFDE00" stroke-width="4.5" stroke-linejoin="miter"/>
+  <polygon points="-68.5,59 -36,34.5 -3.5,59 -36,83.5" fill="none" stroke="#E85B00" stroke-width="0.8" opacity="0.6"/>
+  <use href="#flower-v-upper" x="0" y="44"/>
+  <use href="#flower-v-lower" x="0" y="74"/>
+  <polygon points="0,59 36,32 72,59 36,86" fill="#EE1C25" stroke="#FFDE00" stroke-width="4.5" stroke-linejoin="miter"/>
+  <polygon points="3.5,59 36,34.5 68.5,59 36,83.5" fill="none" stroke="#E85B00" stroke-width="0.8" opacity="0.6"/>
+  <use href="#flower-v-upper" x="72" y="44"/>
+  <use href="#flower-v-lower" x="72" y="74"/>
+  <polygon points="72,59 108,32 144,59 108,86" fill="#EE1C25" stroke="#FFDE00" stroke-width="4.5" stroke-linejoin="miter"/>
+  <polygon points="75.5,59 108,34.5 140.5,59 108,83.5" fill="none" stroke="#E85B00" stroke-width="0.8" opacity="0.6"/>
+  <use href="#flower-v-upper" x="144" y="44"/>
+  <use href="#flower-v-lower" x="144" y="74"/>
+  <!-- Band 3: Red Separator -->
+  <rect x="0" y="88" width="72" height="11" fill="#EE1C25"/>
+  <!-- Band 4: Middle Diamond Band -->
+  <rect x="0" y="99" width="72" height="68" fill="#FFDE00"/>
+  <polygon points="-108,133 -72,101 -36,133 -72,165" fill="#141414"/>
+  <polygon points="-36,133 0,101 36,133 0,165" fill="#141414"/>
+  <polygon points="36,133 72,101 108,133 72,165" fill="#141414"/>
+  <polygon points="108,133 144,101 180,133 144,165" fill="#141414"/>
+  <!-- Band 5: Red Separator -->
+  <rect x="0" y="167" width="72" height="11" fill="#EE1C25"/>
+  <!-- Band 6: Lower Diamond Band -->
+  <rect x="0" y="178" width="72" height="58" fill="#141414"/>
+  <polygon points="-72,207 -36,180 0,207 -36,234" fill="#EE1C25" stroke="#FFDE00" stroke-width="4.5" stroke-linejoin="miter"/>
+  <polygon points="-68.5,207 -36,182.5 -3.5,207 -36,231.5" fill="none" stroke="#E85B00" stroke-width="0.8" opacity="0.6"/>
+  <use href="#flower-v-upper" x="0" y="192"/>
+  <use href="#flower-v-lower" x="0" y="222"/>
+  <polygon points="0,207 36,180 72,207 36,234" fill="#EE1C25" stroke="#FFDE00" stroke-width="4.5" stroke-linejoin="miter"/>
+  <polygon points="3.5,207 36,182.5 68.5,207 36,231.5" fill="none" stroke="#E85B00" stroke-width="0.8" opacity="0.6"/>
+  <use href="#flower-v-upper" x="72" y="192"/>
+  <use href="#flower-v-lower" x="72" y="222"/>
+  <polygon points="72,207 108,180 144,207 108,234" fill="#EE1C25" stroke="#FFDE00" stroke-width="4.5" stroke-linejoin="miter"/>
+  <polygon points="75.5,207 108,182.5 140.5,207 108,231.5" fill="none" stroke="#E85B00" stroke-width="0.8" opacity="0.6"/>
+  <use href="#flower-v-upper" x="144" y="192"/>
+  <use href="#flower-v-lower" x="144" y="222"/>
+  <!-- Band 7: Bottom Wave -->
+  <rect x="0" y="235.5" width="72" height="1" fill="#141414"/>
+  <rect x="0" y="236" width="72" height="30" fill="#FFDE00"/>
+  <path d="
+      M 0 256
+      C 5 257.5, 11 256, 16 250.5
+      C 18.5 247.5, 19.5 244, 21.5 244.5
+      C 23 245.2, 23 247.5, 21 249.5
+      C 19 251.5, 16.5 251, 15 249
+      C 14 247.5, 15 245.5, 17 245.5
+      C 18.5 245.5, 19 246.8, 18 247.8
+      C 17 248.5, 15.8 248, 15.5 247
+      C 15 245.5, 17 243, 20 243.5
+      C 23 244, 25 248, 21.5 251
+      C 18 254.5, 12 257, 5 257
+      L 0 256.5 Z
+      M 0 256
+      C 6 257.5, 14 255.5, 18.5 251.5
+      C 21.5 249, 23 251, 24 256
+      L 24 259.5
+      C 22.5 256, 20 254, 17 255.5
+      C 13 257.5, 6 259.5, 0 259.5 Z
+    " fill="#EE1C25"/>
+  <path d="
+      M 24 256
+      C 29 257.5, 35 256, 40 250.5
+      C 42.5 247.5, 43.5 244, 45.5 244.5
+      C 47 245.2, 47 247.5, 45 249.5
+      C 43 251.5, 40.5 251, 39 249
+      C 38 247.5, 39 245.5, 41 245.5
+      C 42.5 245.5, 43 246.8, 42 247.8
+      C 41 248.5, 39.8 248, 39.5 247
+      C 39 245.5, 41 243, 44 243.5
+      C 47 244, 49 248, 45.5 251
+      C 42 254.5, 36 257, 29 257
+      L 24 256.5 Z
+      M 24 256
+      C 30 257.5, 38 255.5, 42.5 251.5
+      C 45.5 249, 47 251, 48 256
+      L 48 259.5
+      C 46.5 256, 44 254, 41 255.5
+      C 37 257.5, 30 259.5, 24 259.5 Z
+    " fill="#EE1C25"/>
+  <path d="
+      M 48 256
+      C 53 257.5, 59 256, 64 250.5
+      C 66.5 247.5, 67.5 244, 69.5 244.5
+      C 71 245.2, 71 247.5, 69 249.5
+      C 67 251.5, 64.5 251, 63 249
+      C 62 247.5, 63 245.5, 65 245.5
+      C 66.5 245.5, 67 246.8, 66 247.8
+      C 65 248.5, 63.8 248, 63.5 247
+      C 63 245.5, 65 243, 68 243.5
+      C 71 244, 73 248, 69.5 251
+      C 66 254.5, 60 257, 53 257
+      L 48 256.5 Z
+      M 48 256
+      C 54 257.5, 62 255.5, 66.5 251.5
+      C 69.5 249, 71 251, 72 256
+      L 72 259.5
+      C 70.5 256, 68 254, 65 255.5
+      C 61 257.5, 54 259.5, 48 259.5 Z
+    " fill="#EE1C25"/>
+</svg>

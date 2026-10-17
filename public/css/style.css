@@ -10802,19 +10802,14 @@ p {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 36px;
   z-index: 5;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--nias-red) 15%,
-    var(--gold) 35%,
-    var(--nias-red) 50%,
-    var(--gold) 65%,
-    var(--nias-red) 85%,
-    transparent 100%
-  );
-  opacity: 0.6;
+  background-image: url('/assets/images/nias-border.svg');
+  background-repeat: repeat-x;
+  background-size: auto 36px;
+  background-position: center bottom;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45);
+  border-bottom: 2px solid var(--gold);
 }
 
 /* --- Section Title Nias Diamond Decoration --- */
@@ -10933,11 +10928,63 @@ p {
   opacity: 0.3;
 }
 
+/* =========================================
+   NIAS PATTERN BORDER SYSTEM
+   Faithful recreation of traditional Nias geometric ribbon:
+   Ni'obawa gowirio, Ni'okindrö, Ni'obowo, and middle diamonds
+   ========================================= */
+.nias-pattern-border {
+  display: block;
+  width: 100%;
+  height: 42px;
+  background-image: url('/assets/images/nias-border.svg');
+  background-repeat: repeat-x;
+  background-size: auto 42px;
+  background-position: center;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nias-pattern-border--hero {
+  position: relative;
+  z-index: 15;
+  margin-top: -2px;
+  border-bottom: 2px solid var(--gold);
+}
+
+.nias-pattern-border--footer {
+  height: 44px;
+  background-size: auto 44px;
+  border-top: 2px solid var(--gold);
+  border-bottom: 2px solid #141414;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.nias-pattern-border--sm {
+  height: 26px;
+  background-size: auto 26px;
+  box-shadow: none;
+}
+
 /* --- Nias Mobile Adjustments --- */
 @media (max-width: 768px) {
   .hero::after {
-    height: 3px;
-    opacity: 0.5;
+    height: 26px;
+    background-size: auto 26px;
+    opacity: 0.95;
+  }
+  .nias-pattern-border {
+    height: 30px;
+    background-size: auto 30px;
+  }
+  .nias-pattern-border--footer {
+    height: 34px;
+    background-size: auto 34px;
+  }
+  .nias-pattern-border--sm {
+    height: 20px;
+    background-size: auto 20px;
   }
   .section h2::after,
   .section h3.section-title::after {
