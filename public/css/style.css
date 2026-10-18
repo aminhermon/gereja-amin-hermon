@@ -5188,7 +5188,7 @@ p {
   flex-wrap: wrap;
 }
 
-/* ========== PASTOR HERO — PREMIUM CARD ========== */
+/* ========== PASTOR HERO — PREMIUM CARD WITH NIAS ORNAMENTS ========== */
 .pastor-hero {
   max-width: 780px;
   margin: var(--space-xl) auto 0;
@@ -5209,6 +5209,19 @@ p {
   transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1),
               box-shadow 0.45s cubic-bezier(0.23, 1, 0.32, 1);
   cursor: pointer;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.pastor-hero__card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #C8A951 0%, #8B1A1A 30%, #C8A951 50%, #8B1A1A 70%, #C8A951 100%);
+  z-index: -1;
+  opacity: 0.6;
+  transition: opacity 0.4s ease;
 }
 
 .pastor-hero__card:hover {
@@ -5219,12 +5232,45 @@ p {
     0 0 0 1px rgba(200,169,81,0.3);
 }
 
-/* Corner accents */
+.pastor-hero__card:hover::before {
+  opacity: 1;
+}
+
+/* Nias Card Ornamental Border Bars */
+.nias-card-border {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  z-index: 5;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #C8A951 0px, #C8A951 3px,
+      #8B1A1A 3px, #8B1A1A 6px,
+      #C8A951 6px, #C8A951 12px,
+      transparent 12px, transparent 14px
+    );
+  pointer-events: none;
+}
+
+.nias-card-border--top {
+  top: 0;
+  border-radius: 20px 20px 0 0;
+}
+
+.nias-card-border--bottom {
+  bottom: 0;
+  grid-column: 1 / -1;
+  border-radius: 0 0 20px 20px;
+}
+
+/* Corner accents — Nias geometric style */
 .pastor-hero__corner {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  z-index: 2;
+  width: 32px;
+  height: 32px;
+  z-index: 6;
   pointer-events: none;
 }
 
@@ -5232,40 +5278,41 @@ p {
 .pastor-hero__corner::after {
   content: '';
   position: absolute;
-  background: var(--gold, #C8A951);
-  border-radius: 2px;
-  transition: transform 0.4s ease;
+  background: linear-gradient(135deg, #C8A951, #a8892e);
+  border-radius: 1px;
+  transition: transform 0.4s ease, background 0.4s ease;
 }
 
 .pastor-hero__corner::before {
-  width: 28px;
-  height: 2px;
+  width: 32px;
+  height: 3px;
 }
 
 .pastor-hero__corner::after {
-  width: 2px;
-  height: 28px;
+  width: 3px;
+  height: 32px;
 }
 
-.pastor-hero__corner--tl { top: 12px; left: 12px; }
+.pastor-hero__corner--tl { top: 10px; left: 10px; }
 .pastor-hero__corner--tl::before { top: 0; left: 0; }
 .pastor-hero__corner--tl::after { top: 0; left: 0; }
 
-.pastor-hero__corner--tr { top: 12px; right: 12px; }
+.pastor-hero__corner--tr { top: 10px; right: 10px; }
 .pastor-hero__corner--tr::before { top: 0; right: 0; }
 .pastor-hero__corner--tr::after { top: 0; right: 0; }
 
-.pastor-hero__corner--bl { bottom: 12px; left: 12px; }
+.pastor-hero__corner--bl { bottom: 10px; left: 10px; }
 .pastor-hero__corner--bl::before { bottom: 0; left: 0; }
 .pastor-hero__corner--bl::after { bottom: 0; left: 0; }
 
-.pastor-hero__corner--br { bottom: 12px; right: 12px; }
+.pastor-hero__corner--br { bottom: 10px; right: 10px; }
 .pastor-hero__corner--br::before { bottom: 0; right: 0; }
 .pastor-hero__corner--br::after { bottom: 0; right: 0; }
 
 .pastor-hero__card:hover .pastor-hero__corner::before,
 .pastor-hero__card:hover .pastor-hero__corner::after {
-  transform: scale(1.2);
+  transform: scale(1.25);
+  background: linear-gradient(135deg, #ddc36e, #C8A951);
 }
 
 /* Photo section */
@@ -5292,6 +5339,28 @@ p {
   pointer-events: none;
 }
 
+/* Nias geometric overlay pattern on photo */
+.pastor-hero__photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(45deg, rgba(200,169,81,0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(200,169,81,0.05) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(200,169,81,0.05) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(200,169,81,0.05) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.pastor-hero__card:hover .pastor-hero__photo::after {
+  opacity: 1;
+}
+
 .pastor-hero__photo-frame {
   position: relative;
   width: 100%;
@@ -5304,11 +5373,10 @@ p {
 .pastor-hero__photo-frame img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover;
+  object-position: top center;
   display: block;
   transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-  padding: 8px;
 }
 
 .pastor-hero__card:hover .pastor-hero__photo-frame img {
@@ -5340,7 +5408,7 @@ p {
   bottom: 2rem;
   left: 0;
   width: 3px;
-  background: linear-gradient(180deg, transparent, var(--gold, #C8A951), transparent);
+  background: linear-gradient(180deg, transparent, var(--gold, #C8A951), #8B1A1A, var(--gold, #C8A951), transparent);
   border-radius: 3px;
 }
 
@@ -5348,7 +5416,7 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, rgba(200,169,81,0.12), rgba(200,169,81,0.06));
+  background: linear-gradient(135deg, rgba(200,169,81,0.15), rgba(139,26,26,0.08));
   color: var(--gold-dark, #a8892e);
   padding: 6px 16px;
   border-radius: 100px;
@@ -5358,7 +5426,7 @@ p {
   letter-spacing: 1.5px;
   width: fit-content;
   margin-bottom: 1.2rem;
-  border: 1px solid rgba(200,169,81,0.25);
+  border: 1px solid rgba(200,169,81,0.3);
 }
 
 .pastor-hero__badge svg {
@@ -5395,8 +5463,8 @@ p {
 
 .pastor-hero__divider {
   width: 48px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--gold, #C8A951), transparent);
+  height: 3px;
+  background: linear-gradient(90deg, #C8A951, #8B1A1A, transparent);
   margin: 1.2rem 0;
   border-radius: 2px;
 }
@@ -5436,7 +5504,6 @@ p {
   .pastor-hero__photo-frame img {
     object-fit: cover;
     object-position: top center;
-    padding: 0;
   }
 
   .pastor-hero__info {
@@ -5485,15 +5552,15 @@ p {
   }
 
   .pastor-hero__corner {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
 
-  .pastor-hero__corner::before { width: 20px; }
-  .pastor-hero__corner::after { height: 20px; }
+  .pastor-hero__corner::before { width: 22px; }
+  .pastor-hero__corner::after { height: 22px; }
 }
 
-/* ========== PREMIUM CARD — PENGURUS & MAJELIS ========== */
+/* ========== PREMIUM CARD — PENGURUS & MAJELIS (NIAS CULTURAL EDITION) ========== */
 
 /* Grid Layouts */
 .prem-grid {
@@ -5519,7 +5586,7 @@ p {
   max-width: 100%;
 }
 
-/* Card Base */
+/* Card Base — Nias-themed */
 .prem-card {
   position: relative;
   background: linear-gradient(160deg, #ffffff 0%, #faf8f3 100%);
@@ -5528,7 +5595,7 @@ p {
   box-shadow:
     0 2px 8px rgba(0,0,0,0.04),
     0 8px 32px rgba(0,0,0,0.06);
-  border: 1px solid rgba(200, 169, 81, 0.1);
+  border: 2px solid rgba(200, 169, 81, 0.2);
   transition:
     transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
     box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1),
@@ -5542,29 +5609,93 @@ p {
   transform: translateY(-6px);
   box-shadow:
     0 6px 16px rgba(0,0,0,0.06),
-    0 16px 48px rgba(0,0,0,0.1);
-  border-color: rgba(200, 169, 81, 0.35);
+    0 16px 48px rgba(0,0,0,0.1),
+    0 0 20px rgba(200,169,81,0.08);
+  border-color: rgba(200, 169, 81, 0.5);
 }
 
-/* Gold accent line (left edge) */
-.prem-card__accent {
+/* Nias Ornamental Top Bar — Repeating diamond pattern */
+.prem-card__nias-top {
+  height: 8px;
+  width: 100%;
+  position: relative;
+  background: linear-gradient(90deg, #0a1628, #162d50);
+  flex-shrink: 0;
+}
+
+.prem-card__nias-top::before {
+  content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(180deg, var(--gold, #C8A951), rgba(200,169,81,0.2));
-  border-radius: 4px 0 0 4px;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: 2;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 2px,
+      #C8A951 2px,
+      #C8A951 4px,
+      transparent 4px,
+      transparent 6px,
+      #8B1A1A 6px,
+      #8B1A1A 8px,
+      transparent 8px,
+      transparent 12px,
+      #C8A951 12px,
+      #C8A951 14px,
+      transparent 14px,
+      transparent 16px
+    );
+  opacity: 0.9;
 }
 
-.prem-card:hover .prem-card__accent {
+.prem-card__nias-top::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C8A951, transparent);
+}
+
+.prem-card__nias-top--sm {
+  height: 5px;
+}
+
+/* Nias Ornamental Bottom Bar */
+.prem-card__nias-bottom {
+  height: 5px;
+  width: 100%;
+  position: relative;
+  background: linear-gradient(90deg, #C8A951, #8B1A1A, #C8A951);
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.4s ease;
+}
+
+.prem-card__nias-bottom::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.3) 0px,
+      rgba(255,255,255,0.3) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+}
+
+.prem-card__nias-bottom--sm {
+  height: 3px;
+}
+
+.prem-card:hover .prem-card__nias-bottom {
   opacity: 1;
 }
 
-/* Photo */
+/* Photo — FIT TO SIZE with object-fit: cover */
 .prem-card__photo {
   position: relative;
   background: linear-gradient(145deg, #0c1a30 0%, #1a3355 100%);
@@ -5575,6 +5706,16 @@ p {
   justify-content: center;
 }
 
+.prem-card__photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid transparent;
+  border-image: linear-gradient(180deg, rgba(200,169,81,0.3), transparent 50%, rgba(200,169,81,0.3)) 1;
+  z-index: 2;
+  pointer-events: none;
+}
+
 .prem-card__photo::after {
   content: '';
   position: absolute;
@@ -5582,7 +5723,7 @@ p {
   left: 0;
   right: 0;
   height: 40%;
-  background: linear-gradient(to top, rgba(10,22,40,0.35), transparent);
+  background: linear-gradient(to top, rgba(10,22,40,0.4), transparent);
   pointer-events: none;
   z-index: 1;
 }
@@ -5590,11 +5731,10 @@ p {
 .prem-card__photo img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover;
+  object-position: top center;
   display: block;
   transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  padding: 4px;
 }
 
 .prem-card:hover .prem-card__photo img {
@@ -5620,12 +5760,25 @@ p {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  position: relative;
+  background: linear-gradient(180deg, #ffffff 0%, #faf8f3 100%);
 }
 
-/* Badge (role pill) */
+/* Subtle Nias pattern on body bg */
+.prem-card__body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 50%, rgba(200,169,81,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 90% 50%, rgba(139,26,26,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Badge (role pill) — Nias inspired */
 .prem-card__badge {
   display: inline-block;
-  background: linear-gradient(135deg, rgba(200,169,81,0.12), rgba(200,169,81,0.05));
+  background: linear-gradient(135deg, rgba(200,169,81,0.15), rgba(139,26,26,0.08));
   color: var(--gold-dark, #a8892e);
   padding: 4px 14px;
   border-radius: 100px;
@@ -5633,8 +5786,10 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  border: 1px solid rgba(200,169,81,0.22);
+  border: 1px solid rgba(200,169,81,0.3);
   line-height: 1.4;
+  position: relative;
+  z-index: 1;
 }
 
 .prem-card__badge--sm {
@@ -5647,6 +5802,8 @@ p {
 .prem-card__name {
   font-family: var(--font-heading);
   margin: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .prem-card__name .leader-name__main {
@@ -5671,7 +5828,7 @@ p {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255,255,255,0.08),
+    rgba(200,169,81,0.06),
     transparent
   );
   transition: none;
