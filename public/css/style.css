@@ -11153,3 +11153,723 @@ p {
     max-width: 80px;
   }
 }
+
+/* =========================================
+   NIAS CULTURAL ENHANCEMENT — ALL ELEMENTS
+   Menambahkan nuansa adat Nias (Ni'okindrö, Ni'ohulayo)
+   pada seluruh elemen website secara konsisten
+   ========================================= */
+
+/* --- 1. NAVBAR: Nias Bottom Border on Scroll --- */
+.navbar.scrolled::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gold) 0px, var(--gold) 8px,
+    var(--nias-red) 8px, var(--nias-red) 12px,
+    var(--gold) 12px, var(--gold) 16px,
+    transparent 16px, transparent 20px
+  );
+  opacity: 0.6;
+  animation: niasNavShimmer 8s linear infinite;
+}
+
+@keyframes niasNavShimmer {
+  0% { background-position: 0 0; }
+  100% { background-position: 200px 0; }
+}
+
+/* --- 2. GOLD-LINE: Enhanced with Nias Diamond Center --- */
+.gold-line {
+  position: relative;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--nias-red), var(--gold), transparent) !important;
+}
+
+.gold-line::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  border: 1px solid var(--nias-red);
+}
+
+/* --- 3. SUB-SECTION TITLES: Nias Diamond Ornaments --- */
+.sub-section-title {
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.sub-section-title::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--nias-red), var(--gold), transparent);
+}
+
+.sub-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--nias-red);
+  border: 1px solid var(--gold);
+}
+
+/* --- 4. BUTTONS: Nias Cultural Hover Glow --- */
+.btn--gold {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn--gold::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 30%, rgba(139, 26, 26, 0.15) 50%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.btn--gold:hover::before {
+  opacity: 1;
+}
+
+.btn--gold:hover {
+  box-shadow: 0 6px 25px rgba(200, 169, 81, 0.4), 0 0 15px var(--nias-red-glow);
+}
+
+.btn--navy {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn--navy::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--nias-red), var(--gold));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn--navy:hover::after {
+  opacity: 0.7;
+}
+
+.btn--outline-gold:hover {
+  box-shadow: 0 0 20px var(--gold-glow), 0 0 8px var(--nias-red-glow);
+  border-color: var(--gold);
+}
+
+/* --- 5. VM CARDS (Visi/Misi): Nias Ornamental Top Border --- */
+.vm-card::before {
+  height: 5px !important;
+  background: linear-gradient(90deg, var(--nias-red), var(--gold), var(--nias-red)) !important;
+}
+
+.vm-card::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px, transparent 4px,
+    var(--gold) 4px, var(--gold) 6px,
+    transparent 6px, transparent 10px,
+    var(--nias-red) 10px, var(--nias-red) 12px,
+    transparent 12px, transparent 16px
+  );
+  opacity: 0.4;
+}
+
+.vm-card ul li::before {
+  border-radius: 0 !important;
+  transform: rotate(45deg);
+  background: var(--gold) !important;
+  border: 1px solid var(--nias-red);
+  width: 7px !important;
+  height: 7px !important;
+}
+
+/* --- 6. SCHEDULE CARDS: Enhanced Nias Top Border --- */
+.schedule-card::before {
+  background: linear-gradient(90deg, var(--nias-red), var(--gold), var(--nias-red)) !important;
+  height: 4px !important;
+  transform: scaleX(1) !important;
+  opacity: 0.6;
+  transition: opacity var(--transition-base) !important;
+}
+
+.schedule-card:hover::before {
+  opacity: 1 !important;
+}
+
+.schedule-card__icon {
+  border: 2px solid rgba(200, 169, 81, 0.15);
+  transition: all var(--transition-base);
+}
+
+.schedule-card:hover .schedule-card__icon {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px var(--gold-glow), 0 0 5px var(--nias-red-glow);
+}
+
+/* --- 7. FEATURE CARDS: Nias Border Accents --- */
+.feature-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--nias-red), var(--gold), transparent);
+  opacity: 0.4;
+  transition: opacity 0.4s ease;
+}
+
+.feature-card:hover::before {
+  opacity: 0.8;
+}
+
+.feature-card__icon {
+  border-color: rgba(200, 169, 81, 0.2) !important;
+}
+
+.feature-card:hover .feature-card__icon {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 20px var(--gold-glow), 0 0 10px var(--nias-red-glow) !important;
+}
+
+/* --- 8. EXPECT CARDS (Visit Page): Nias Bottom Accent --- */
+.expect-card::after {
+  background: linear-gradient(90deg, var(--nias-red), var(--gold), var(--nias-red)) !important;
+}
+
+.expect-card {
+  border-top: 2px solid transparent;
+  transition: all var(--transition-base), border-color 0.4s ease;
+}
+
+.expect-card:hover {
+  border-top-color: rgba(200, 169, 81, 0.3);
+}
+
+/* --- 9. FAQ ACCORDION: Nias Accents --- */
+.faq-item {
+  border-left: 3px solid transparent;
+  transition: all var(--transition-base), border-color 0.3s ease;
+}
+
+.faq-item:hover {
+  border-left-color: rgba(200, 169, 81, 0.3);
+}
+
+.faq-item.open {
+  border-left-color: var(--gold);
+}
+
+.faq-question__icon {
+  border: 1px solid rgba(200, 169, 81, 0.2);
+}
+
+.faq-item.open .faq-question__icon {
+  border-color: var(--nias-red);
+  box-shadow: 0 0 8px var(--nias-red-glow);
+}
+
+/* --- 10. CONTACT CARDS: Nias Hover Border --- */
+.contact-card {
+  position: relative;
+  overflow: hidden;
+  border-top: 3px solid transparent;
+  transition: all var(--transition-base), border-color 0.3s ease;
+}
+
+.contact-card:hover {
+  border-top-color: var(--gold);
+}
+
+.contact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--nias-red), var(--gold), var(--nias-red));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.contact-card:hover::before {
+  opacity: 1;
+}
+
+.contact-card__icon {
+  border: 2px solid rgba(200, 169, 81, 0.1);
+  transition: all var(--transition-base);
+}
+
+.contact-card:hover .contact-card__icon {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+
+/* --- 11. PRAYER FORM: Nias Top Border & Focus Styling --- */
+.prayer-form {
+  border-top: 4px solid transparent;
+  border-image: linear-gradient(90deg, var(--nias-red), var(--gold), var(--nias-red)) 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.prayer-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px, transparent 4px,
+    rgba(200, 169, 81, 0.3) 4px, rgba(200, 169, 81, 0.3) 6px,
+    transparent 6px, transparent 10px
+  );
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 4px var(--gold-glow), 0 0 0 1px rgba(139, 26, 26, 0.05) !important;
+}
+
+/* --- 12. CONTACT INFO SIDEBAR: Nias Accent --- */
+.contact-info-side__card {
+  border: 1px solid rgba(200, 169, 81, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-info-side__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold), var(--nias-red), var(--gold));
+}
+
+.contact-info-item__icon {
+  border: 1px solid rgba(200, 169, 81, 0.2);
+  transition: all var(--transition-base);
+}
+
+.contact-info-item:hover .contact-info-item__icon {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(200, 169, 81, 0.2);
+}
+
+/* --- 13. SEJARAH CONTENT BOX: Nias Frame --- */
+.sejarah-content-box {
+  position: relative;
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(180deg, var(--gold), var(--nias-red), var(--gold)) 1;
+  padding-left: 1.5rem !important;
+}
+
+.sejarah-content-box::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -3px;
+  width: 3px;
+  height: 20px;
+  background: var(--gold);
+}
+
+/* --- 14. FOOTER: Enhanced Nias Cultural Styling --- */
+.footer__heading::after {
+  background: linear-gradient(90deg, var(--gold), var(--nias-red)) !important;
+  height: 2px;
+  width: 35px;
+}
+
+.footer__links a {
+  position: relative;
+}
+
+.footer__links a::before {
+  content: '◆';
+  font-size: 5px;
+  color: var(--nias-red-light);
+  margin-right: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease, color 0.3s ease;
+  vertical-align: middle;
+}
+
+.footer__links a:hover::before {
+  opacity: 1;
+  color: var(--gold);
+}
+
+.footer__bottom {
+  position: relative;
+}
+
+/* --- 15. OFF-WHITE SECTIONS: Subtle Nias Diamond Pattern BG --- */
+.section--off-white {
+  position: relative;
+}
+
+.section--off-white::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 5L25 10L20 15L15 10Z' fill='none' stroke='%23C8A951' stroke-width='0.3' opacity='0.08'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section--off-white > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- 16. CREAM SECTIONS: Subtle Nias Pattern --- */
+.section--cream {
+  position: relative;
+}
+
+.section--cream::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M24 8L32 16L24 24L16 16Z' fill='none' stroke='%238B1A1A' stroke-width='0.25' opacity='0.05'/%3E%3C/svg%3E");
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section--cream > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- 17. HERO EYEBROW: Enhanced Nias Diamond Accents --- */
+.hero__eyebrow::before {
+  background: linear-gradient(90deg, transparent, var(--gold), var(--nias-red)) !important;
+  width: 40px !important;
+}
+
+.hero__eyebrow::after {
+  background: linear-gradient(90deg, var(--nias-red), var(--gold), transparent) !important;
+  width: 40px !important;
+}
+
+/* --- 18. HERO CONTENT: Nias Pattern Side Accents --- */
+.hero__content::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -30px;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, transparent, var(--gold), var(--nias-red), var(--gold), transparent);
+  opacity: 0.3;
+  border-radius: 3px;
+}
+
+.hero__content::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, transparent, var(--gold), var(--nias-red), var(--gold), transparent);
+  opacity: 0.3;
+  border-radius: 3px;
+}
+
+/* --- 19. LOCATION MAP: Nias Border Frame --- */
+.location-map {
+  border: 2px solid rgba(200, 169, 81, 0.15);
+  position: relative;
+}
+
+.location-map::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--nias-red), var(--gold));
+  z-index: 2;
+  opacity: 0.5;
+}
+
+.location-detail__icon {
+  border: 1px solid rgba(200, 169, 81, 0.15);
+  transition: all var(--transition-base);
+}
+
+.location-detail:hover .location-detail__icon {
+  border-color: var(--gold);
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+
+/* --- 20. SCROLLBAR: Nias Cultural Styling --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--navy-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold), var(--nias-red));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
+}
+
+/* --- 21. TEXT SELECTION: Nias Colors --- */
+::selection {
+  background: rgba(200, 169, 81, 0.3);
+  color: var(--navy-dark);
+}
+
+::-moz-selection {
+  background: rgba(200, 169, 81, 0.3);
+  color: var(--navy-dark);
+}
+
+/* --- 22. LINKS: Nias Hover Underline --- */
+.section a:not(.btn):not(.navbar__link):hover {
+  color: var(--gold-dark);
+}
+
+/* --- 23. HERO VERSE: Nias Accent --- */
+.hero__verse {
+  position: relative;
+  padding: 0 1.5rem;
+}
+
+.hero__verse::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  font-size: 8px;
+  opacity: 0.5;
+}
+
+.hero__verse::after {
+  content: '◆';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--nias-red-light);
+  font-size: 8px;
+  opacity: 0.5;
+}
+
+/* --- 24. CAROUSEL/SLIDER: Nias Pagination Bullets --- */
+.swiper-pagination-bullet-active {
+  background: var(--gold) !important;
+  box-shadow: 0 0 6px var(--gold-glow);
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--gold) !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  color: var(--gold-light) !important;
+  filter: drop-shadow(0 0 6px rgba(200, 169, 81, 0.4));
+}
+
+/* --- 25. BLOCKQUOTES: Nias Styled --- */
+blockquote {
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(180deg, var(--gold), var(--nias-red)) 1;
+  padding-left: 1.2rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--text-light);
+  position: relative;
+}
+
+blockquote::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  transform: rotate(45deg);
+}
+
+/* --- 26. FLOATING BADGES: Nias Glow --- */
+.floating-badge a {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all var(--transition-base);
+}
+
+.floating-badge a:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 15px var(--gold-glow);
+}
+
+/* --- 27. RENUNGAN/DEVOTIONAL CARDS: Nias Top Accent --- */
+.devotional-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.devotional-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--nias-red), var(--gold), transparent);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.devotional-card:hover::before {
+  opacity: 1;
+}
+
+/* --- 28. MEDIA/GALLERY PAGE: Nias Frame --- */
+.gallery-item {
+  position: relative;
+}
+
+.gallery-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-image: linear-gradient(135deg, rgba(200, 169, 81, 0.2), transparent 50%, rgba(139, 26, 26, 0.2)) 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-item:hover::after {
+  opacity: 1;
+}
+
+/* --- 29. PHOTO MODAL: Nias Ornamental Frame --- */
+.photo-modal__card {
+  border: 2px solid rgba(200, 169, 81, 0.3);
+  position: relative;
+}
+
+.photo-modal__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold), var(--nias-red), var(--gold));
+  z-index: 10;
+}
+
+/* --- 30. GENERAL CARD HOVER: Nias Gold Glow Effect --- */
+.schedule-card:hover,
+.feature-card:hover,
+.expect-card:hover,
+.contact-card:hover,
+.vm-card:hover {
+  box-shadow: 0 12px 40px var(--shadow-lg), 0 0 20px var(--gold-glow);
+}
+
+/* --- 31. Nias Ornamental Separator Between Sections --- */
+.section + .section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--nias-red), var(--gold), transparent);
+  opacity: 0.2;
+}
+
+/* --- MOBILE RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+  .hero__content::before,
+  .hero__content::after {
+    display: none;
+  }
+
+  .navbar.scrolled::after {
+    height: 2px;
+  }
+
+  .sejarah-content-box {
+    padding-left: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .gold-line::before {
+    width: 5px;
+    height: 5px;
+  }
+
+  .sub-section-title::after {
+    width: 6px;
+    height: 6px;
+  }
+}
+
