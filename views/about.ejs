@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="stylesheet" href="/css/style.min.css?v=41">
+  <link rel="stylesheet" href="/css/style.min.css?v=42">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -87,28 +87,62 @@
     </div>
   </section>
 
-  <!-- ========== VISI & MISI ========== -->
+  <!-- ========== VISI & MISI (PREMIUM NIAS EDITION) ========== -->
   <section class="section section--off-white" id="visi-misi">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
         <h2>Visi & <span class="text-gold">Misi</span></h2>
         <span class="gold-line"></span>
       </div>
-      <div class="vm-grid" data-aos="fade-up">
-        <div class="vm-card">
-          <div class="vm-card__label">Visi</div>
-          <h3>Terang Kristus bagi Setiap Keluarga</h3>
-          <p><%= about.visiMisi.visi %></p>
+      <div class="vm-premium-grid" data-aos="fade-up">
+
+        <!-- VISI CARD -->
+        <div class="vm-prem">
+          <div class="vm-prem__nias-top"></div>
+          <div class="vm-prem__header">
+            <div class="vm-prem__icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            </div>
+            <span class="vm-prem__badge">Visi</span>
+          </div>
+          <div class="vm-prem__divider"></div>
+          <div class="vm-prem__body">
+            <p class="vm-prem__text"><%= about.visiMisi.visi %></p>
+          </div>
+          <div class="vm-prem__corner vm-prem__corner--tl"></div>
+          <div class="vm-prem__corner vm-prem__corner--tr"></div>
+          <div class="vm-prem__corner vm-prem__corner--bl"></div>
+          <div class="vm-prem__corner vm-prem__corner--br"></div>
+          <div class="vm-prem__nias-bottom"></div>
         </div>
-        <div class="vm-card">
-          <div class="vm-card__label">Misi</div>
-          <h3>Mewujudkan Panggilan Ilahi</h3>
-          <ul>
-            <% about.visiMisi.misiList.forEach(function(m) { %>
-              <li><%= m %></li>
-            <% }); %>
-          </ul>
+
+        <!-- MISI CARD -->
+        <div class="vm-prem vm-prem--misi">
+          <div class="vm-prem__nias-top"></div>
+          <div class="vm-prem__header">
+            <div class="vm-prem__icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <span class="vm-prem__badge">Misi</span>
+          </div>
+          <div class="vm-prem__divider"></div>
+          <div class="vm-prem__body">
+            <ul class="vm-prem__list">
+              <% about.visiMisi.misiList.forEach(function(m, idx) { %>
+                <li>
+                  <span class="vm-prem__bullet"><%= idx + 1 %></span>
+                  <span><%= m %></span>
+                </li>
+              <% }); %>
+            </ul>
+          </div>
+          <div class="vm-prem__corner vm-prem__corner--tl"></div>
+          <div class="vm-prem__corner vm-prem__corner--tr"></div>
+          <div class="vm-prem__corner vm-prem__corner--bl"></div>
+          <div class="vm-prem__corner vm-prem__corner--br"></div>
+          <div class="vm-prem__nias-bottom"></div>
         </div>
+
       </div>
     </div>
   </section>
