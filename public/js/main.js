@@ -744,9 +744,6 @@ function initPopupBanner() {
   var popup = document.getElementById('popupBanner');
   if (!popup) return;
 
-  // Check if already dismissed this session
-  if (sessionStorage.getItem('popupBannerDismissed')) return;
-
   // Show popup after delay
   setTimeout(function() {
     popup.style.display = 'flex';
@@ -755,7 +752,6 @@ function initPopupBanner() {
 
   function closePopup() {
     popup.classList.add('closing');
-    sessionStorage.setItem('popupBannerDismissed', '1');
     setTimeout(function() {
       popup.style.display = 'none';
       popup.classList.remove('closing');
