@@ -1314,6 +1314,37 @@ app.post('/admin/delete-file/logo', requireAuth, (req, res) => {
   res.redirect('/admin?tab=beranda');
 });
 
+// Popup Banner settings
+app.post('/admin/popup-banner', requireAuth, upload.single('popupImage'), (req, res) => {
+  const db = getDB();
+  if (!db.popupBanner) db.popupBanner = {};
+  
+  db.popupBanner.enabled = req.body.popupEnabled === 'on';
+  db.popupBanner.title = (req.body.popupTitle || '').trim();
+  db.popupBanner.description = (req.body.popupDescription || '').trim();
+  db.popupBanner.buttonText = (req.body.popupButtonText || '').trim();
+  db.popupBanner.buttonLink = (req.body.popupButtonLink || '').trim();
+
+  if (req.file) {
+    // Delete old image if exists
+    if (db.popupBanner.image && db.popupBanner.image.startsWith('uploads/')) {
+      deleteUploadedFile(db.popupBanner.image);
+    }
+    db.popupBanner.image = 'uploads/' + req.file.filename;
+  }
+
+  // Handle image removal
+  if (req.body.removePopupImage === '1' && db.popupBanner.image) {
+    if (db.popupBanner.image.startsWith('uploads/')) {
+      deleteUploadedFile(db.popupBanner.image);
+    }
+    db.popupBanner.image = '';
+  }
+
+  saveDB(db);
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Pop-up banner berhasil diperbarui!'));
+});
+
 // Home hero (Image & Video)
 app.post('/admin/home/hero', requireAuth, upload.fields([
   { name: 'bgImage', maxCount: 1 },

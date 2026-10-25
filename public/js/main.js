@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initKomsekDropdown();
   initBackToTop();
   initDailyVerse();
+  initPopupBanner();
 });
 
 /* ---------- Navbar Dropdowns (Mobile & Desktop toggle) ---------- */
@@ -736,4 +737,41 @@ function initGlobalLightbox() {
       else lightboxNext();
     }
   }, { passive: true });
+}
+
+/* ---------- Popup Banner ---------- */
+function initPopupBanner() {
+  var popup = document.getElementById('popupBanner');
+  if (!popup) return;
+
+  // Check if already dismissed this session
+  if (sessionStorage.getItem('popupBannerDismissed')) return;
+
+  // Show popup after delay
+  setTimeout(function() {
+    popup.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }, 1500);
+
+  function closePopup() {
+    popup.classList.add('closing');
+    sessionStorage.setItem('popupBannerDismissed', '1');
+    setTimeout(function() {
+      popup.style.display = 'none';
+      popup.classList.remove('closing');
+      document.body.style.overflow = '';
+    }, 350);
+  }
+
+  var closeBtn = document.getElementById('popupBannerClose');
+  var overlay = document.getElementById('popupBannerOverlay');
+
+  if (closeBtn) closeBtn.addEventListener('click', closePopup);
+  if (overlay) overlay.addEventListener('click', closePopup);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && popup.style.display === 'flex') {
+      closePopup();
+    }
+  });
 }

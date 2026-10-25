@@ -57,12 +57,57 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="/css/style.min.css?v=42">
+  <link rel="stylesheet" href="/css/style.min.css?v=43">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
   <%- include('partials/skeleton') %>
 
+  <!-- ========== POPUP BANNER (Premium Nias Edition) ========== -->
+  <% if (popupBanner && popupBanner.enabled) { %>
+  <div class="popup-banner" id="popupBanner" style="display:none;">
+    <div class="popup-banner__overlay" id="popupBannerOverlay"></div>
+    <div class="popup-banner__card">
+      <div class="popup-banner__nias-top"></div>
+      <button class="popup-banner__close" id="popupBannerClose" aria-label="Tutup">&times;</button>
+      
+      <% if (popupBanner.image) { %>
+      <div class="popup-banner__img-wrap">
+        <img src="<%= typeof imgUrl === 'function' ? imgUrl(popupBanner.image) : '/' + popupBanner.image %>" alt="<%= popupBanner.title || 'Banner' %>" loading="eager">
+        <div class="popup-banner__img-overlay"></div>
+      </div>
+      <% } %>
+
+      <div class="popup-banner__body">
+        <div class="popup-banner__corner popup-banner__corner--tl"></div>
+        <div class="popup-banner__corner popup-banner__corner--tr"></div>
+        <div class="popup-banner__corner popup-banner__corner--bl"></div>
+        <div class="popup-banner__corner popup-banner__corner--br"></div>
+
+        <% if (popupBanner.title) { %>
+        <h3 class="popup-banner__title"><%= popupBanner.title %></h3>
+        <% } %>
+
+        <% if (popupBanner.title) { %>
+        <div class="popup-banner__divider"></div>
+        <% } %>
+
+        <% if (popupBanner.description) { %>
+        <p class="popup-banner__desc"><%= popupBanner.description %></p>
+        <% } %>
+
+        <% if (popupBanner.buttonText && popupBanner.buttonLink) { %>
+        <a href="<%= popupBanner.buttonLink %>" class="popup-banner__cta">
+          <span><%= popupBanner.buttonText %></span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <% } %>
+      </div>
+
+      <div class="popup-banner__nias-bottom"></div>
+    </div>
+  </div>
+  <% } %>
   <!-- ========== NAVIGATION ========== -->
   <nav class="navbar" id="navbar" aria-label="Main navigation">
     <div class="navbar__inner">
@@ -362,7 +407,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="/js/main.min.js?v=17" defer></script>
+  <script src="/js/main.min.js?v=18" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
