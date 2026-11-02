@@ -13337,3 +13337,155 @@ pre {
 img, video, iframe {
   max-width: 100%;
 }
+
+
+/* =========================================
+   MOBILE ENHANCEMENT: PENGURUS HARIAN & MAJELIS
+   Bigger, more attractive cards on mobile
+   ========================================= */
+
+@media (max-width: 768px) {
+  /* Pengurus Harian grids: 2 columns, wider */
+  .prem-grid {
+    gap: 0.8rem;
+    max-width: 100%;
+  }
+  .prem-grid--3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 100% !important;
+  }
+  .prem-grid--2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 100% !important;
+  }
+  /* Majelis: 2 columns */
+  .prem-grid--auto {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 100% !important;
+  }
+
+  /* Bigger cards */
+  .prem-card {
+    border-radius: 14px;
+    border-width: 1.5px;
+  }
+  .prem-card__photo {
+    aspect-ratio: 3 / 3.8;
+  }
+  .prem-card__body {
+    padding: 0.9rem 0.7rem;
+    gap: 5px;
+  }
+  .prem-card__badge {
+    font-size: 0.62rem;
+    padding: 3px 10px;
+    letter-spacing: 1px;
+  }
+  .prem-card__name .leader-name__main {
+    font-size: 0.82rem;
+    line-height: 1.3;
+  }
+  .prem-card__name .leader-name__alias {
+    font-size: 0.68rem;
+    margin-top: 2px;
+  }
+
+  /* Compact Majelis cards bigger */
+  .prem-card--compact .prem-card__photo {
+    min-height: 160px;
+    max-height: 260px;
+    aspect-ratio: 3 / 3.8;
+  }
+  .prem-card--compact .prem-card__body {
+    padding: 0.8rem 0.6rem;
+  }
+  .prem-card--compact .prem-card__name .leader-name__main {
+    font-size: 0.78rem;
+  }
+  .prem-card--compact .prem-card__badge--sm {
+    font-size: 0.58rem;
+    padding: 2px 8px;
+  }
+
+  /* Sub section title (Pengurus Harian / Majelis Jemaat heading) */
+  .sub-section-title {
+    font-size: 1.2rem !important;
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Still 2 columns but tighter */
+  .prem-grid {
+    gap: 0.6rem;
+  }
+  .prem-grid--3,
+  .prem-grid--2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 100% !important;
+  }
+  .prem-grid--auto {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 100% !important;
+  }
+
+  /* Card adjustments for small phones */
+  .prem-card {
+    border-radius: 12px;
+  }
+  .prem-card__photo {
+    aspect-ratio: 3 / 3.5;
+  }
+  .prem-card__body {
+    padding: 0.7rem 0.5rem;
+    gap: 4px;
+  }
+  .prem-card__badge {
+    font-size: 0.56rem;
+    padding: 2px 8px;
+    letter-spacing: 0.8px;
+  }
+  .prem-card__name .leader-name__main {
+    font-size: 0.75rem;
+  }
+  .prem-card__name .leader-name__alias {
+    font-size: 0.62rem;
+  }
+
+  /* Nias bars thinner on small */
+  .prem-card__nias-top { height: 5px; }
+  .prem-card__nias-top--sm { height: 4px; }
+  .prem-card__nias-bottom { height: 4px; }
+  .prem-card__nias-bottom--sm { height: 2px; }
+
+  /* Compact */
+  .prem-card--compact .prem-card__photo {
+    min-height: 130px;
+    max-height: 220px;
+    aspect-ratio: 3 / 3.5;
+  }
+  .prem-card--compact .prem-card__name .leader-name__main {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .prem-grid {
+    gap: 0.5rem;
+  }
+  .prem-card__body {
+    padding: 0.6rem 0.4rem;
+    gap: 3px;
+  }
+  .prem-card__badge {
+    font-size: 0.52rem;
+    padding: 2px 6px;
+  }
+  .prem-card__name .leader-name__main {
+    font-size: 0.68rem;
+  }
+  .prem-card__name .leader-name__alias {
+    font-size: 0.58rem;
+  }
+}
