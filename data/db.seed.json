@@ -481,7 +481,14 @@
         "q": "Bagaimana cara mengunduh Warta Jemaat?",
         "a": "Anda dapat mengunduh Warta Jemaat mingguan dalam format PDF di halaman Media."
       }
-    ]
+    ],
+    "contactInfo": {
+      "address": "Jl. Kresek Griya Agung No.58, RT.004/RW.004, Jatimelati, Kec. Pd. Melati, Kota Bks, Jawa Barat 17415, Indonesia",
+      "addressMapLink": "https://www.google.com/maps/search/?api=1&query=Jl.+Kresek+Griya+Agung+No.58,+RT.004/RW.004,+Jatimelati,+Kec.+Pd.+Melati,+Kota+Bks,+Jawa+Barat+17415",
+      "phone": "Sekretariat Gereja",
+      "email": "mail@aminhermon.or.id",
+      "mapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.8!2d106.9!3d-6.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTgnMDAuMCJTIDEwNsKwNTQnMDAuMCJF!5e0!3m2!1sid!2sid!4v1"
+    }
   },
   "kalender": [
     {
@@ -681,5 +688,24 @@
     "resetFlag": "2026-09-20-reset-v1",
     "resetAt": "2026-09-20T00:00:00.000Z"
   },
-  "popupBanners": []
+  "popupBanners": [],
+  "footer": {
+    "description": "Komunitas yang bertumbuh dalam iman, kasih, dan pengharapan. Mari bergabung dan bertumbuh bersama kami dalam anugerah Tuhan.",
+    "socials": {
+      "facebook": "https://web.facebook.com/profile.php?id=61593610491064",
+      "instagram": "https://www.instagram.com/amin_hermon/",
+      "youtube": "https://www.youtube.com/@GerejaAMINJemaatHermon"
+    },
+    "address": "Jl. Kresek Griya Agung No.58, RT.004/RW.004, Jatimelati, Kec. Pd. Melati, Kota Bks, Jawa Barat 17415, Indonesia",
+    "addressMapLink": "https://www.google.com/maps/search/?api=1&query=Jl.+Kresek+Griya+Agung+No.58,+RT.004/RW.004,+Jatimelati,+Kec.+Pd.+Melati,+Kota+Bks,+Jawa+Barat+17415",
+    "phone": "Sekretariat Gereja",
+    "email": "mail@aminhermon.or.id",
+    "scheduleDay": "Minggu",
+    "scheduleTime": "09.00 WIB",
+    "scheduleDesc": "Ibadah Raya Mingguan",
+    "floatingSocials": {
+      "instagram": "https://www.instagram.com/amin_hermon/",
+      "facebook": "https://web.facebook.com/profile.php?id=61593610491064"
+    }
+  }
 }

@@ -431,6 +431,24 @@ function enrichMissingTopLevelKeys(targetDb) {
       }
     }
 
+    // Ensure footer key exists with defaults from seed
+    if (!targetDb.footer || typeof targetDb.footer !== 'object') {
+      if (seedDb.footer) {
+        targetDb.footer = JSON.parse(JSON.stringify(seedDb.footer));
+        modified = true;
+        console.log('✨ Footer editable key ditambahkan ke database');
+      }
+    }
+
+    // Ensure contactFaq.contactInfo exists
+    if (targetDb.contactFaq && !targetDb.contactFaq.contactInfo) {
+      if (seedDb.contactFaq && seedDb.contactFaq.contactInfo) {
+        targetDb.contactFaq.contactInfo = JSON.parse(JSON.stringify(seedDb.contactFaq.contactInfo));
+        modified = true;
+        console.log('✨ Contact info editable key ditambahkan ke database');
+      }
+    }
+
     // Migrate old single popupBanner to popupBanners array
     if (targetDb.popupBanner && !Array.isArray(targetDb.popupBanners)) {
       const old = targetDb.popupBanner;
@@ -2040,6 +2058,77 @@ app.post('/admin/contact/whatsapp', requireAuth, (req, res) => {
   db.contactFaq.whatsapp.label = req.body.label;
   saveDB(db);
   res.redirect('/admin?tab=contact');
+});
+
+
+// ===== TAB: FOOTER (EDITABLE) =====
+
+app.post('/admin/footer', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.footer) db.footer = {};
+  db.footer.description = req.body.description || '';
+  db.footer.address = req.body.address || '';
+  db.footer.addressMapLink = req.body.addressMapLink || '';
+  db.footer.phone = req.body.phone || '';
+  db.footer.email = req.body.email || '';
+  db.footer.scheduleDay = req.body.scheduleDay || '';
+  db.footer.scheduleTime = req.body.scheduleTime || '';
+  db.footer.scheduleDesc = req.body.scheduleDesc || '';
+  if (!db.footer.socials) db.footer.socials = {};
+  db.footer.socials.facebook = req.body.socialFacebook || '';
+  db.footer.socials.instagram = req.body.socialInstagram || '';
+  db.footer.socials.youtube = req.body.socialYoutube || '';
+  if (!db.footer.floatingSocials) db.footer.floatingSocials = {};
+  db.footer.floatingSocials.instagram = req.body.floatingInstagram || '';
+  db.footer.floatingSocials.facebook = req.body.floatingFacebook || '';
+  saveDB(db);
+  res.redirect('/admin?tab=footer&msg=' + encodeURIComponent('Footer berhasil diperbarui!'));
+});
+
+// ===== TAB: CONTACT — FAQ CRUD =====
+
+app.post('/admin/contact/info', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.contactFaq.contactInfo) db.contactFaq.contactInfo = {};
+  db.contactFaq.contactInfo.address = req.body.address || '';
+  db.contactFaq.contactInfo.addressMapLink = req.body.addressMapLink || '';
+  db.contactFaq.contactInfo.phone = req.body.phone || '';
+  db.contactFaq.contactInfo.email = req.body.email || '';
+  db.contactFaq.contactInfo.mapsEmbed = req.body.mapsEmbed || '';
+  saveDB(db);
+  res.redirect('/admin?tab=contact&msg=' + encodeURIComponent('Info kontak berhasil diperbarui!'));
+});
+
+app.post('/admin/contact/faq/add', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.contactFaq.faq) db.contactFaq.faq = [];
+  db.contactFaq.faq.push({
+    q: req.body.q || '',
+    a: req.body.a || ''
+  });
+  saveDB(db);
+  res.redirect('/admin?tab=contact&msg=' + encodeURIComponent('FAQ berhasil ditambahkan!'));
+});
+
+app.post('/admin/contact/faq/edit/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.contactFaq.faq && db.contactFaq.faq[idx]) {
+    db.contactFaq.faq[idx].q = req.body.q || '';
+    db.contactFaq.faq[idx].a = req.body.a || '';
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=contact&msg=' + encodeURIComponent('FAQ berhasil diperbarui!'));
+});
+
+app.post('/admin/contact/faq/delete/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.contactFaq.faq && db.contactFaq.faq[idx]) {
+    db.contactFaq.faq.splice(idx, 1);
+  }
+  saveDB(db);
+  res.redirect('/admin?tab=contact&msg=' + encodeURIComponent('FAQ berhasil dihapus!'));
 });
 
 // ===== TAB: KALENDER (INTEGRASI KOMSEK & BERANDA) =====
