@@ -430,6 +430,24 @@ function enrichMissingTopLevelKeys(targetDb) {
         console.log(`✨ Schema baru ditambahkan ke database: [${key}]`);
       }
     }
+
+    // Migrate old single popupBanner to popupBanners array
+    if (targetDb.popupBanner && !Array.isArray(targetDb.popupBanners)) {
+      const old = targetDb.popupBanner;
+      if (old.enabled || old.title || old.image) {
+        targetDb.popupBanners = [{ ...old, id: Date.now().toString(36) }];
+      } else {
+        targetDb.popupBanners = [];
+      }
+      delete targetDb.popupBanner;
+      modified = true;
+      console.log('🔄 Migrasi popupBanner → popupBanners array');
+    }
+    if (!Array.isArray(targetDb.popupBanners)) {
+      targetDb.popupBanners = [];
+      modified = true;
+    }
+
     if (modified) {
       saveDB(targetDb);
     }
@@ -1314,35 +1332,86 @@ app.post('/admin/delete-file/logo', requireAuth, (req, res) => {
   res.redirect('/admin?tab=beranda');
 });
 
-// Popup Banner settings
-app.post('/admin/popup-banner', requireAuth, upload.single('popupImage'), (req, res) => {
+// Popup Banner — Multiple banners support
+// Add new banner
+app.post('/admin/popup-banner/add', requireAuth, upload.single('popupImage'), (req, res) => {
   const db = getDB();
-  if (!db.popupBanner) db.popupBanner = {};
-  
-  db.popupBanner.enabled = req.body.popupEnabled === 'on';
-  db.popupBanner.title = (req.body.popupTitle || '').trim();
-  db.popupBanner.description = (req.body.popupDescription || '').trim();
-  db.popupBanner.buttonText = (req.body.popupButtonText || '').trim();
-  db.popupBanner.buttonLink = (req.body.popupButtonLink || '').trim();
-
-  if (req.file) {
-    // Delete old image if exists
-    if (db.popupBanner.image && db.popupBanner.image.startsWith('uploads/')) {
-      deleteUploadedFile(db.popupBanner.image);
+  if (!Array.isArray(db.popupBanners)) {
+    // Migrate old single popupBanner to array
+    if (db.popupBanner && db.popupBanner.enabled) {
+      db.popupBanners = [{ ...db.popupBanner, id: Date.now().toString(36) }];
+    } else {
+      db.popupBanners = [];
     }
-    db.popupBanner.image = 'uploads/' + req.file.filename;
+    delete db.popupBanner;
   }
 
-  // Handle image removal
-  if (req.body.removePopupImage === '1' && db.popupBanner.image) {
-    if (db.popupBanner.image.startsWith('uploads/')) {
-      deleteUploadedFile(db.popupBanner.image);
+  const banner = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    enabled: req.body.popupEnabled === 'on',
+    title: (req.body.popupTitle || '').trim(),
+    description: (req.body.popupDescription || '').trim(),
+    buttonText: (req.body.popupButtonText || '').trim(),
+    buttonLink: (req.body.popupButtonLink || '').trim(),
+    image: ''
+  };
+
+  if (req.file) {
+    banner.image = 'uploads/' + req.file.filename;
+  }
+
+  db.popupBanners.push(banner);
+  saveDB(db);
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Pop-up banner berhasil ditambahkan!'));
+});
+
+// Edit existing banner
+app.post('/admin/popup-banner/edit/:id', requireAuth, upload.single('popupImage'), (req, res) => {
+  const db = getDB();
+  if (!Array.isArray(db.popupBanners)) db.popupBanners = [];
+
+  const banner = db.popupBanners.find(b => b.id === req.params.id);
+  if (!banner) return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Banner tidak ditemukan'));
+
+  banner.enabled = req.body.popupEnabled === 'on';
+  banner.title = (req.body.popupTitle || '').trim();
+  banner.description = (req.body.popupDescription || '').trim();
+  banner.buttonText = (req.body.popupButtonText || '').trim();
+  banner.buttonLink = (req.body.popupButtonLink || '').trim();
+
+  if (req.file) {
+    if (banner.image && banner.image.startsWith('uploads/')) {
+      deleteUploadedFile(banner.image);
     }
-    db.popupBanner.image = '';
+    banner.image = 'uploads/' + req.file.filename;
+  }
+
+  if (req.body.removePopupImage === '1' && banner.image) {
+    if (banner.image.startsWith('uploads/')) {
+      deleteUploadedFile(banner.image);
+    }
+    banner.image = '';
   }
 
   saveDB(db);
   res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Pop-up banner berhasil diperbarui!'));
+});
+
+// Delete a banner
+app.post('/admin/popup-banner/delete/:id', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!Array.isArray(db.popupBanners)) db.popupBanners = [];
+
+  const idx = db.popupBanners.findIndex(b => b.id === req.params.id);
+  if (idx !== -1) {
+    const banner = db.popupBanners[idx];
+    if (banner.image && banner.image.startsWith('uploads/')) {
+      deleteUploadedFile(banner.image);
+    }
+    db.popupBanners.splice(idx, 1);
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Pop-up banner berhasil dihapus!'));
 });
 
 // Home hero (Image & Video)

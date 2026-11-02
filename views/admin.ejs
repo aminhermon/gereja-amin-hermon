@@ -471,55 +471,106 @@
         </div>
       </div>
 
-        <!-- Pop-up Banner -->
+        <!-- Pop-up Banners (Multiple) -->
         <div class="card" style="border-left: 4px solid #C8A951;">
-          <h2 class="card-title">🎯 Pop-up Banner</h2>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Pop-up banner muncul saat pengunjung pertama kali membuka halaman beranda. Ditutup oleh pengunjung, dan tidak tampil lagi selama sesi tersebut.</p>
-          <form action="/admin/popup-banner" method="POST" enctype="multipart/form-data">
-            
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="checkbox" name="popupEnabled" <%= (db.popupBanner && db.popupBanner.enabled) ? 'checked' : '' %> style="width:18px; height:18px;">
-                <strong>Aktifkan Pop-up Banner</strong>
-              </label>
-            </div>
+          <h2 class="card-title">🎯 Pop-up Banners</h2>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Kelola beberapa pop-up banner sekaligus. Banner yang aktif akan ditampilkan sebagai carousel saat pengunjung membuka halaman beranda. Klik gambar untuk memperbesar.</p>
 
-            <div class="form-group">
-              <label class="form-label">Judul Banner</label>
-              <input type="text" name="popupTitle" class="form-input" value="<%= (db.popupBanner && db.popupBanner.title) || '' %>" placeholder="Contoh: Ibadah Natal 2026">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Deskripsi</label>
-              <textarea name="popupDescription" class="form-input" rows="3" placeholder="Deskripsi singkat yang muncul di pop-up banner"><%= (db.popupBanner && db.popupBanner.description) || '' %></textarea>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Gambar Banner (opsional)</label>
-              <input type="file" name="popupImage" accept="image/*" class="form-input">
-              <% if (db.popupBanner && db.popupBanner.image) { %>
-                <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
-                  <img src="<%= typeof imgUrl === 'function' ? imgUrl(db.popupBanner.image) : '/' + db.popupBanner.image %>" alt="Preview" style="height:60px; border-radius:8px; border:1px solid #ddd;">
-                  <label style="font-size:0.8rem; color:#991B1B; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                    <input type="checkbox" name="removePopupImage" value="1"> Hapus gambar
+          <!-- Existing Banners List -->
+          <% var banners = Array.isArray(db.popupBanners) ? db.popupBanners : []; %>
+          <% if (banners.length > 0) { %>
+          <div style="margin-bottom:1.5rem;">
+            <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:0.8rem; color:#374151;">📋 Banner Terdaftar (<%= banners.length %>)</h3>
+            <% banners.forEach(function(b, idx) { %>
+            <div style="border:1px solid #e5e7eb; border-radius:12px; padding:1rem; margin-bottom:1rem; background:<%= b.enabled ? '#f0fdf4' : '#fef2f2' %>;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.8rem;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:1.2rem;"><%= b.enabled ? '🟢' : '🔴' %></span>
+                  <strong style="font-size:0.95rem;"><%= b.title || ('Banner #' + (idx + 1)) %></strong>
+                </div>
+                <form action="/admin/popup-banner/delete/<%= b.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus banner ini?')">
+                  <button type="submit" style="background:none; border:1px solid #fca5a5; color:#dc2626; padding:4px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer;">🗑️ Hapus</button>
+                </form>
+              </div>
+              <form action="/admin/popup-banner/edit/<%= b.id %>" method="POST" enctype="multipart/form-data">
+                <div class="form-group" style="margin-bottom:0.8rem;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" name="popupEnabled" <%= b.enabled ? 'checked' : '' %> style="width:16px; height:16px;">
+                    <span style="font-size:0.85rem;"><strong>Aktif</strong></span>
                   </label>
                 </div>
-              <% } %>
+                <div class="form-group">
+                  <label class="form-label">Judul</label>
+                  <input type="text" name="popupTitle" class="form-input" value="<%= b.title || '' %>" placeholder="Judul banner">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Deskripsi</label>
+                  <textarea name="popupDescription" class="form-input" rows="2" placeholder="Deskripsi singkat"><%= b.description || '' %></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Gambar Banner</label>
+                  <input type="file" name="popupImage" accept="image/*" class="form-input">
+                  <% if (b.image) { %>
+                  <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+                    <img src="<%= typeof imgUrl === 'function' ? imgUrl(b.image) : '/' + b.image %>" alt="Preview" style="height:60px; border-radius:8px; border:1px solid #ddd;">
+                    <label style="font-size:0.8rem; color:#991B1B; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                      <input type="checkbox" name="removePopupImage" value="1"> Hapus gambar
+                    </label>
+                  </div>
+                  <% } %>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
+                  <div class="form-group">
+                    <label class="form-label">Teks Tombol</label>
+                    <input type="text" name="popupButtonText" class="form-input" value="<%= b.buttonText || '' %>" placeholder="Contoh: Daftar Sekarang">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Link Tombol</label>
+                    <input type="text" name="popupButtonLink" class="form-input" value="<%= b.buttonLink || '' %>" placeholder="https://...">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn--primary" style="margin-top:0.3rem; font-size:0.85rem; padding:8px 20px;">💾 Simpan Perubahan</button>
+              </form>
             </div>
+            <% }); %>
+          </div>
+          <% } %>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
-              <div class="form-group">
-                <label class="form-label">Teks Tombol (opsional)</label>
-                <input type="text" name="popupButtonText" class="form-input" value="<%= (db.popupBanner && db.popupBanner.buttonText) || '' %>" placeholder="Contoh: Daftar Sekarang">
+          <!-- Add New Banner -->
+          <div style="border:2px dashed #C8A951; border-radius:12px; padding:1.2rem; background:#fffbeb;">
+            <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:0.8rem; color:#92400e;">➕ Tambah Banner Baru</h3>
+            <form action="/admin/popup-banner/add" method="POST" enctype="multipart/form-data">
+              <div class="form-group" style="margin-bottom:0.8rem;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" name="popupEnabled" checked style="width:16px; height:16px;">
+                  <span style="font-size:0.85rem;"><strong>Langsung Aktifkan</strong></span>
+                </label>
               </div>
               <div class="form-group">
-                <label class="form-label">Link Tombol</label>
-                <input type="text" name="popupButtonLink" class="form-input" value="<%= (db.popupBanner && db.popupBanner.buttonLink) || '' %>" placeholder="Contoh: /visit atau https://...">
+                <label class="form-label">Judul Banner</label>
+                <input type="text" name="popupTitle" class="form-input" placeholder="Contoh: Ibadah Natal 2026">
               </div>
-            </div>
-
-            <button type="submit" class="btn btn--primary" style="margin-top:0.5rem;">💾 Simpan Pop-up Banner</button>
-          </form>
+              <div class="form-group">
+                <label class="form-label">Deskripsi</label>
+                <textarea name="popupDescription" class="form-input" rows="2" placeholder="Deskripsi singkat"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Gambar Banner</label>
+                <input type="file" name="popupImage" accept="image/*" class="form-input">
+              </div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
+                <div class="form-group">
+                  <label class="form-label">Teks Tombol (opsional)</label>
+                  <input type="text" name="popupButtonText" class="form-input" placeholder="Contoh: Daftar Sekarang">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Link Tombol</label>
+                  <input type="text" name="popupButtonLink" class="form-input" placeholder="https://...">
+                </div>
+              </div>
+              <button type="submit" class="btn btn--primary" style="margin-top:0.3rem;">➕ Tambah Banner</button>
+            </form>
+          </div>
         </div>
 
       </div>

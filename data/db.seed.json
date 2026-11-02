@@ -681,12 +681,5 @@
     "resetFlag": "2026-09-20-reset-v1",
     "resetAt": "2026-09-20T00:00:00.000Z"
   },
-  "popupBanner": {
-    "enabled": false,
-    "title": "",
-    "description": "",
-    "image": "",
-    "buttonText": "",
-    "buttonLink": ""
-  }
+  "popupBanners": []
 }
