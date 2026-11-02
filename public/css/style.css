@@ -12269,11 +12269,13 @@ blockquote::before {
     0 10px 40px rgba(0, 0, 0, 0.15),
     0 30px 90px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-  max-width: 620px;
-  width: 100%;
+  max-width: 520px;
+  width: 92vw;
   animation: popupSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  max-height: 90vh;
 }
 
 .popup-banner__card::before {
@@ -12548,17 +12550,24 @@ blockquote::before {
   width: 100%;
   overflow: hidden;
   z-index: 1;
+  min-width: 0;
 }
 
 .popup-banner__track {
   display: flex;
   transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 100%;
+  will-change: transform;
 }
 
 .popup-banner__slide {
+  width: 100%;
   min-width: 100%;
-  flex-shrink: 0;
+  max-width: 100%;
+  flex: 0 0 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: calc(90vh - 30px);
 }
 
 /* Navigation Arrows */
