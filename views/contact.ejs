@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="shortcut icon" href="/favicon.ico">
 
-  <meta name="description" content="Hubungi <%= general.churchName %> untuk informasi lebih lanjut.">
+  <meta name="description" content="Hubungi <%= general.churchName %> untuk informasi ibadah, pelayanan, dan kegiatan jemaat.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="<%= general.siteUrl || 'https://aminhermon.org' %>/contact">
   <title>Hubungi Kami — <%= general.churchName %></title>
@@ -17,7 +17,7 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Hubungi Kami — <%= general.churchName %>">
-  <meta property="og:description" content="Hubungi <%= general.churchName %> untuk informasi lebih lanjut.">
+  <meta property="og:description" content="Hubungi <%= general.churchName %> untuk informasi ibadah, pelayanan, dan kegiatan jemaat.">
   <meta property="og:url" content="<%= general.siteUrl || 'https://aminhermon.org' %>/contact">
   <meta property="og:site_name" content="<%= general.churchName %>">
   <meta property="og:locale" content="id_ID">
@@ -46,6 +46,7 @@
 <body>
   <%- include('partials/skeleton') %>
   <%- include('partials/navbar') %>
+
   <!-- ========== HERO ========== -->
   <section class="hero hero--sub" id="hero-contact">
     <div class="hero__bg"><img src="<%= imgUrl(contactFaq.hero.bgImage, '/assets/images/church-interior.png') %>" alt="Hubungi Kami" loading="eager" width="1280" height="720" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null; this.src='/assets/images/church-interior.png';"></div>
@@ -57,7 +58,130 @@
     </div>
   </section>
 
+  <!-- ========== INFO KONTAK & LOKASI ========== -->
+  <section class="section section--off-white" id="contact-info">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Informasi <span class="text-gold">Kontak & Lokasi</span></h2>
+        <span class="gold-line"></span>
+        <p>Kunjungi atau hubungi Sekretariat Gereja AMIN Hermon.</p>
+      </div>
 
+      <%
+        var info = (contactFaq && contactFaq.contactInfo) ? contactFaq.contactInfo : {};
+        var cAddr = info.address || 'Jl. Kresek Griya Agung No.58, RT.004/RW.004, Jatimelati, Kec. Pd. Melati, Kota Bks, Jawa Barat 17415, Indonesia';
+        var cMapLink = info.addressMapLink || 'https://www.google.com/maps/search/?api=1&query=Jl.+Kresek+Griya+Agung+No.58,+RT.004/RW.004,+Jatimelati,+Kec.+Pd.+Melati,+Kota+Bks,+Jawa+Barat+17415';
+        var cPhone = info.phone || 'Sekretariat Gereja';
+        var cEmail = info.email || 'mail@aminhermon.or.id';
+        var cMapEmbed = info.mapsEmbed || 'https://www.google.com/maps/embed/v1/search?q=Jl.+Kresek+Griya+Agung+No.58,+RT.004/RW.004,+Jatimelati,+Kec.+Pd.+Melati,+Kota+Bks,+Jawa+Barat+17415&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8';
+      %>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;" data-aos="fade-up">
+        
+        <!-- Card 1: Alamat -->
+        <div style="background: var(--white); padding: 1.75rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); border-top: 3px solid var(--gold); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(200, 169, 81, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: var(--gold);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <h4 style="color: var(--navy); margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 700;">Alamat Gereja</h4>
+            <p style="color: var(--text-light); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;"><%= cAddr %></p>
+          </div>
+          <a href="<%= cMapLink %>" target="_blank" rel="noopener noreferrer" style="color: var(--gold); font-weight: 600; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            Buka Petunjuk Arah &rarr;
+          </a>
+        </div>
+
+        <!-- Card 2: Telepon -->
+        <div style="background: var(--white); padding: 1.75rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); border-top: 3px solid var(--gold); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(200, 169, 81, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: var(--gold);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.8.36 1.59.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c1.22.34 2.01.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <h4 style="color: var(--navy); margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 700;">Telepon / Kontak</h4>
+            <p style="color: var(--text-light); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;"><%= cPhone %></p>
+          </div>
+          <span style="color: var(--gold); font-weight: 600; font-size: 0.85rem;">Respons Cepat via WhatsApp</span>
+        </div>
+
+        <!-- Card 3: Email -->
+        <div style="background: var(--white); padding: 1.75rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); border-top: 3px solid var(--gold); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(200, 169, 81, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: var(--gold);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <h4 style="color: var(--navy); margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 700;">Email Resmi</h4>
+            <p style="color: var(--text-light); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;"><%= cEmail %></p>
+          </div>
+          <a href="mailto:<%= cEmail %>" style="color: var(--gold); font-weight: 600; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            Kirim Email &rarr;
+          </a>
+        </div>
+
+        <!-- Card 4: Jam Pelayanan -->
+        <div style="background: var(--white); padding: 1.75rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); border-top: 3px solid var(--gold); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(200, 169, 81, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: var(--gold);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h4 style="color: var(--navy); margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 700;">Jam Sekretariat</h4>
+            <p style="color: var(--text-light); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.3rem;"><strong>Senin &ndash; Sabtu:</strong> 09.00 &ndash; 16.00 WIB</p>
+            <p style="color: var(--text-light); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;"><strong>Minggu:</strong> Ibadah Raya 09.30 WIB</p>
+          </div>
+          <span style="color: var(--gold); font-weight: 600; font-size: 0.85rem;">Terbuka untuk Konsultasi</span>
+        </div>
+
+      </div>
+
+      <!-- Google Maps Embed Container -->
+      <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.08); border: 1px solid var(--border); height: 380px; width: 100%; position: relative;" data-aos="fade-up">
+        <% if (cMapEmbed && cMapEmbed.startsWith('http')) { %>
+          <iframe 
+            src="<%= cMapEmbed %>"
+            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            title="Peta Lokasi Gereja"></iframe>
+        <% } else { %>
+          <iframe 
+            src="https://www.google.com/maps/embed/v1/search?q=Jl.+Kresek+Griya+Agung+No.58,+RT.004/RW.004,+Jatimelati,+Kec.+Pd.+Melati,+Kota+Bks,+Jawa+Barat+17415&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
+            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            title="Peta Lokasi Gereja"></iframe>
+        <% } %>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== FAQ ACCORDION ========== -->
+  <% if (contactFaq && contactFaq.faq && contactFaq.faq.length > 0) { %>
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2>Pertanyaan yang <span class="text-gold">Sering Diajukan</span></h2>
+        <span class="gold-line"></span>
+        <p>Jawaban atas pertanyaan seputar kunjungan pertama, ibadah, dan kegiatan jemaat.</p>
+      </div>
+
+      <div class="faq-list" data-aos="fade-up">
+        <% contactFaq.faq.forEach(function(item, idx) { %>
+        <div class="faq-item <%= idx === 0 ? 'open' : '' %>">
+          <button class="faq-question" type="button" aria-expanded="<%= idx === 0 ? 'true' : 'false' %>">
+            <span><%= item.q %></span>
+            <div class="faq-question__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer__inner">
+              <p><%= item.a %></p>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+    </div>
+  </section>
+  <% } %>
 
   <!-- ========== WHATSAPP CTA ========== -->
   <section class="section section--navy" id="whatsapp-cta">
@@ -78,10 +202,6 @@
   </section>
 
   <%- include('partials/footer') %>
-  <script src="/js/main.min.js?v=20" defer></script>
+  <script src="/js/main.min.js?v=21" defer></script>
 </body>
 </html>
-
-
-
-

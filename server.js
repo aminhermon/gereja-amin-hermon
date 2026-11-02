@@ -2061,6 +2061,143 @@ app.post('/admin/contact/whatsapp', requireAuth, (req, res) => {
 });
 
 
+
+// ===== CRUD ABOUT: PENDETA =====
+app.post('/admin/about/pendeta/add', requireAuth, upload.single('image'), (req, res) => {
+  const db = getDB();
+  if (!db.about.pemimpin.pendeta) db.about.pemimpin.pendeta = [];
+  const item = {
+    name: req.body.name || '',
+    role: req.body.role || 'Pendeta Jemaat',
+    bio: req.body.bio || '',
+    image: req.file ? 'uploads/' + req.file.filename : ''
+  };
+  db.about.pemimpin.pendeta.push(item);
+  saveDB(db);
+  res.redirect('/admin?tab=about&msg=' + encodeURIComponent('Pendeta baru berhasil ditambahkan!'));
+});
+
+app.post('/admin/about/pendeta/delete-member/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.about.pemimpin.pendeta && db.about.pemimpin.pendeta[idx]) {
+    const p = db.about.pemimpin.pendeta[idx];
+    if (p.image && p.image.startsWith('uploads/')) deleteUploadedFile(p.image);
+    db.about.pemimpin.pendeta.splice(idx, 1);
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=about&msg=' + encodeURIComponent('Pendeta berhasil dihapus.'));
+});
+
+// ===== CRUD ABOUT: PENGURUS HARIAN (BPH) =====
+app.post('/admin/about/pengurus/add', requireAuth, upload.single('image'), (req, res) => {
+  const db = getDB();
+  if (!db.about.pemimpin.pengurus) db.about.pemimpin.pengurus = [];
+  const item = {
+    name: req.body.name || '',
+    role: req.body.role || '',
+    image: req.file ? 'uploads/' + req.file.filename : ''
+  };
+  db.about.pemimpin.pengurus.push(item);
+  saveDB(db);
+  res.redirect('/admin?tab=about&msg=' + encodeURIComponent('Pengurus harian baru berhasil ditambahkan!'));
+});
+
+app.post('/admin/about/pengurus/delete-member/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.about.pemimpin.pengurus && db.about.pemimpin.pengurus[idx]) {
+    const p = db.about.pemimpin.pengurus[idx];
+    if (p.image && p.image.startsWith('uploads/')) deleteUploadedFile(p.image);
+    db.about.pemimpin.pengurus.splice(idx, 1);
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=about&msg=' + encodeURIComponent('Pengurus harian berhasil dihapus.'));
+});
+
+// ===== CRUD ABOUT: MAJELIS JEMAAT =====
+app.post('/admin/about/majelis/add', requireAuth, upload.single('image'), (req, res) => {
+  const db = getDB();
+  if (!db.about.pemimpin.majelis) db.about.pemimpin.majelis = [];
+  const item = {
+    name: req.body.name || '',
+    role: req.body.role || 'Majelis',
+    image: req.file ? 'uploads/' + req.file.filename : ''
+  };
+  db.about.pemimpin.majelis.push(item);
+  saveDB(db);
+  res.redirect('/admin?tab=about&msg=' + encodeURIComponent('Majelis jemaat baru berhasil ditambahkan!'));
+});
+
+app.post('/admin/about/majelis/delete-member/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.about.pemimpin.majelis && db.about.pemimpin.majelis[idx]) {
+    const m = db.about.pemimpin.majelis[idx];
+    if (m.image && m.image.startsWith('uploads/')) deleteUploadedFile(m.image);
+    db.about.pemimpin.majelis.splice(idx, 1);
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=about&msg=' + encodeURIComponent('Majelis jemaat berhasil dihapus.'));
+});
+
+// ===== CRUD VISIT: JADWAL IBADAH =====
+app.post('/admin/visit/jadwal/add', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.visit.jadwalIbadah) db.visit.jadwalIbadah = [];
+  db.visit.jadwalIbadah.push({
+    nama: req.body.nama || '',
+    hari: req.body.hari || 'Minggu',
+    jam: req.body.jam || '09.30 WIB',
+    keterangan: req.body.keterangan || ''
+  });
+  saveDB(db);
+  res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Jadwal ibadah baru berhasil ditambahkan!'));
+});
+
+app.post('/admin/visit/jadwal/delete/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.visit.jadwalIbadah && db.visit.jadwalIbadah[idx]) {
+    db.visit.jadwalIbadah.splice(idx, 1);
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Jadwal ibadah berhasil dihapus.'));
+});
+
+// ===== CRUD VISIT: SAKRAMEN =====
+app.post('/admin/visit/sakramen/add', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.visit.sakramen) db.visit.sakramen = [];
+  db.visit.sakramen.push({
+    nama: req.body.nama || '',
+    icon: req.body.icon || '✝️',
+    desc: req.body.desc || ''
+  });
+  saveDB(db);
+  res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Sakramen baru berhasil ditambahkan!'));
+});
+
+app.post('/admin/visit/sakramen/delete/:idx', requireAuth, (req, res) => {
+  const db = getDB();
+  const idx = parseInt(req.params.idx);
+  if (db.visit.sakramen && db.visit.sakramen[idx]) {
+    db.visit.sakramen.splice(idx, 1);
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Sakramen berhasil dihapus.'));
+});
+
+// ===== TAB HOME: AYAT HARI INI KUSTOM =====
+app.post('/admin/home/verse', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.home.customVerse) db.home.customVerse = {};
+  db.home.customVerse.enabled = req.body.enabled === 'on';
+  db.home.customVerse.text = req.body.text || '';
+  db.home.customVerse.ref = req.body.ref || '';
+  saveDB(db);
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Pengaturan Ayat Hari Ini berhasil disimpan!'));
+});
 // ===== TAB: FOOTER (EDITABLE) =====
 
 app.post('/admin/footer', requireAuth, (req, res) => {

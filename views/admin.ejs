@@ -257,6 +257,29 @@
           <form id="formResetLogo" action="/admin/delete-file/logo" method="POST" style="display:none;"></form>
         </div>
 
+        <!-- Ayat Hari Ini Control -->
+        <div class="card">
+          <h2 class="card-title">📖 Ayat Hari Ini (Beranda)</h2>
+          <p class="card-subtitle">Secara default, website memutar ayat harian otomatis setiap hari. Anda juga dapat menentukan ayat khusus yang tampil tetap di beranda.</p>
+          <form action="/admin/home/verse" method="POST">
+            <div style="margin-bottom:1rem;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; color:var(--navy);">
+                <input type="checkbox" name="enabled" <%= (db.home && db.home.customVerse && db.home.customVerse.enabled) ? 'checked' : '' %>>
+                Gunakan Ayat Firman Kustom (Menimpa rotasi harian otomatis)
+              </label>
+            </div>
+            <div class="form-group">
+              <label>Isi Teks Firman / Ayat</label>
+              <textarea name="text" rows="2" placeholder="Contoh: Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku."><%= (db.home && db.home.customVerse && db.home.customVerse.text) ? db.home.customVerse.text : '' %></textarea>
+            </div>
+            <div class="form-group">
+              <label>Referensi Kitab & Pasal</label>
+              <input type="text" name="ref" value="<%= (db.home && db.home.customVerse && db.home.customVerse.ref) ? db.home.customVerse.ref : '' %>" placeholder="Contoh: Filipi 4:13">
+            </div>
+            <button type="submit" class="btn btn--gold">💾 Simpan Ayat Hari Ini</button>
+          </form>
+        </div>
+
         <!-- Hero Beranda -->
         <div class="card">
           <h2 class="card-title">🖼️ Hero Banner (Gambar & Video)</h2>
@@ -751,6 +774,22 @@
         <!-- Pengurus Harian (BPH) -->
         <div class="card">
           <h2 class="card-title">👥 Pengurus Harian (BPH)</h2>
+          <!-- Form Tambah Pengurus Baru -->
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem;">
+            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Pengurus Harian Baru</h4>
+            <form action="/admin/about/pengurus/add" method="POST" enctype="multipart/form-data">
+              <div class="grid-3">
+                <div class="form-group">
+                  <label>Nama</label>
+                  <input type="text" name="name" placeholder="Contoh: SNK. Nama (Ama/Ina ...)" required>
+                </div>
+                <div class="form-group"><label>Jabatan</label><input type="text" name="role" placeholder="Contoh: Ketua 4 / Koordinator" required></div>
+                <div class="form-group"><label>Foto</label><input type="file" name="image" accept="image/*"></div>
+              </div>
+              <button type="submit" class="btn btn--gold btn--sm">➕ Tambah Pengurus</button>
+            </form>
+          </div>
+          <hr class="divider">
           <p class="card-subtitle">Upload foto dan edit data untuk setiap pengurus harian.</p>
           <% db.about.pemimpin.pengurus.forEach(function(pg, i) { %>
           <div class="item-card" style="margin-bottom:.8rem;">
@@ -779,10 +818,12 @@
                 <button type="submit" class="btn btn--gold btn--sm">💾 Simpan</button>
                 <% if (pg.image) { %>
                 <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelPengurus_<%= i %>" data-del-name="<%= pg.name %>" onclick="confirmAndDelete(this)">🗑️ Hapus Foto</button>
+                <button type="button" class="btn btn--danger btn--xs" onclick="if(confirm('HAPUS PENGURUS INI DARI DAFTAR?\n\nNama: <%= pg.name %>\nJabatan: <%= pg.role %>')) document.getElementById('formDelMemberPengurus_<%= i %>').submit();">🗑️ Hapus Pengurus</button>
                 <% } %>
               </div>
             </form>
             <form id="formDelPengurus_<%= i %>" action="/admin/delete-file/pengurus/<%= i %>" method="POST" style="display:none;"></form>
+            <form id="formDelMemberPengurus_<%= i %>" action="/admin/about/pengurus/delete-member/<%= i %>" method="POST" style="display:none;"></form>
           </div>
           <% }); %>
         </div>
@@ -791,6 +832,22 @@
         <div class="card">
           <h2 class="card-title">🏛️ Majelis Jemaat (<%= db.about.pemimpin.majelis.length %> orang)</h2>
           <p class="card-subtitle">Upload foto dan edit nama untuk setiap majelis jemaat.</p>
+          <!-- Form Tambah Majelis Baru -->
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem; margin-top:1rem;">
+            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Majelis Jemaat Baru</h4>
+            <form action="/admin/about/majelis/add" method="POST" enctype="multipart/form-data">
+              <div class="grid-3">
+                <div class="form-group">
+                  <label>Nama Majelis</label>
+                  <input type="text" name="name" placeholder="Contoh: SNK. Nama Majelis" required>
+                </div>
+                <div class="form-group"><label>Jabatan / Penugasan</label><input type="text" name="role" placeholder="Contoh: Ketua Sektor Sion" required></div>
+                <div class="form-group"><label>Foto</label><input type="file" name="image" accept="image/*"></div>
+              </div>
+              <button type="submit" class="btn btn--gold btn--sm">➕ Tambah Majelis</button>
+            </form>
+          </div>
+          <hr class="divider">
           <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:.8rem;">
             <% db.about.pemimpin.majelis.forEach(function(m, i) { %>
             <div class="item-card">
@@ -812,11 +869,13 @@
                 <div style="display:flex; gap:6px;">
                   <button type="submit" class="btn btn--gold btn--xs" style="flex:1; justify-content:center;">💾 Simpan</button>
                   <% if (m.image) { %>
-                  <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelMajelis_<%= i %>" data-del-name="<%= m.name %>" onclick="confirmAndDelete(this)" title="Hapus Foto">🗑️</button>
+                  <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelMajelis_<%= i %>" data-del-name="<%= m.name %>" onclick="confirmAndDelete(this)" title="Hapus Foto">🗑️ Foto</button>
+                  <button type="button" class="btn btn--danger btn--xs" onclick="if(confirm('Hapus majelis ini dari daftar?\n\nNama: <%= m.name %>')) document.getElementById('formDelMemberMajelis_<%= i %>').submit();" title="Hapus Anggota Majelis">🗑️ Hapus</button>
                   <% } %>
                 </div>
               </form>
               <form id="formDelMajelis_<%= i %>" action="/admin/delete-file/majelis/<%= i %>" method="POST" style="display:none;"></form>
+              <form id="formDelMemberMajelis_<%= i %>" action="/admin/about/majelis/delete-member/<%= i %>" method="POST" style="display:none;"></form>
             </div>
             <% }); %>
           </div>

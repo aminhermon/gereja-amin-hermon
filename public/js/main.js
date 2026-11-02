@@ -463,6 +463,8 @@ function initBackToTop() {
 
 /* ---------- Daily Verse (Ayat Hari Ini Otomatis) ---------- */
 function initDailyVerse() {
+  const card = document.querySelector('.renungan-otomatis-card');
+  if (card && card.getAttribute('data-custom-verse') === 'true') return;
   const verseText = document.getElementById('daily-verse-text');
   const verseRef = document.getElementById('daily-verse-ref');
   if (!verseText || !verseRef) return;
