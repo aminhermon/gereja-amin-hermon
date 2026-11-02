@@ -12800,3 +12800,540 @@ blockquote::before {
   .popup-banner__dot { width: 8px; height: 8px; }
   .popup-banner__zoom-hint { font-size: 0.7rem; padding: 4px 10px; }
 }
+
+
+/* =========================================
+   GLOBAL MOBILE RESPONSIVENESS OVERHAUL
+   Comprehensive fixes for all sections
+   ========================================= */
+
+/* ---- TABLET (max 1024px) ---- */
+@media (max-width: 1024px) {
+  .section { padding: 3.5rem 0; }
+  .section-header h2 { font-size: 1.8rem; }
+  .section-header p { font-size: 0.95rem; }
+}
+
+/* ---- MOBILE (max 768px) ---- */
+@media (max-width: 768px) {
+
+  /* Root overrides */
+  :root {
+    --space-2xl: 2rem;
+    --space-3xl: 2.5rem;
+  }
+
+  /* Typography scale down */
+  h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  h2 { font-size: clamp(1.4rem, 5vw, 1.8rem); }
+  h3 { font-size: clamp(1.1rem, 4vw, 1.4rem); }
+
+  /* Container breathing room */
+  .container {
+    padding: 0 1rem;
+  }
+
+  /* Sections tighter */
+  .section {
+    padding: 2.5rem 0;
+  }
+
+  /* Section header */
+  .section-header {
+    margin-bottom: 1.8rem;
+  }
+  .section-header h2 {
+    font-size: 1.5rem;
+    line-height: 1.35;
+  }
+  .section-header p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    padding: 0 0.5rem;
+  }
+
+  /* Hero section */
+  .hero {
+    min-height: 85vh;
+  }
+  .hero__content {
+    padding: 2rem 1rem;
+  }
+  .hero__logo {
+    width: 90px;
+    margin-bottom: 0.8rem;
+  }
+  .hero__eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+  .hero__eyebrow::before,
+  .hero__eyebrow::after {
+    width: 20px;
+  }
+  .hero h1 {
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+  }
+  .hero__subtitle {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    padding: 0 0.5rem;
+  }
+  .hero__actions {
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+  }
+  .hero__actions .btn {
+    padding: 12px 24px;
+    font-size: 0.85rem;
+    max-width: 280px;
+  }
+
+  /* Gold line */
+  .gold-line {
+    width: 50px;
+  }
+
+  /* Schedule cards */
+  .schedule-card {
+    padding: 1.2rem;
+  }
+  .schedule-card h3 {
+    font-size: 1.05rem;
+  }
+
+  /* Expect cards */
+  .expect-card {
+    padding: 1.2rem;
+  }
+
+  /* Feature cards */
+  .feature-card {
+    padding: 1.2rem;
+  }
+
+  /* Contact cards */
+  .contact-card {
+    padding: 1.2rem;
+  }
+
+  /* Leader cards */
+  .leaders-grid {
+    max-width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+  .leaders-grid--2 {
+    max-width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+  .pengurus-row--3,
+  .pengurus-row--2 {
+    max-width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    margin: 0 auto;
+  }
+  .leader-card {
+    border-radius: 12px;
+  }
+  .leader-card__info {
+    padding: 0.8rem 0.6rem;
+  }
+  .leader-card__name {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  .leader-card__role {
+    font-size: 0.7rem;
+  }
+
+  /* Featured leader */
+  .leader-featured {
+    gap: 1.2rem;
+    padding: 1.2rem;
+    border-radius: 16px;
+  }
+  .leader-featured__img {
+    max-width: 200px;
+    border-radius: 12px;
+  }
+
+  /* Visi Misi premium cards */
+  .vm-premium-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 100%;
+  }
+  .vm-prem {
+    border-radius: 18px;
+  }
+  .vm-prem__header {
+    padding: 1.5rem 1.5rem 0;
+    gap: 0.8rem;
+  }
+  .vm-prem__icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+  }
+  .vm-prem__icon-wrap svg {
+    width: 22px;
+    height: 22px;
+  }
+  .vm-prem__badge {
+    font-size: 0.78rem;
+    padding: 6px 18px;
+    letter-spacing: 2px;
+  }
+  .vm-prem__divider {
+    margin: 1rem 1.5rem 0;
+  }
+  .vm-prem__body {
+    padding: 1.2rem 1.5rem 1.5rem;
+  }
+  .vm-prem__text {
+    font-size: 1.05rem;
+    line-height: 1.85;
+  }
+  .vm-prem__list {
+    gap: 0.6rem;
+  }
+  .vm-prem__list li {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    gap: 0.7rem;
+    padding: 0.4rem 0.5rem;
+  }
+  .vm-prem__bullet {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+  }
+  .vm-prem__corner {
+    width: 22px;
+    height: 22px;
+  }
+  .vm-prem__corner--tl::before, .vm-prem__corner--tr::before,
+  .vm-prem__corner--bl::before, .vm-prem__corner--br::before { width: 22px; }
+  .vm-prem__corner--tl::after, .vm-prem__corner--tr::after,
+  .vm-prem__corner--bl::after, .vm-prem__corner--br::after { height: 22px; }
+
+  /* Creed section */
+  .creed-section {
+    padding: 1.5rem;
+    border-radius: 14px;
+  }
+
+  /* Footer */
+  .footer {
+    padding-top: 2.5rem;
+  }
+  .footer__col {
+    text-align: center;
+  }
+  .footer__col h3 {
+    font-size: 1rem;
+  }
+  .footer__link {
+    font-size: 0.85rem;
+  }
+  .footer__bottom {
+    padding: 1rem 0;
+  }
+  .footer__bottom-inner {
+    font-size: 0.78rem;
+    gap: 0.5rem;
+  }
+
+  /* Warta */
+  .warta-item {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  /* Prayer form */
+  .prayer-form {
+    padding: 1.5rem;
+    border-radius: 14px;
+  }
+
+  /* Sermon cards */
+  .sermon-card__body {
+    padding: 1rem;
+  }
+  .sermon-card__title {
+    font-size: 1rem;
+  }
+
+  /* Gallery */
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+  .gallery-filter-btn {
+    padding: 8px 16px;
+    font-size: 0.78rem;
+  }
+
+  /* Popup banner on mobile */
+  .popup-banner__card {
+    max-width: 95vw;
+    width: 95vw;
+    border-radius: 16px;
+    max-height: 88vh;
+  }
+  .popup-banner__body {
+    padding: 1rem 1.2rem 1.2rem;
+  }
+  .popup-banner__title {
+    font-size: 1.1rem;
+  }
+  .popup-banner__desc {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  .popup-banner__cta {
+    padding: 10px 20px;
+    font-size: 0.82rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .popup-banner__close {
+    width: 34px;
+    height: 34px;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2rem;
+  }
+  .popup-banner__nav {
+    width: 32px;
+    height: 32px;
+  }
+  .popup-banner__nav svg {
+    width: 16px;
+    height: 16px;
+  }
+  .popup-banner__nav--prev { left: 6px; }
+  .popup-banner__nav--next { right: 6px; }
+  .popup-banner__dots {
+    padding: 8px 0 4px;
+    gap: 8px;
+  }
+  .popup-banner__dot {
+    width: 8px;
+    height: 8px;
+  }
+  .popup-banner__slide {
+    max-height: calc(88vh - 24px);
+  }
+
+  /* Lightbox mobile */
+  .popup-lightbox {
+    padding: 0.5rem;
+  }
+  .popup-lightbox__close {
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+  }
+}
+
+/* ---- SMALL PHONES (max 480px) ---- */
+@media (max-width: 480px) {
+
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .section {
+    padding: 2rem 0;
+  }
+
+  /* Hero tighter */
+  .hero {
+    min-height: 80vh;
+  }
+  .hero__content {
+    padding: 1.5rem 0.75rem;
+  }
+  .hero__logo {
+    width: 78px;
+  }
+  .hero h1 {
+    font-size: 1.35rem;
+  }
+  .hero__subtitle {
+    font-size: 0.82rem;
+  }
+  .hero__eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+  }
+
+  /* Leader grids: 2 columns for small phones */
+  .leaders-grid,
+  .leaders-grid--2,
+  .pengurus-row--3,
+  .pengurus-row--2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .leader-card__info {
+    padding: 0.6rem 0.4rem;
+  }
+  .leader-card__name {
+    font-size: 0.72rem;
+  }
+  .leader-card__role {
+    font-size: 0.62rem;
+  }
+
+  /* Visi Misi */
+  .vm-prem__header {
+    padding: 1.2rem 1.2rem 0;
+  }
+  .vm-prem__body {
+    padding: 1rem 1.2rem 1.2rem;
+  }
+  .vm-prem__text {
+    font-size: 0.95rem;
+  }
+  .vm-prem__list li {
+    font-size: 0.88rem;
+    padding: 0.3rem 0.4rem;
+    gap: 0.5rem;
+  }
+  .vm-prem__bullet {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    font-size: 0.68rem;
+  }
+
+  /* Section headers */
+  .section-header h2 {
+    font-size: 1.3rem;
+  }
+  .section-header p {
+    font-size: 0.82rem;
+  }
+
+  /* Schedule cards compact */
+  .schedule-card {
+    padding: 1rem;
+  }
+  .schedule-card h3 {
+    font-size: 0.95rem;
+  }
+
+  /* Contact info */
+  .contact-card {
+    padding: 1rem;
+  }
+
+  /* Footer */
+  .footer__grid {
+    gap: 1.5rem;
+  }
+  .footer__logo-text {
+    font-size: 1.2rem;
+  }
+
+  /* Popup */
+  .popup-banner__body {
+    padding: 0.8rem 1rem 1rem;
+  }
+  .popup-banner__title {
+    font-size: 0.95rem;
+  }
+  .popup-banner__desc {
+    font-size: 0.78rem;
+  }
+}
+
+/* ---- VERY SMALL PHONES (max 360px) ---- */
+@media (max-width: 360px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .hero h1 {
+    font-size: 1.2rem;
+  }
+  .hero__subtitle {
+    font-size: 0.78rem;
+  }
+  .hero__logo {
+    width: 68px;
+  }
+
+  .leaders-grid,
+  .leaders-grid--2,
+  .pengurus-row--3,
+  .pengurus-row--2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+  .leader-card__name {
+    font-size: 0.68rem;
+  }
+  .leader-card__role {
+    font-size: 0.58rem;
+  }
+  .leader-card__info {
+    padding: 0.5rem 0.3rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.15rem;
+  }
+
+  .vm-prem__text {
+    font-size: 0.88rem;
+  }
+  .vm-prem__list li {
+    font-size: 0.82rem;
+  }
+}
+
+/* ---- FIX: Prevent horizontal overflow on all screen sizes ---- */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure all elements respect viewport width */
+.section,
+.container,
+.hero,
+.footer {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Fix tables and pre elements that might overflow */
+table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Ensure images never overflow */
+img, video, iframe {
+  max-width: 100%;
+}
