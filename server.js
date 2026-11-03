@@ -443,7 +443,7 @@ function enrichMissingTopLevelKeys(targetDb) {
     // Ensure visit.sakramen has the 3 standard sakramen cards with jadwal & keterangan
     if (targetDb.visit && Array.isArray(targetDb.visit.sakramen)) {
       const hasPerjamuan = targetDb.visit.sakramen.some(s => s.nama && s.nama.toLowerCase().includes('perjamuan'));
-      if (!hasPerjamuan || targetDb.visit.sakramen.some(s => !s.jadwal || !s.keterangan)) {
+      if (!hasPerjamuan || targetDb.visit.sakramen.some(s => !s.jadwal)) {
         if (seedDb.visit && Array.isArray(seedDb.visit.sakramen)) {
           targetDb.visit.sakramen = JSON.parse(JSON.stringify(seedDb.visit.sakramen));
           modified = true;
@@ -1696,13 +1696,11 @@ app.post('/admin/visit/sakramen', requireAuth, (req, res) => {
   const icons = Array.isArray(req.body.icon) ? req.body.icon : [req.body.icon];
   const descs = Array.isArray(req.body.desc) ? req.body.desc : [req.body.desc];
   const jadwals = Array.isArray(req.body.jadwal) ? req.body.jadwal : [req.body.jadwal];
-  const keterangans = Array.isArray(req.body.keterangan) ? req.body.keterangan : [req.body.keterangan];
   db.visit.sakramen = names.map((n, i) => ({
     nama: n,
     icon: icons[i] || '✝️',
     desc: descs[i] || '',
-    jadwal: jadwals[i] || '',
-    keterangan: keterangans[i] || ''
+    jadwal: jadwals[i] || ''
   }));
   saveDB(db);
   res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Data sakramen berhasil disimpan!'));
@@ -2191,8 +2189,7 @@ app.post('/admin/visit/sakramen/add', requireAuth, (req, res) => {
     nama: req.body.nama || '',
     icon: req.body.icon || '✝️',
     desc: req.body.desc || '',
-    jadwal: req.body.jadwal || '',
-    keterangan: req.body.keterangan || ''
+    jadwal: req.body.jadwal || ''
   });
   saveDB(db);
   res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Sakramen baru berhasil ditambahkan!'));

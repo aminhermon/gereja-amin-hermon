@@ -673,7 +673,7 @@
                 <!-- Sakramen -->
         <div class="card">
           <h2 class="card-title">✝️ Sakramen & Katekisasi</h2>
-          <p class="card-subtitle">Kelola informasi sakramen dan katekisasi. Setiap kartu di halaman Baru di Sini dapat diklik oleh jemaat untuk membuka popup jadwal dan keterangan lengkap.</p>
+          <p class="card-subtitle">Kelola informasi sakramen dan katekisasi. Setiap kartu di halaman Baru di Sini dapat diklik oleh jemaat untuk membuka popup jadwal pelaksanaan.</p>
 
           <!-- Form Tambah Sakramen Baru -->
           <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1.5rem;">
@@ -685,7 +685,7 @@
               </div>
               <div class="form-group"><label>Ringkasan Singkat (Tampil di Kartu)</label><textarea name="desc" rows="2" placeholder="Teks ringkas yang tampil langsung pada kartu..." required></textarea></div>
               <div class="form-group"><label>Jadwal Pelaksanaan</label><input type="text" name="jadwal" placeholder="Contoh: Minggu Pertama Awal Bulan & Hari Raya Gerejawi" required></div>
-              <div class="form-group"><label>Keterangan Lengkap & Tata Laksana (Tampil di Popup)</label><textarea name="keterangan" rows="4" placeholder="Penjelasan lengkap mengenai makna sakramen, syarat pendaftaran, dan tata laksana..." required></textarea></div>
+              
               <button type="submit" class="btn btn--gold btn--sm">➕ Tambah Sakramen</button>
             </form>
           </div>
@@ -702,7 +702,7 @@
               </div>
               <div class="form-group"><label>Ringkasan di Kartu</label><textarea name="desc" rows="2" required><%= s.desc %></textarea></div>
               <div class="form-group"><label>Jadwal Pelaksanaan</label><input type="text" name="jadwal" value="<%= s.jadwal || '' %>" placeholder="Jadwal pelaksanaan..." required></div>
-              <div class="form-group"><label>Keterangan Lengkap & Tata Cara</label><textarea name="keterangan" rows="4" placeholder="Keterangan lengkap..." required><%= s.keterangan || '' %></textarea></div>
+              
               <div style="display:flex; justify-content:flex-end;">
                 <button type="button" class="btn btn--outline-danger btn--xs" onclick="if(confirm('Hapus sakramen '<%= s.nama %>'?')) document.getElementById('delSakramenForm_<%= i %>').submit();">🗑️ Hapus Sakramen Ini</button>
               </div>
