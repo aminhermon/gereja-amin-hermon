@@ -13749,3 +13749,321 @@ img, video, iframe {
     font-size: 0.65rem;
   }
 }
+
+
+/* =========================================================
+   SAKRAMEN INTERACTIVE CARDS & POPUP MODAL
+   ========================================================= */
+.sakramen-card--interactive {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top: 4px solid var(--gold);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 2rem;
+  background: var(--white);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+  border-top-width: 4px;
+  border-top-color: var(--gold);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  user-select: none;
+}
+
+.sakramen-card--interactive:hover,
+.sakramen-card--interactive:focus-visible {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 35px rgba(27, 42, 74, 0.12);
+  border-color: var(--gold);
+  outline: none;
+}
+
+.sakramen-card__nias-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold) 0%, #b81a1a 50%, var(--gold) 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.sakramen-card__hint {
+  margin-top: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(200, 169, 81, 0.35);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold);
+  transition: all 0.25s ease;
+}
+
+.sakramen-card--interactive:hover .sakramen-card__hint {
+  color: var(--navy);
+  gap: 12px;
+}
+
+.sakramen-card--interactive:hover .sakramen-card__hint svg {
+  transform: translateX(3px);
+}
+
+.sakramen-card__hint svg {
+  transition: transform 0.25s ease;
+}
+
+/* Modal Popup */
+.sakramen-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sakramen-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sakramen-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 29, 53, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.sakramen-modal__content {
+  position: relative;
+  z-index: 10;
+  background: #ffffff;
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  border-radius: 18px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.92) translateY(20px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.sakramen-modal.active .sakramen-modal__content {
+  transform: scale(1) translateY(0);
+}
+
+.sakramen-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--navy);
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.2s ease;
+}
+
+.sakramen-modal__close:hover {
+  background: rgba(184, 26, 26, 0.12);
+  color: #b81a1a;
+  transform: scale(1.1);
+}
+
+.sakramen-modal__top-ribbon {
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--gold) 0%, #b81a1a 50%, var(--gold) 100%);
+  flex-shrink: 0;
+}
+
+.sakramen-modal__header {
+  padding: 1.75rem 2rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sakramen-modal__icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(200, 169, 81, 0.12);
+  border: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  flex-shrink: 0;
+}
+
+.sakramen-modal__titles {
+  flex: 1;
+}
+
+.sakramen-modal__badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  color: var(--navy);
+  background: rgba(200, 169, 81, 0.2);
+  padding: 3px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.sakramen-modal__title {
+  margin: 0;
+  color: var(--navy);
+  font-size: 1.4rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.sakramen-modal__body {
+  padding: 1.5rem 2rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sakramen-modal__jadwal-box {
+  background: #FFFDF9;
+  border: 1px solid rgba(200, 169, 81, 0.35);
+  border-left: 4px solid var(--gold);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.sakramen-modal__jadwal-icon {
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sakramen-modal__jadwal-heading {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--navy);
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.sakramen-modal__jadwal-text {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2D2D2D;
+  line-height: 1.5;
+}
+
+.sakramen-modal__section-heading {
+  font-size: 0.95rem;
+  color: var(--navy);
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sakramen-modal__keterangan-text {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  line-height: 1.85;
+}
+
+.sakramen-modal__keterangan-text p {
+  margin-bottom: 0.85rem;
+}
+
+.sakramen-modal__keterangan-text p:last-child {
+  margin-bottom: 0;
+}
+
+.sakramen-modal__footer {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: center;
+  background: #FAFAFA;
+  border-radius: 0 0 18px 18px;
+}
+
+.sakramen-modal__btn-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366 !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600;
+}
+
+.sakramen-modal__btn-wa:hover {
+  background: #1fa851 !important;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .sakramen-modal {
+    padding: 1rem;
+  }
+  .sakramen-modal__content {
+    max-height: 92vh;
+    border-radius: 14px;
+  }
+  .sakramen-modal__header {
+    padding: 1.25rem 1.25rem 1rem;
+    gap: 12px;
+  }
+  .sakramen-modal__icon-wrap {
+    width: 48px;
+    height: 48px;
+    font-size: 1.8rem;
+  }
+  .sakramen-modal__title {
+    font-size: 1.15rem;
+  }
+  .sakramen-modal__body {
+    padding: 1.25rem;
+  }
+  .sakramen-modal__footer {
+    padding: 1rem 1.25rem;
+    flex-direction: column-reverse;
+  }
+  .sakramen-modal__footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

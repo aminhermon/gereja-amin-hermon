@@ -440,6 +440,18 @@ function enrichMissingTopLevelKeys(targetDb) {
       }
     }
 
+    // Ensure visit.sakramen has the 3 standard sakramen cards with jadwal & keterangan
+    if (targetDb.visit && Array.isArray(targetDb.visit.sakramen)) {
+      const hasPerjamuan = targetDb.visit.sakramen.some(s => s.nama && s.nama.toLowerCase().includes('perjamuan'));
+      if (!hasPerjamuan || targetDb.visit.sakramen.some(s => !s.jadwal || !s.keterangan)) {
+        if (seedDb.visit && Array.isArray(seedDb.visit.sakramen)) {
+          targetDb.visit.sakramen = JSON.parse(JSON.stringify(seedDb.visit.sakramen));
+          modified = true;
+          console.log('🔄 visit.sakramen dimigrasikan ke: Perjamuan Kudus, Baptis Anak, Sidi/Katekisasi');
+        }
+      }
+    }
+
     // Ensure contactFaq.contactInfo exists
     if (targetDb.contactFaq && !targetDb.contactFaq.contactInfo) {
       if (seedDb.contactFaq && seedDb.contactFaq.contactInfo) {
@@ -1683,11 +1695,17 @@ app.post('/admin/visit/sakramen', requireAuth, (req, res) => {
   const names = Array.isArray(req.body.nama) ? req.body.nama : [req.body.nama];
   const icons = Array.isArray(req.body.icon) ? req.body.icon : [req.body.icon];
   const descs = Array.isArray(req.body.desc) ? req.body.desc : [req.body.desc];
+  const jadwals = Array.isArray(req.body.jadwal) ? req.body.jadwal : [req.body.jadwal];
+  const keterangans = Array.isArray(req.body.keterangan) ? req.body.keterangan : [req.body.keterangan];
   db.visit.sakramen = names.map((n, i) => ({
-    nama: n, icon: icons[i], desc: descs[i]
+    nama: n,
+    icon: icons[i] || '✝️',
+    desc: descs[i] || '',
+    jadwal: jadwals[i] || '',
+    keterangan: keterangans[i] || ''
   }));
   saveDB(db);
-  res.redirect('/admin?tab=visit');
+  res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Data sakramen berhasil disimpan!'));
 });
 
 // ===== TAB: TENTANG GEREJA =====
@@ -2172,7 +2190,9 @@ app.post('/admin/visit/sakramen/add', requireAuth, (req, res) => {
   db.visit.sakramen.push({
     nama: req.body.nama || '',
     icon: req.body.icon || '✝️',
-    desc: req.body.desc || ''
+    desc: req.body.desc || '',
+    jadwal: req.body.jadwal || '',
+    keterangan: req.body.keterangan || ''
   });
   saveDB(db);
   res.redirect('/admin?tab=visit&msg=' + encodeURIComponent('Sakramen baru berhasil ditambahkan!'));

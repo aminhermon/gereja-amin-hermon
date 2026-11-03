@@ -91,19 +91,25 @@
     },
     "sakramen": [
       {
-        "nama": "Baptisan Anak",
-        "icon": "👶",
-        "desc": "Sakramen baptisan kudus bagi bayi dan anak-anak dari keluarga Kristen sebagai tanda perjanjian kasih karunia Allah."
+        "nama": "Sakramen Perjamuan Kudus",
+        "icon": "🍷",
+        "desc": "Peringatan akan pengorbanan tubuh dan darah Kristus di kayu salib demi penebusan dosa manusia serta tanda persekutuan jemaat yang kudus.",
+        "jadwal": "Setiap Minggu Pertama Awal Bulan, Ibadah Jumat Agung, & Hari Raya Gerejawi",
+        "keterangan": "Perjamuan Kudus adalah sakramen kudus yang ditetapkan langsung oleh Tuhan Yesus Kristus bagi orang percaya. Melalui roti yang dipecah-pecahkan dan cawan anggur yang dituangkan, jemaat mengingat kembali sengsara dan karya pengorbanan Kristus di Golgota, mengucap syukur atas anugerah keselamatan yang cuma-cuma, serta memperbaharui komitmen hidup setia di hadapan Tuhan.\n\nSakramen ini terbuka bagi seluruh anggota jemaat yang telah mengaku percaya dan telah menerima peneguhan Sidi (anggota sidi gereja). Sebelum mengikuti perjamuan, jemaat diajak untuk berdoa, memeriksa hati nurani, dan berdamai dengan sesama."
       },
       {
-        "nama": "Baptisan Dewasa",
-        "icon": "🙏",
-        "desc": "Sakramen baptisan bagi orang dewasa yang telah mengaku percaya kepada Yesus Kristus sebagai Tuhan dan Juruselamat."
+        "nama": "Baptis Anak",
+        "icon": "👶",
+        "desc": "Tanda dan meterai perjanjian anugerah keselamatan Allah yang dilayankan bagi anak-anak dari keluarga orang percaya.",
+        "jadwal": "Dikoordinasikan secara berkala dalam Ibadah Raya Minggu (Sesuai Pendaftaran di Sekretariat)",
+        "keterangan": "Sakramen Baptisan Anak dilayankan kepada bayi dan anak-anak yang lahir dalam keluarga Kristen di mana orang tua telah menjadi anggota jemaat yang mengaku percaya. Baptisan ini menegaskan bahwa anak-anak tercakup di dalam janji dan kasih karunia Allah sejak usia dini.\n\nOrang tua diwajibkan mendaftarkan putra-putrinya ke Sekretariat Gereja serta mengikuti sesi bimbingan pastoral (katekisasi pra-baptis) bersama Pendeta Jemaat sebelum hari pelaksanaan ibadah baptisan."
       },
       {
         "nama": "Sidi / Katekisasi",
         "icon": "📖",
-        "desc": "Pengakuan iman (Sidi) bagi mereka yang telah menyelesaikan kelas katekisasi dan siap menjadi anggota sidi jemaat."
+        "desc": "Pembinaan pengajaran dasar iman Kristen bagi kaum muda dan jemaat sebelum mengucapkan pengakuan iman secara pribadi.",
+        "jadwal": "Kelas Pembinaan Rutin Setiap Minggu (Periode 6–12 Bulan) & Peneguhan Menjelang Paskah atau Natal",
+        "keterangan": "Katekisasi adalah program pengajaran firman Tuhan, pemahaman doktrin iman Kristen, pengakuan iman gereja, dan pembinaan kedewasaan rohani. Melalui kelas katekisasi, peserta dibimbing untuk memahami arti keselamatan, hidup doa, sakramen, dan tanggung jawab melayani sebagai murid Kristus.\n\nSetelah menyelesaikan kurikulum pembelajaran katekisasi dan evaluasi pastoral, peserta akan diteguhkan dalam Kebaktian Peneguhan Sidi (Angkat Sidi) di hadapan jemaat dan Tuhan, menjadi anggota sidi penuh, serta berhak menerima Sakramen Perjamuan Kudus."
       }
     ]
   },
