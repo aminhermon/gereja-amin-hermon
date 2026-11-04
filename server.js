@@ -452,6 +452,13 @@ function enrichMissingTopLevelKeys(targetDb) {
       }
     }
 
+    // Ensure about.sejarah.title is updated to Sejarah Jemaat Hermon
+    if (targetDb.about && targetDb.about.sejarah && targetDb.about.sejarah.title === 'Sejarah Gereja') {
+      targetDb.about.sejarah.title = 'Sejarah Jemaat Hermon';
+      modified = true;
+      console.log('🔄 about.sejarah.title diperbarui ke "Sejarah Jemaat Hermon"');
+    }
+
     // Ensure contactFaq.contactInfo exists
     if (targetDb.contactFaq && !targetDb.contactFaq.contactInfo) {
       if (seedDb.contactFaq && seedDb.contactFaq.contactInfo) {

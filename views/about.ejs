@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="stylesheet" href="/css/style.min.css?v=53">
+  <link rel="stylesheet" href="/css/style.min.css?v=54">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -72,16 +72,31 @@
     </div>
   </section>
 
-  <!-- ========== SEJARAH ========== -->
+  <!-- ========== SEJARAH JEMAAT HERMON ========== -->
   <section class="section" id="sejarah">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
-        <h2><%= about.sejarah.title %></h2>
+        <h2><%= about.sejarah.title || 'Sejarah Jemaat Hermon' %></h2>
         <span class="gold-line"></span>
       </div>
       <div class="sejarah-content-box" data-aos="fade-up">
-        <% about.sejarah.content.split('\n\n').forEach(function(p) { %>
+        <div class="sejarah-content-box__top-ribbon" aria-hidden="true"></div>
+        <%
+          var rawContent = (about.sejarah && about.sejarah.content) ? about.sejarah.content : '';
+          var pList = rawContent.split(/\r?\n\s*\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+          if (pList.length === 0 && rawContent.trim()) {
+            pList = [rawContent.trim()];
+          }
+          pList.forEach(function(p, idx) {
+        %>
           <p class="sejarah-p"><%= p %></p>
+          <% if (idx < pList.length - 1) { %>
+            <div class="sejarah-separator" aria-hidden="true">
+              <span class="sejarah-sep__line"></span>
+              <span class="sejarah-sep__diamond"></span>
+              <span class="sejarah-sep__line"></span>
+            </div>
+          <% } %>
         <% }); %>
       </div>
     </div>
@@ -151,9 +166,9 @@
   <section class="section" id="pemimpin">
     <div class="container">
       <div class="section-header" data-aos="fade-up">
-        <h2>STRUKTUR PENGURUS<br><span class="text-gold">GEREJA AMIN HERMON</span></h2>
+        <h2>MAJELIS JEMAAT<br><span class="text-gold">GEREJA AMIN HERMON</span></h2>
         <span class="gold-line"></span>
-        <p>Para pelayan dan pengurus yang dipercayakan untuk menggembalakan dan melayani jemaat.</p>
+        <p>Para pelayan jemaat yang telah ditahbiskan secara khusus dan dipercayakan untuk menggembalakan dan menatalayani aktivitas gerejawi di tengah jemaat.</p>
       </div>
 
       <%

@@ -9501,17 +9501,26 @@ p {
   .rv-reaction__text { display: none; }
 }
 
-/* ---------- Sejarah Gereja Refined Typography ---------- */
+/* ---------- Sejarah Jemaat Hermon Typography & Separation ---------- */
 .sejarah-content-box {
-  max-width: 800px;
+  max-width: 860px;
   margin: 0 auto;
   background: var(--white);
   border: 1px solid rgba(200, 169, 81, 0.3);
-  border-top: 4px solid var(--gold);
-  border-radius: var(--radius-xl);
-  padding: 3rem 3.5rem;
-  box-shadow: 0 15px 40px rgba(15, 29, 53, 0.07);
+  border-radius: 18px;
+  padding: 3.5rem 3.5rem;
+  box-shadow: 0 16px 45px rgba(15, 29, 53, 0.08);
   position: relative;
+  overflow: hidden;
+}
+
+.sejarah-content-box__top-ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--gold) 0%, #b81a1a 50%, var(--gold) 100%);
 }
 
 .sejarah-content-box::before {
@@ -9520,7 +9529,7 @@ p {
   top: 15px;
   right: 25px;
   font-family: var(--font-heading);
-  font-size: 5.5rem;
+  font-size: 5rem;
   line-height: 1;
   color: rgba(200, 169, 81, 0.12);
   pointer-events: none;
@@ -9529,36 +9538,64 @@ p {
 
 .sejarah-p {
   font-size: 1.08rem;
-  line-height: 1.95;
-  color: #374151;
+  line-height: 2.05;
+  color: #2D3748;
   text-align: justify;
   text-justify: inter-word;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
+  letter-spacing: 0.15px;
 }
 
 .sejarah-p:first-of-type {
-  font-size: 1.15rem;
-  color: #1F2937;
+  font-size: 1.12rem;
+  color: #1A202C;
   font-weight: 500;
 }
 
 .sejarah-p:first-of-type::first-letter {
   font-family: var(--font-heading);
-  font-size: 2.8rem;
+  font-size: 3rem;
   float: left;
   line-height: 0.85;
-  margin-right: 0.65rem;
+  margin-right: 0.75rem;
+  margin-top: 0.15rem;
   color: var(--gold);
   font-weight: 700;
 }
 
-.sejarah-p:last-of-type {
-  margin-bottom: 0;
+/* Ornamental Paragraph Separator */
+.sejarah-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 2.25rem auto;
+  max-width: 280px;
+  user-select: none;
+}
+
+.sejarah-sep__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200, 169, 81, 0.6));
+}
+
+.sejarah-separator .sejarah-sep__line:last-child {
+  background: linear-gradient(90deg, rgba(200, 169, 81, 0.6), transparent);
+}
+
+.sejarah-sep__diamond {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 8px rgba(200, 169, 81, 0.5);
+  flex-shrink: 0;
 }
 
 .sejarah-footer-note {
-  margin-top: 2rem;
-  padding-top: 1.4rem;
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
   border-top: 1px dashed rgba(200, 169, 81, 0.3);
   text-align: center;
   font-family: var(--font-heading);
@@ -10987,19 +11024,26 @@ p {
 
 /* ---------- MOBILE: Sejarah (History) Page ---------- */
 @media (max-width: 768px) {
+  .sejarah-content-box {
+    padding: 2.25rem 1.5rem !important;
+    border-radius: 14px !important;
+  }
   .sejarah-p {
-    font-size: 0.88rem;
-    line-height: 1.7;
-    margin-bottom: 1rem;
+    font-size: 1rem !important;
+    line-height: 1.85 !important;
+    text-align: left !important;
+    margin-bottom: 0 !important;
   }
-
   .sejarah-p:first-of-type {
-    font-size: 0.95rem;
+    font-size: 1.05rem !important;
   }
-
   .sejarah-p:first-of-type::first-letter {
-    font-size: 2.2rem;
-    margin-right: 0.35rem;
+    font-size: 2.4rem !important;
+    margin-right: 0.5rem !important;
+  }
+  .sejarah-separator {
+    margin: 1.6rem auto !important;
+    max-width: 200px !important;
   }
 }
 
@@ -11891,23 +11935,7 @@ p {
   box-shadow: 0 0 10px rgba(200, 169, 81, 0.2);
 }
 
-/* --- 13. SEJARAH CONTENT BOX: Nias Frame --- */
-.sejarah-content-box {
-  position: relative;
-  border-left: 3px solid transparent;
-  border-image: linear-gradient(180deg, var(--gold), var(--nias-red), var(--gold)) 1;
-  padding-left: 1.5rem !important;
-}
-
-.sejarah-content-box::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -3px;
-  width: 3px;
-  height: 20px;
-  background: var(--gold);
-}
+/* --- 13. SEJARAH CONTENT BOX: Refined --- */
 
 /* --- 14. FOOTER: Enhanced Nias Cultural Styling --- */
 .footer__heading::after {
@@ -12248,9 +12276,7 @@ blockquote::before {
     height: 2px;
   }
 
-  .sejarah-content-box {
-    padding-left: 1rem !important;
-  }
+  /* sejarah padding normalized */
 }
 
 @media (max-width: 480px) {
