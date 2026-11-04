@@ -802,10 +802,10 @@
 
         <!-- Pengurus Harian (BPH) -->
         <div class="card">
-          <h2 class="card-title">👥 Pengurus Harian (BPH)</h2>
+          <h2 class="card-title">👥 Badan Pengurus Harian Majelis Jemaat (BPH)</h2>
           <!-- Form Tambah Pengurus Baru -->
           <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem;">
-            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Pengurus Harian Baru</h4>
+            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Anggota BPH Baru</h4>
             <form action="/admin/about/pengurus/add" method="POST" enctype="multipart/form-data">
               <div class="grid-3">
                 <div class="form-group">
@@ -859,11 +859,11 @@
 
         <!-- Majelis Jemaat -->
         <div class="card">
-          <h2 class="card-title">🏛️ Majelis Jemaat (<%= db.about.pemimpin.majelis.length %> orang)</h2>
-          <p class="card-subtitle">Upload foto dan edit nama untuk setiap majelis jemaat.</p>
+          <h2 class="card-title">🏛️ Penatua Sektor dan Komisi (<%= db.about.pemimpin.majelis.length %> orang)</h2>
+          <p class="card-subtitle">Upload foto dan edit nama untuk setiap penatua sektor dan komisi.</p>
           <!-- Form Tambah Majelis Baru -->
           <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem; margin-top:1rem;">
-            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Majelis Jemaat Baru</h4>
+            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Penatua Sektor / Komisi Baru</h4>
             <form action="/admin/about/majelis/add" method="POST" enctype="multipart/form-data">
               <div class="grid-3">
                 <div class="form-group">

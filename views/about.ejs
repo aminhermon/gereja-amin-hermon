@@ -219,15 +219,8 @@
           </div>
 
           <div class="pastor-hero__info">
-            <div class="pastor-hero__badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.09 8.26L21 9.27L16.18 14.14L17.18 21.02L12 18.27L6.82 21.02L7.82 14.14L3 9.27L9.91 8.26L12 2Z"/></svg>
-              Gembala Jemaat
-            </div>
             <h4 class="pastor-hero__name"><%- formatLeaderName(pastor.name) %></h4>
             <span class="pastor-hero__role"><%= pastor.role %></span>
-            <div class="pastor-hero__divider"></div>
-            <p class="pastor-hero__verse">"Akulah gembala yang baik. Gembala yang baik memberikan nyawanya bagi domba-dombanya."</p>
-            <span class="pastor-hero__verse-ref">— Yohanes 10:11</span>
           </div>
           <!-- Nias bottom ornamental border -->
           <div class="nias-card-border nias-card-border--bottom"></div>
@@ -235,8 +228,8 @@
       </div>
       <% } %>
 
-      <!-- Pengurus Harian -->
-      <h3 class="sub-section-title" data-aos="fade-up">Pengurus Harian</h3>
+      <!-- Badan Pengurus Harian Majelis Jemaat -->
+      <h3 class="sub-section-title" data-aos="fade-up">Badan Pengurus Harian Majelis Jemaat</h3>
 
       <!-- Baris 1: Ketua (3 kartu) -->
       <div class="prem-grid prem-grid--3" data-aos="fade-up">
@@ -321,8 +314,8 @@
         <% }); %>
       </div>
 
-      <!-- Majelis Jemaat -->
-      <h3 class="sub-section-title" data-aos="fade-up">Majelis Jemaat</h3>
+      <!-- Penatua Sektor dan Komisi -->
+      <h3 class="sub-section-title" data-aos="fade-up">Penatua Sektor dan Komisi</h3>
       <div class="prem-grid prem-grid--auto" data-aos="fade-up">
         <% about.pemimpin.majelis.forEach(function(m, i) { %>
         <div class="prem-card prem-card--compact leader-card--clickable"
