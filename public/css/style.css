@@ -5843,6 +5843,15 @@ p {
   opacity: 0.7;
 }
 
+
+.pastor-hero__desc {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-light, #5a6374);
+  margin: 0;
+  font-weight: 400;
+}
+
 .pastor-hero__divider {
   width: 48px;
   height: 3px;
@@ -5906,6 +5915,11 @@ p {
 
   .pastor-hero__verse-ref {
     padding-left: 0;
+    text-align: center;
+  }
+
+  
+  .pastor-hero__desc {
     text-align: center;
   }
 
