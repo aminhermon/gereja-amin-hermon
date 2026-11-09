@@ -320,9 +320,16 @@
       <h3 class="sub-section-title" data-aos="fade-up">Penatua Sektor dan Komisi</h3>
 
       <%
-        var majelisSektor = about.pemimpin.majelis.filter(function(m){ return m.kategori === 'sektor'; });
-        var majelisKategorial = about.pemimpin.majelis.filter(function(m){ return m.kategori === 'kategorial'; });
-        var majelisKhusus = about.pemimpin.majelis.filter(function(m){ return m.kategori === 'khusus'; });
+        function detectKategori(m) {
+          if (m.kategori) return m.kategori;
+          var r = (m.role || '').toLowerCase();
+          if (r.indexOf('sektor') !== -1) return 'sektor';
+          if (r.indexOf('anak') !== -1 || r.indexOf('pemuda') !== -1 || r.indexOf('perempuan') !== -1 || r.indexOf('bapak') !== -1) return 'kategorial';
+          return 'khusus';
+        }
+        var majelisSektor = about.pemimpin.majelis.filter(function(m){ return detectKategori(m) === 'sektor'; });
+        var majelisKategorial = about.pemimpin.majelis.filter(function(m){ return detectKategori(m) === 'kategorial'; });
+        var majelisKhusus = about.pemimpin.majelis.filter(function(m){ return detectKategori(m) === 'khusus'; });
       %>
 
       <!-- Layer 1: Penatua Sektor -->
