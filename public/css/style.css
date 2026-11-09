@@ -6027,30 +6027,31 @@ p {
 
 .prem-grid--5 {
   grid-template-columns: repeat(5, 1fr);
-  max-width: 1000px;
+  max-width: 1100px;
 }
 
 .prem-grid--4 {
   grid-template-columns: repeat(4, 1fr);
-  max-width: 860px;
+  max-width: 960px;
 }
 
 /* Ensure majelis compact cards have consistent sizing */
 .prem-grid--majelis .prem-card--compact {
   width: 100%;
-  max-width: 220px;
+  max-width: 260px;
   margin: 0 auto;
 }
 
 .prem-grid--majelis .prem-card--compact .prem-card__photo {
-  aspect-ratio: 3 / 3.6;
+  aspect-ratio: 3 / 4;
   min-height: unset;
   max-height: unset;
+  overflow: hidden;
 }
 
 .prem-grid--majelis .prem-card--compact .prem-card__photo img {
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover;
+  object-position: top center;
 }
 
 .prem-grid--majelis .prem-card--compact .prem-card__body {
@@ -6344,8 +6345,8 @@ p {
 .prem-card--compact .prem-card__photo img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover;
+  object-position: top center;
   background: linear-gradient(145deg, #0c1a30 0%, #1a3355 100%);
 }
 
