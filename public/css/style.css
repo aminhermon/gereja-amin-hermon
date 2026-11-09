@@ -1880,6 +1880,41 @@ p {
 }
 
 /* 2-column grid for Pendeta */
+
+/* Layer subtitle for Penatua Sektor / Komisi grouping */
+.sub-section-subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--gold-dark, #A68B3C);
+  margin: var(--space-2xl) 0 var(--space-lg);
+  letter-spacing: 0.3px;
+  position: relative;
+}
+
+.sub-section-subtitle svg {
+  stroke: var(--gold, #C8A951);
+  flex-shrink: 0;
+}
+
+.sub-section-subtitle::before,
+.sub-section-subtitle::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold, #C8A951));
+}
+
+.sub-section-subtitle::after {
+  background: linear-gradient(90deg, var(--gold, #C8A951), transparent);
+}
+
 .leaders-grid--2 {
   grid-template-columns: repeat(2, 1fr);
   max-width: 700px;

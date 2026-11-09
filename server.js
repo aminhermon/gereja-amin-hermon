@@ -1832,6 +1832,7 @@ app.post('/admin/about/majelis/:idx', requireAuth, upload.single('image'), (req,
   if (db.about.pemimpin.majelis[idx]) {
     db.about.pemimpin.majelis[idx].name = req.body.name;
     db.about.pemimpin.majelis[idx].role = req.body.role || 'Majelis';
+    if (req.body.kategori) db.about.pemimpin.majelis[idx].kategori = req.body.kategori;
     if (req.file) {
       if (db.about.pemimpin.majelis[idx].image && db.about.pemimpin.majelis[idx].image.startsWith('uploads/')) {
         deleteUploadedFile(db.about.pemimpin.majelis[idx].image);
@@ -2145,7 +2146,8 @@ app.post('/admin/about/majelis/add', requireAuth, upload.single('image'), (req, 
   const item = {
     name: req.body.name || '',
     role: req.body.role || 'Majelis',
-    image: req.file ? 'uploads/' + req.file.filename : ''
+    image: req.file ? 'uploads/' + req.file.filename : '',
+    kategori: req.body.kategori || 'sektor'
   };
   db.about.pemimpin.majelis.push(item);
   saveDB(db);

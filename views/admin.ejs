@@ -857,28 +857,42 @@
           <% }); %>
         </div>
 
-        <!-- Majelis Jemaat -->
+        <!-- Penatua Sektor dan Komisi (3 Layer) -->
         <div class="card">
           <h2 class="card-title">🏛️ Penatua Sektor dan Komisi (<%= db.about.pemimpin.majelis.length %> orang)</h2>
-          <p class="card-subtitle">Upload foto dan edit nama untuk setiap penatua sektor dan komisi.</p>
+          <p class="card-subtitle">Kelola data penatua sektor dan komisi. Pilih kategori saat menambahkan anggota baru.</p>
           <!-- Form Tambah Majelis Baru -->
           <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem; margin-top:1rem;">
-            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Penatua Sektor / Komisi Baru</h4>
+            <h4 style="color:var(--navy); margin-bottom:0.8rem; font-size:0.85rem;">➕ Tambah Penatua Baru</h4>
             <form action="/admin/about/majelis/add" method="POST" enctype="multipart/form-data">
-              <div class="grid-3">
+              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:0.8rem;">
                 <div class="form-group">
-                  <label>Nama Majelis</label>
-                  <input type="text" name="name" placeholder="Contoh: SNK. Nama Majelis" required>
+                  <label>Nama</label>
+                  <input type="text" name="name" placeholder="Contoh: SNK. Nama Lengkap" required>
                 </div>
-                <div class="form-group"><label>Jabatan / Penugasan</label><input type="text" name="role" placeholder="Contoh: Ketua Sektor Sion" required></div>
+                <div class="form-group">
+                  <label>Jabatan / Penugasan</label>
+                  <input type="text" name="role" placeholder="Contoh: Ketua Sektor Sion" required>
+                </div>
+                <div class="form-group">
+                  <label>Kategori</label>
+                  <select name="kategori" required style="padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.85rem;">
+                    <option value="sektor">🏠 Penatua Sektor</option>
+                    <option value="kategorial">👥 Komisi Pelayanan Kategorial</option>
+                    <option value="khusus">⭐ Komisi Pelayanan Khusus</option>
+                  </select>
+                </div>
                 <div class="form-group"><label>Foto</label><input type="file" name="image" accept="image/*"></div>
               </div>
-              <button type="submit" class="btn btn--gold btn--sm">➕ Tambah Majelis</button>
+              <button type="submit" class="btn btn--gold btn--sm">➕ Tambah Penatua</button>
             </form>
           </div>
           <hr class="divider">
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:.8rem;">
+          <!-- Penatua Sektor -->
+          <h4 style="color:var(--navy); margin:1.2rem 0 0.6rem; font-size:0.9rem; font-weight:700;">🏠 Penatua Sektor</h4>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:.8rem; margin-bottom:1rem;">
             <% db.about.pemimpin.majelis.forEach(function(m, i) { %>
+            <% if (m.kategori === 'sektor') { %>
             <div class="item-card">
               <form action="/admin/about/majelis/<%= i %>" method="POST" enctype="multipart/form-data">
                 <div style="display:flex; gap:.8rem; align-items:center; margin-bottom:.5rem;">
@@ -890,8 +904,9 @@
                     <% } %>
                   </div>
                   <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
-                    <input type="text" name="name" value="<%= m.name %>" placeholder="Nama Majelis" style="padding:4px 6px; font-size:0.8rem;">
+                    <input type="text" name="name" value="<%= m.name %>" placeholder="Nama" style="padding:4px 6px; font-size:0.8rem;">
                     <input type="text" name="role" value="<%= m.role || 'Majelis' %>" placeholder="Jabatan" style="padding:4px 6px; font-size:0.75rem;">
+                    <input type="hidden" name="kategori" value="sektor">
                   </div>
                 </div>
                 <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Foto</label><input type="file" name="image" accept="image/*"></div>
@@ -899,13 +914,88 @@
                   <button type="submit" class="btn btn--gold btn--xs" style="flex:1; justify-content:center;">💾 Simpan</button>
                   <% if (m.image) { %>
                   <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelMajelis_<%= i %>" data-del-name="<%= m.name %>" onclick="confirmAndDelete(this)" title="Hapus Foto">🗑️ Foto</button>
-                  <button type="button" class="btn btn--danger btn--xs" onclick="if(confirm('Hapus majelis ini dari daftar?\n\nNama: <%= m.name %>')) document.getElementById('formDelMemberMajelis_<%= i %>').submit();" title="Hapus Anggota Majelis">🗑️ Hapus</button>
+                  <button type="button" class="btn btn--danger btn--xs" onclick="if(confirm('Hapus penatua ini dari daftar?\n\nNama: <%= m.name %>')) document.getElementById('formDelMemberMajelis_<%= i %>').submit();" title="Hapus Penatua">🗑️ Hapus</button>
                   <% } %>
                 </div>
               </form>
               <form id="formDelMajelis_<%= i %>" action="/admin/delete-file/majelis/<%= i %>" method="POST" style="display:none;"></form>
               <form id="formDelMemberMajelis_<%= i %>" action="/admin/about/majelis/delete-member/<%= i %>" method="POST" style="display:none;"></form>
             </div>
+            <% } %>
+            <% }); %>
+          </div>
+
+          <!-- Komisi Pelayanan Kategorial -->
+          <h4 style="color:var(--navy); margin:1.2rem 0 0.6rem; font-size:0.9rem; font-weight:700;">👥 Komisi Pelayanan Kategorial</h4>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:.8rem; margin-bottom:1rem;">
+            <% db.about.pemimpin.majelis.forEach(function(m, i) { %>
+            <% if (m.kategori === 'kategorial') { %>
+            <div class="item-card">
+              <form action="/admin/about/majelis/<%= i %>" method="POST" enctype="multipart/form-data">
+                <div style="display:flex; gap:.8rem; align-items:center; margin-bottom:.5rem;">
+                  <div style="flex-shrink:0; width:52px; height:52px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border: 1px solid var(--border);">
+                    <% if (m.image) { %>
+                      <img src="/<%= m.image %>" style="width:100%; height:100%; object-fit:cover;">
+                    <% } else { %>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <% } %>
+                  </div>
+                  <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+                    <input type="text" name="name" value="<%= m.name %>" placeholder="Nama" style="padding:4px 6px; font-size:0.8rem;">
+                    <input type="text" name="role" value="<%= m.role || 'Majelis' %>" placeholder="Jabatan" style="padding:4px 6px; font-size:0.75rem;">
+                    <input type="hidden" name="kategori" value="kategorial">
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Foto</label><input type="file" name="image" accept="image/*"></div>
+                <div style="display:flex; gap:6px;">
+                  <button type="submit" class="btn btn--gold btn--xs" style="flex:1; justify-content:center;">💾 Simpan</button>
+                  <% if (m.image) { %>
+                  <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelMajelis_<%= i %>" data-del-name="<%= m.name %>" onclick="confirmAndDelete(this)" title="Hapus Foto">🗑️ Foto</button>
+                  <button type="button" class="btn btn--danger btn--xs" onclick="if(confirm('Hapus penatua ini dari daftar?\n\nNama: <%= m.name %>')) document.getElementById('formDelMemberMajelis_<%= i %>').submit();" title="Hapus Penatua">🗑️ Hapus</button>
+                  <% } %>
+                </div>
+              </form>
+              <form id="formDelMajelis_<%= i %>" action="/admin/delete-file/majelis/<%= i %>" method="POST" style="display:none;"></form>
+              <form id="formDelMemberMajelis_<%= i %>" action="/admin/about/majelis/delete-member/<%= i %>" method="POST" style="display:none;"></form>
+            </div>
+            <% } %>
+            <% }); %>
+          </div>
+
+          <!-- Komisi Pelayanan Khusus -->
+          <h4 style="color:var(--navy); margin:1.2rem 0 0.6rem; font-size:0.9rem; font-weight:700;">⭐ Komisi Pelayanan Khusus</h4>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:.8rem; margin-bottom:1rem;">
+            <% db.about.pemimpin.majelis.forEach(function(m, i) { %>
+            <% if (m.kategori === 'khusus') { %>
+            <div class="item-card">
+              <form action="/admin/about/majelis/<%= i %>" method="POST" enctype="multipart/form-data">
+                <div style="display:flex; gap:.8rem; align-items:center; margin-bottom:.5rem;">
+                  <div style="flex-shrink:0; width:52px; height:52px; border-radius:50%; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border: 1px solid var(--border);">
+                    <% if (m.image) { %>
+                      <img src="/<%= m.image %>" style="width:100%; height:100%; object-fit:cover;">
+                    <% } else { %>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <% } %>
+                  </div>
+                  <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+                    <input type="text" name="name" value="<%= m.name %>" placeholder="Nama" style="padding:4px 6px; font-size:0.8rem;">
+                    <input type="text" name="role" value="<%= m.role || 'Majelis' %>" placeholder="Jabatan" style="padding:4px 6px; font-size:0.75rem;">
+                    <input type="hidden" name="kategori" value="khusus">
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Foto</label><input type="file" name="image" accept="image/*"></div>
+                <div style="display:flex; gap:6px;">
+                  <button type="submit" class="btn btn--gold btn--xs" style="flex:1; justify-content:center;">💾 Simpan</button>
+                  <% if (m.image) { %>
+                  <button type="button" class="btn btn--outline-danger btn--xs" data-del-form="formDelMajelis_<%= i %>" data-del-name="<%= m.name %>" onclick="confirmAndDelete(this)" title="Hapus Foto">🗑️ Foto</button>
+                  <button type="button" class="btn btn--danger btn--xs" onclick="if(confirm('Hapus penatua ini dari daftar?\n\nNama: <%= m.name %>')) document.getElementById('formDelMemberMajelis_<%= i %>').submit();" title="Hapus Penatua">🗑️ Hapus</button>
+                  <% } %>
+                </div>
+              </form>
+              <form id="formDelMajelis_<%= i %>" action="/admin/delete-file/majelis/<%= i %>" method="POST" style="display:none;"></form>
+              <form id="formDelMemberMajelis_<%= i %>" action="/admin/about/majelis/delete-member/<%= i %>" method="POST" style="display:none;"></form>
+            </div>
+            <% } %>
             <% }); %>
           </div>
         </div>

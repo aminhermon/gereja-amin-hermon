@@ -180,67 +180,80 @@
         {
           "name": "SNK. Arta Meiman Nazara",
           "image": "uploads/1786022942171.png",
-          "role": "Ketua Sektor Berkat"
+          "role": "Ketua Sektor Berkat",
+          "kategori": "sektor"
         },
         {
           "name": "SNK. Purniati Laowö",
           "image": "uploads/1786022996752.png",
-          "role": "Ketua Sektor Berkat"
+          "role": "Ketua Sektor Berkat",
+          "kategori": "sektor"
         },
         {
           "name": "SNK. Noferius Gea",
           "image": "uploads/1786023241514.png",
-          "role": "Ketua Sektor Imanuel"
+          "role": "Ketua Sektor Imanuel",
+          "kategori": "sektor"
         },
         {
           "name": "SNK. Suarnyanyi Laowö",
           "image": "uploads/1786023331299.png",
-          "role": "Ketua Sektor Sion"
+          "role": "Ketua Sektor Sion",
+          "kategori": "sektor"
         },
         {
           "name": "SNK. Yasanto Mendröfa",
           "image": "uploads/1786023462495.png",
-          "role": "Ketua Sektor Yordan"
+          "role": "Ketua Sektor Yordan",
+          "kategori": "sektor"
         },
         {
           "name": "SNK. Destariani Gea",
           "image": "uploads/1786023517508.png",
-          "role": "Ketua KPA (Komisi Pelayanan Anak)"
+          "role": "Ketua KPA (Komisi Pelayanan Anak)",
+          "kategori": "kategorial"
         },
         {
           "name": "SNK. Alvin Nitema Larosa",
           "image": "uploads/1786024457023.png",
-          "role": "Ketua Komisi Pemuda"
+          "role": "Ketua Komisi Pemuda",
+          "kategori": "kategorial"
         },
         {
           "name": "SNK. Martiani Wau",
           "image": "uploads/1786024512158.png",
-          "role": "Ketua Komisi Perempuan"
+          "role": "Ketua Komisi Perempuan",
+          "kategori": "kategorial"
         },
         {
           "name": "SNK. Tulus Krisdianto Samaeri Lömbu",
           "image": "uploads/1786024574003.png",
-          "role": "Ketua Komisi Bapak"
+          "role": "Ketua Komisi Bapak",
+          "kategori": "kategorial"
         },
         {
           "name": "SNK. Tötönafösaro Telaumbanua",
           "image": "uploads/1786024682552.png",
-          "role": "Ketua Komisi Ibadah dan Musik"
+          "role": "Ketua Komisi Ibadah dan Musik",
+          "kategori": "khusus"
         },
         {
           "name": "SNK. Nia'aro Ziliwu",
           "image": "uploads/1786024749426.png",
-          "role": "Ketua Komisi Pelayanan Kasih (KPK)"
+          "role": "Ketua Komisi Pelayanan Kasih (KPK)",
+          "kategori": "khusus"
         },
         {
           "name": "SNK. Dönazatulö Harefa",
           "image": "uploads/1786024802728.png",
-          "role": "Ketua Komisi Pembangunan"
+          "role": "Ketua Komisi Pembangunan",
+          "kategori": "khusus"
         },
         {
           "name": "SNK. Yuniani Larosa",
           "image": "uploads/1786024905400.png",
-          "role": "Ketua Komisi HubGerMas (Hubungan Gereja Dan Masyarakat)"
+          "role": "Ketua Komisi HubGerMas (Hubungan Gereja Dan Masyarakat)",
+          "kategori": "khusus"
         }
       ]
     }
