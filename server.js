@@ -1355,6 +1355,79 @@ app.post('/admin/delete-file/logo', requireAuth, (req, res) => {
 });
 
 
+
+// ===== FLOATING EVENT BANNER =====
+// Add new floating event
+app.post('/admin/floating-event/add', requireAuth, upload.single('febImage'), (req, res) => {
+  const db = getDB();
+  if (!Array.isArray(db.floatingEvents)) db.floatingEvents = [];
+
+  const event = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    enabled: req.body.febEnabled === 'on',
+    title: (req.body.febTitle || '').trim(),
+    eventDate: (req.body.febDate || '').trim(),
+    description: (req.body.febDescription || '').trim(),
+    buttonText: (req.body.febButtonText || '').trim(),
+    buttonLink: (req.body.febButtonLink || '').trim(),
+    image: req.file ? 'uploads/' + req.file.filename : ''
+  };
+
+  db.floatingEvents.push(event);
+  saveDB(db);
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Floating event banner berhasil ditambahkan!'));
+});
+
+// Edit floating event
+app.post('/admin/floating-event/edit/:id', requireAuth, upload.single('febImage'), (req, res) => {
+  const db = getDB();
+  if (!Array.isArray(db.floatingEvents)) db.floatingEvents = [];
+
+  const event = db.floatingEvents.find(e => e.id === req.params.id);
+  if (!event) return res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Event tidak ditemukan'));
+
+  event.enabled = req.body.febEnabled === 'on';
+  event.title = (req.body.febTitle || '').trim();
+  event.eventDate = (req.body.febDate || '').trim();
+  event.description = (req.body.febDescription || '').trim();
+  event.buttonText = (req.body.febButtonText || '').trim();
+  event.buttonLink = (req.body.febButtonLink || '').trim();
+
+  if (req.file) {
+    if (event.image && event.image.startsWith('uploads/')) {
+      deleteUploadedFile(event.image);
+    }
+    event.image = 'uploads/' + req.file.filename;
+  }
+
+  if (req.body.removeFebImage === '1' && event.image) {
+    if (event.image.startsWith('uploads/')) {
+      deleteUploadedFile(event.image);
+    }
+    event.image = '';
+  }
+
+  saveDB(db);
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Floating event banner berhasil diperbarui!'));
+});
+
+// Delete floating event
+app.post('/admin/floating-event/delete/:id', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!Array.isArray(db.floatingEvents)) db.floatingEvents = [];
+
+  const idx = db.floatingEvents.findIndex(e => e.id === req.params.id);
+  if (idx !== -1) {
+    const event = db.floatingEvents[idx];
+    if (event.image && event.image.startsWith('uploads/')) {
+      deleteUploadedFile(event.image);
+    }
+    db.floatingEvents.splice(idx, 1);
+    saveDB(db);
+  }
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Floating event banner berhasil dihapus!'));
+});
+
 // Home hero (Image & Video)
 app.post('/admin/home/hero', requireAuth, upload.fields([
   { name: 'bgImage', maxCount: 1 },

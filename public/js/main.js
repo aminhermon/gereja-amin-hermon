@@ -741,3 +741,56 @@ function initGlobalLightbox() {
 }
 
 
+
+
+/* ---------- Floating Event Banner Premium ---------- */
+function initFloatingEventBanner() {
+  var banner = document.getElementById('floatingEventBanner');
+  if (!banner) return;
+
+  var closeBtn = document.getElementById('febClose');
+  var tab = document.getElementById('febTab');
+  var tabBtn = document.getElementById('febTabBtn');
+  var dismissKey = 'feb_dismissed_' + (banner.querySelector('.feb__title') ? banner.querySelector('.feb__title').textContent.trim().substring(0, 20) : 'default');
+
+  // Check if previously dismissed in this session
+  if (sessionStorage.getItem(dismissKey)) {
+    tab.classList.add('active');
+    return;
+  }
+
+  // Show banner after 2 seconds
+  setTimeout(function() {
+    banner.classList.add('active');
+  }, 2000);
+
+  function closeBanner() {
+    banner.classList.add('closing');
+    setTimeout(function() {
+      banner.classList.remove('active', 'closing');
+      banner.style.display = 'none';
+      tab.classList.add('active');
+      sessionStorage.setItem(dismissKey, '1');
+    }, 350);
+  }
+
+  function reopenBanner() {
+    tab.classList.remove('active');
+    banner.style.display = '';
+    banner.classList.remove('closing');
+    setTimeout(function() {
+      banner.classList.add('active');
+    }, 50);
+    sessionStorage.removeItem(dismissKey);
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeBanner);
+  if (tabBtn) tabBtn.addEventListener('click', reopenBanner);
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && banner.classList.contains('active')) {
+      closeBanner();
+    }
+  });
+}
