@@ -744,7 +744,7 @@ function initGlobalLightbox() {
 
 
 
-/* ---------- Floating Event Banner Premium ---------- */
+/* ---------- Floating Event Banner Premium — Smart Init ---------- */
 function initFloatingEventBanner() {
   var banner = document.getElementById('floatingEventBanner');
   if (!banner) return;
@@ -754,36 +754,109 @@ function initFloatingEventBanner() {
   var closeBtn = document.getElementById('febClose');
   var tab = document.getElementById('febTab');
   var tabBtn = document.getElementById('febTabBtn');
-  var titleEl = banner.querySelector('.feb__title');
-  var dismissKey = 'feb_dismissed_' + (titleEl ? titleEl.textContent.trim().substring(0, 20) : 'default');
+
+  // Parse event data from data attributes
+  var startAt = banner.dataset.febStart ? new Date(banner.dataset.febStart) : null;
+  var endAt = banner.dataset.febEnd ? new Date(banner.dataset.febEnd) : null;
+  var eventId = banner.dataset.febId || 'default';
+  var dismissKey = 'feb_dismissed_' + eventId;
+
+  // Check if event has ended
+  if (endAt && endAt.getTime() < Date.now()) {
+    banner.style.display = 'none';
+    return;
+  }
 
   // Check if previously dismissed in this session
   if (sessionStorage.getItem(dismissKey)) {
-    if (tab) tab.classList.add('active');
+    if (tab) tab.classList.add('feb-tab--visible');
     return;
   }
 
   // Show banner after 2 seconds
   setTimeout(function() {
-    banner.classList.add('active');
+    banner.classList.add('feb--visible');
   }, 2000);
 
+  // ---- Countdown Timer ----
+  var cdContainer = document.getElementById('febCountdown');
+  var cdLiveContainer = document.getElementById('febCdLive');
+  var cdInterval = null;
+
+  function padZero(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function updateCountdown() {
+    if (!startAt || !cdContainer) return;
+    var now = Date.now();
+    var diff = startAt.getTime() - now;
+
+    // Event has started
+    if (diff <= 0) {
+      cdContainer.style.display = 'none';
+      if (cdLiveContainer) cdLiveContainer.style.display = 'flex';
+      if (cdInterval) clearInterval(cdInterval);
+
+      // Check if event has ended
+      if (endAt && endAt.getTime() < now) {
+        closeBannerPermanent();
+      }
+      return;
+    }
+
+    if (cdLiveContainer) cdLiveContainer.style.display = 'none';
+    cdContainer.style.display = 'flex';
+
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    var secs = Math.floor((diff % 60000) / 1000);
+
+    setUnit('febCdDays', padZero(days));
+    setUnit('febCdHours', padZero(hours));
+    setUnit('febCdMins', padZero(mins));
+    setUnit('febCdSecs', padZero(secs));
+  }
+
+  function setUnit(id, val) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (el.textContent !== val) {
+      el.textContent = val;
+      el.classList.remove('feb__cd-num--tick');
+      void el.offsetWidth; // force reflow
+      el.classList.add('feb__cd-num--tick');
+    }
+  }
+
+  if (startAt && cdContainer) {
+    updateCountdown();
+    cdInterval = setInterval(updateCountdown, 1000);
+  }
+
+  // ---- Close / Reopen ----
   function closeBanner() {
-    banner.classList.add('closing');
+    banner.classList.add('feb--closing');
     setTimeout(function() {
-      banner.classList.remove('active', 'closing');
+      banner.classList.remove('feb--visible', 'feb--closing');
       banner.style.display = 'none';
-      if (tab) tab.classList.add('active');
+      if (tab) tab.classList.add('feb-tab--visible');
       sessionStorage.setItem(dismissKey, '1');
-    }, 350);
+    }, 400);
+  }
+
+  function closeBannerPermanent() {
+    banner.classList.remove('feb--visible');
+    banner.style.display = 'none';
+    if (tab) tab.classList.remove('feb-tab--visible');
+    if (cdInterval) clearInterval(cdInterval);
   }
 
   function reopenBanner() {
-    if (tab) tab.classList.remove('active');
+    if (tab) tab.classList.remove('feb-tab--visible');
     banner.style.display = '';
-    banner.classList.remove('closing');
+    banner.classList.remove('feb--closing');
     setTimeout(function() {
-      banner.classList.add('active');
+      banner.classList.add('feb--visible');
     }, 50);
     sessionStorage.removeItem(dismissKey);
   }
@@ -793,8 +866,9 @@ function initFloatingEventBanner() {
 
   // Close on Escape
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && banner.classList.contains('active')) {
+    if (e.key === 'Escape' && banner.classList.contains('feb--visible')) {
       closeBanner();
     }
   });
 }
+

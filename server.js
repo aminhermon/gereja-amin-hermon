@@ -1365,7 +1365,7 @@ app.post('/admin/delete-file/logo', requireAuth, (req, res) => {
 
 
 
-// ===== FLOATING EVENT BANNER =====
+// ===== FLOATING EVENT BANNER — PREMIUM =====
 // Add new floating event
 app.post('/admin/floating-event/add', requireAuth, upload.single('febImage'), (req, res) => {
   const db = getDB();
@@ -1375,8 +1375,10 @@ app.post('/admin/floating-event/add', requireAuth, upload.single('febImage'), (r
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     enabled: req.body.febEnabled === 'on',
     title: (req.body.febTitle || '').trim(),
-    eventDate: (req.body.febDate || '').trim(),
     description: (req.body.febDescription || '').trim(),
+    start_at: (req.body.febStartAt || '').trim(),
+    end_at: (req.body.febEndAt || '').trim(),
+    location: (req.body.febLocation || '').trim(),
     buttonText: (req.body.febButtonText || '').trim(),
     buttonLink: (req.body.febButtonLink || '').trim(),
     image: req.file ? 'uploads/' + req.file.filename : ''
@@ -1384,7 +1386,7 @@ app.post('/admin/floating-event/add', requireAuth, upload.single('febImage'), (r
 
   db.floatingEvents.push(event);
   saveDB(db);
-  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Floating event banner berhasil ditambahkan!'));
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Kegiatan floating banner berhasil ditambahkan!'));
 });
 
 // Edit floating event
@@ -1397,8 +1399,10 @@ app.post('/admin/floating-event/edit/:id', requireAuth, upload.single('febImage'
 
   event.enabled = req.body.febEnabled === 'on';
   event.title = (req.body.febTitle || '').trim();
-  event.eventDate = (req.body.febDate || '').trim();
   event.description = (req.body.febDescription || '').trim();
+  event.start_at = (req.body.febStartAt || '').trim();
+  event.end_at = (req.body.febEndAt || '').trim();
+  event.location = (req.body.febLocation || '').trim();
   event.buttonText = (req.body.febButtonText || '').trim();
   event.buttonLink = (req.body.febButtonLink || '').trim();
 
@@ -1417,7 +1421,7 @@ app.post('/admin/floating-event/edit/:id', requireAuth, upload.single('febImage'
   }
 
   saveDB(db);
-  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Floating event banner berhasil diperbarui!'));
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Kegiatan floating banner berhasil diperbarui!'));
 });
 
 // Delete floating event
@@ -1434,7 +1438,7 @@ app.post('/admin/floating-event/delete/:id', requireAuth, (req, res) => {
     db.floatingEvents.splice(idx, 1);
     saveDB(db);
   }
-  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Floating event banner berhasil dihapus!'));
+  res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Kegiatan floating banner berhasil dihapus!'));
 });
 
 // Home hero (Image & Video)

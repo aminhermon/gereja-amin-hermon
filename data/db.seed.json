@@ -726,14 +726,16 @@
   },
   "floatingEvents": [
     {
-      "id": "feb_default_1",
+      "id": "feb_sample_1",
       "enabled": true,
       "title": "Ibadah Raya & Doa Bersama Jemaat",
-      "eventDate": "Setiap Minggu • 09.00 WIB",
-      "description": "Mari bersekutu dan bertumbuh dalam iman bersama seluruh keluarga jemaat di Gereja AMIN Hermon. Disediakan ibadah sekolah minggu untuk anak-anak.",
-      "buttonText": "Lihat Jadwal Ibadah",
-      "buttonLink": "/visit",
-      "image": "/assets/images/slider_ibadah_raya.png"
+      "description": "Mari bersekutu dan bertumbuh dalam iman bersama seluruh keluarga jemaat di Gereja AMIN Hermon.",
+      "start_at": "2026-11-23T09:00:00+07:00",
+      "end_at": "2026-11-23T12:00:00+07:00",
+      "location": "Gereja AMIN Hermon",
+      "image": "/assets/images/slider_ibadah_raya.png",
+      "buttonText": "LIHAT DETAIL KEGIATAN",
+      "buttonLink": "/visit"
     }
   ]
 }

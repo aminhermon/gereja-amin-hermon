@@ -498,24 +498,37 @@
 
 
 
-        <!-- Floating Event Banner Premium -->
-        <div class="card" style="border-left: 4px solid #C8A951;">
-          <h2 class="card-title">🎉 Floating Event Banner</h2>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Banner mengambang yang tampil di sudut kanan bawah halaman beranda untuk menginformasikan kegiatan gereja yang akan berlangsung.</p>
+        <!-- ========== FLOATING BANNER KEGIATAN ========== -->
+        <div class="card" style="border-left: 4px solid #D9B66F;">
+          <h2 class="card-title">📅 Floating Banner Kegiatan</h2>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+            Banner mengambang premium yang tampil di sudut kanan bawah halaman beranda. Menampilkan satu kegiatan terdekat yang aktif, lengkap dengan poster, countdown, dan detail informasi.
+          </p>
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; margin-bottom:1.2rem;">
+            <p style="font-size:0.8rem; color:#1e40af; margin:0;">
+              <strong>💡 Tips:</strong> Sistem akan otomatis menampilkan kegiatan aktif yang paling dekat tanggalnya. Kegiatan yang sudah selesai tidak akan ditampilkan.
+            </p>
+          </div>
 
           <!-- Existing Events List -->
           <% var febList = Array.isArray(db.floatingEvents) ? db.floatingEvents : []; %>
           <% if (febList.length > 0) { %>
           <div style="margin-bottom:1.5rem;">
-            <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:0.8rem; color:#374151;">📋 Event Terdaftar (<%= febList.length %>)</h3>
+            <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:0.8rem; color:#374151;">📋 Daftar Kegiatan (<%= febList.length %>)</h3>
             <% febList.forEach(function(ev, idx) { %>
-            <div style="border:1px solid #e5e7eb; border-radius:12px; padding:1rem; margin-bottom:1rem; background:<%= ev.enabled ? '#f0fdf4' : '#fef2f2' %>;">
+            <%
+              var evStatus = '🟢 Aktif';
+              var evBg = '#f0fdf4';
+              if (!ev.enabled) { evStatus = '🔴 Nonaktif'; evBg = '#fef2f2'; }
+              else if (ev.end_at && new Date(ev.end_at).getTime() < Date.now()) { evStatus = '⏰ Selesai'; evBg = '#fefce8'; }
+            %>
+            <div style="border:1px solid #e5e7eb; border-radius:12px; padding:1rem; margin-bottom:1rem; background:<%= evBg %>;">
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.8rem;">
                 <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="font-size:1.2rem;"><%= ev.enabled ? '🟢' : '🔴' %></span>
-                  <strong style="font-size:0.95rem;"><%= ev.title || ('Event #' + (idx + 1)) %></strong>
+                  <span style="font-size:0.85rem;"><%= evStatus %></span>
+                  <strong style="font-size:0.95rem;"><%= ev.title || ('Kegiatan #' + (idx + 1)) %></strong>
                 </div>
-                <form action="/admin/floating-event/delete/<%= ev.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus event ini?')">
+                <form action="/admin/floating-event/delete/<%= ev.id %>" method="POST" style="margin:0;" onsubmit="return confirm('Hapus kegiatan ini?')">
                   <button type="submit" style="background:none; border:1px solid #fca5a5; color:#dc2626; padding:4px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer;">🗑️ Hapus</button>
                 </form>
               </div>
@@ -528,26 +541,36 @@
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
                   <div class="form-group">
-                    <label class="form-label">Judul Event</label>
+                    <label class="form-label">Nama Kegiatan</label>
                     <input type="text" name="febTitle" class="form-input" value="<%= ev.title || '' %>" placeholder="Contoh: Ibadah Natal 2026">
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Tanggal Event</label>
-                    <input type="text" name="febDate" class="form-input" value="<%= ev.eventDate || '' %>" placeholder="Contoh: Rabu, 25 Desember 2026">
+                    <label class="form-label">Lokasi</label>
+                    <input type="text" name="febLocation" class="form-input" value="<%= ev.location || '' %>" placeholder="Contoh: Gereja AMIN Hermon">
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Deskripsi</label>
+                  <label class="form-label">Deskripsi Singkat</label>
                   <textarea name="febDescription" class="form-input" rows="2" placeholder="Deskripsi singkat kegiatan"><%= ev.description || '' %></textarea>
                 </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
+                  <div class="form-group">
+                    <label class="form-label">Tanggal & Jam Mulai</label>
+                    <input type="datetime-local" name="febStartAt" class="form-input" value="<%= ev.start_at ? ev.start_at.replace('+07:00','').replace('+08:00','') : '' %>">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Tanggal & Jam Selesai</label>
+                    <input type="datetime-local" name="febEndAt" class="form-input" value="<%= ev.end_at ? ev.end_at.replace('+07:00','').replace('+08:00','') : '' %>">
+                  </div>
+                </div>
                 <div class="form-group">
-                  <label class="form-label">Gambar Banner</label>
-                  <input type="file" name="febImage" accept="image/*" class="form-input">
+                  <label class="form-label">Poster Kegiatan (JPG, PNG, WebP)</label>
+                  <input type="file" name="febImage" accept="image/jpeg,image/png,image/webp" class="form-input">
                   <% if (ev.image) { %>
                   <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
                     <img src="<%= typeof imgUrl === 'function' ? imgUrl(ev.image) : '/' + ev.image %>" alt="Preview" style="height:50px; border-radius:8px; border:1px solid #ddd;">
                     <label style="font-size:0.8rem; color:#991B1B; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                      <input type="checkbox" name="removeFebImage" value="1"> Hapus gambar
+                      <input type="checkbox" name="removeFebImage" value="1"> Hapus poster
                     </label>
                   </div>
                   <% } %>
@@ -555,11 +578,11 @@
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
                   <div class="form-group">
                     <label class="form-label">Teks Tombol</label>
-                    <input type="text" name="febButtonText" class="form-input" value="<%= ev.buttonText || '' %>" placeholder="Contoh: Lihat Detail">
+                    <input type="text" name="febButtonText" class="form-input" value="<%= ev.buttonText || '' %>" placeholder="LIHAT DETAIL KEGIATAN">
                   </div>
                   <div class="form-group">
                     <label class="form-label">Link Tombol</label>
-                    <input type="text" name="febButtonLink" class="form-input" value="<%= ev.buttonLink || '' %>" placeholder="https://...">
+                    <input type="text" name="febButtonLink" class="form-input" value="<%= ev.buttonLink || '' %>" placeholder="/visit atau https://...">
                   </div>
                 </div>
                 <button type="submit" class="btn btn--primary" style="margin-top:0.3rem; font-size:0.85rem; padding:8px 20px;">💾 Simpan Perubahan</button>
@@ -570,8 +593,8 @@
           <% } %>
 
           <!-- Add New Event -->
-          <div style="border:2px dashed #C8A951; border-radius:12px; padding:1.2rem; background:#fffbeb;">
-            <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:0.8rem; color:#92400e;">➕ Tambah Event Baru</h3>
+          <div style="border:2px dashed #D9B66F; border-radius:12px; padding:1.2rem; background:#fffbeb;">
+            <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:0.8rem; color:#92400e;">➕ Tambah Kegiatan Baru</h3>
             <form action="/admin/floating-event/add" method="POST" enctype="multipart/form-data">
               <div class="form-group" style="margin-bottom:0.8rem;">
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
@@ -581,33 +604,43 @@
               </div>
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
                 <div class="form-group">
-                  <label class="form-label">Judul Event</label>
-                  <input type="text" name="febTitle" class="form-input" placeholder="Contoh: Ibadah Natal 2026">
+                  <label class="form-label">Nama Kegiatan</label>
+                  <input type="text" name="febTitle" class="form-input" placeholder="Contoh: Ibadah Natal 2026" required>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Tanggal Event</label>
-                  <input type="text" name="febDate" class="form-input" placeholder="Contoh: Rabu, 25 Desember 2026">
+                  <label class="form-label">Lokasi</label>
+                  <input type="text" name="febLocation" class="form-input" placeholder="Contoh: Gereja AMIN Hermon">
                 </div>
               </div>
               <div class="form-group">
-                <label class="form-label">Deskripsi</label>
+                <label class="form-label">Deskripsi Singkat</label>
                 <textarea name="febDescription" class="form-input" rows="2" placeholder="Deskripsi singkat kegiatan"></textarea>
               </div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
+                <div class="form-group">
+                  <label class="form-label">Tanggal & Jam Mulai</label>
+                  <input type="datetime-local" name="febStartAt" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tanggal & Jam Selesai</label>
+                  <input type="datetime-local" name="febEndAt" class="form-input">
+                </div>
+              </div>
               <div class="form-group">
-                <label class="form-label">Gambar Banner</label>
-                <input type="file" name="febImage" accept="image/*" class="form-input">
+                <label class="form-label">Poster Kegiatan (JPG, PNG, WebP)</label>
+                <input type="file" name="febImage" accept="image/jpeg,image/png,image/webp" class="form-input">
               </div>
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
                 <div class="form-group">
                   <label class="form-label">Teks Tombol (opsional)</label>
-                  <input type="text" name="febButtonText" class="form-input" placeholder="Contoh: Lihat Detail">
+                  <input type="text" name="febButtonText" class="form-input" placeholder="LIHAT DETAIL KEGIATAN">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Link Tombol</label>
-                  <input type="text" name="febButtonLink" class="form-input" placeholder="https://...">
+                  <input type="text" name="febButtonLink" class="form-input" placeholder="/visit atau https://...">
                 </div>
               </div>
-              <button type="submit" class="btn btn--primary" style="margin-top:0.3rem;">➕ Tambah Event</button>
+              <button type="submit" class="btn btn--primary" style="margin-top:0.3rem;">➕ Tambah Kegiatan</button>
             </form>
           </div>
         </div>
