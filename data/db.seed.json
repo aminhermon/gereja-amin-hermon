@@ -724,5 +724,16 @@
       "facebook": "https://web.facebook.com/profile.php?id=61593610491064"
     }
   },
-  "floatingEvents": []
+  "floatingEvents": [
+    {
+      "id": "feb_default_1",
+      "enabled": true,
+      "title": "Ibadah Raya & Doa Bersama Jemaat",
+      "eventDate": "Setiap Minggu • 09.00 WIB",
+      "description": "Mari bersekutu dan bertumbuh dalam iman bersama seluruh keluarga jemaat di Gereja AMIN Hermon. Disediakan ibadah sekolah minggu untuk anak-anak.",
+      "buttonText": "Lihat Jadwal Ibadah",
+      "buttonLink": "/visit",
+      "image": "/assets/images/slider_ibadah_raya.png"
+    }
+  ]
 }

@@ -12403,7 +12403,7 @@ blockquote::before {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 999;
+  z-index: 9995;
   max-width: 400px;
   width: calc(100% - 48px);
   pointer-events: none;
@@ -12701,7 +12701,7 @@ blockquote::before {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 998;
+  z-index: 9990;
   display: none;
   cursor: pointer;
   pointer-events: auto;

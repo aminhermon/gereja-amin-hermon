@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initKomsekDropdown();
   initBackToTop();
   initDailyVerse();
+  initFloatingEventBanner();
 });
 
 /* ---------- Navbar Dropdowns (Mobile & Desktop toggle) ---------- */
@@ -747,15 +748,18 @@ function initGlobalLightbox() {
 function initFloatingEventBanner() {
   var banner = document.getElementById('floatingEventBanner');
   if (!banner) return;
+  if (banner.dataset.febInit === '1') return;
+  banner.dataset.febInit = '1';
 
   var closeBtn = document.getElementById('febClose');
   var tab = document.getElementById('febTab');
   var tabBtn = document.getElementById('febTabBtn');
-  var dismissKey = 'feb_dismissed_' + (banner.querySelector('.feb__title') ? banner.querySelector('.feb__title').textContent.trim().substring(0, 20) : 'default');
+  var titleEl = banner.querySelector('.feb__title');
+  var dismissKey = 'feb_dismissed_' + (titleEl ? titleEl.textContent.trim().substring(0, 20) : 'default');
 
   // Check if previously dismissed in this session
   if (sessionStorage.getItem(dismissKey)) {
-    tab.classList.add('active');
+    if (tab) tab.classList.add('active');
     return;
   }
 
@@ -769,13 +773,13 @@ function initFloatingEventBanner() {
     setTimeout(function() {
       banner.classList.remove('active', 'closing');
       banner.style.display = 'none';
-      tab.classList.add('active');
+      if (tab) tab.classList.add('active');
       sessionStorage.setItem(dismissKey, '1');
     }, 350);
   }
 
   function reopenBanner() {
-    tab.classList.remove('active');
+    if (tab) tab.classList.remove('active');
     banner.style.display = '';
     banner.classList.remove('closing');
     setTimeout(function() {

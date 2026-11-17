@@ -468,6 +468,15 @@ function enrichMissingTopLevelKeys(targetDb) {
       }
     }
 
+    // Ensure floatingEvents has initial default event if missing or empty
+    if (!Array.isArray(targetDb.floatingEvents) || targetDb.floatingEvents.length === 0) {
+      if (Array.isArray(seedDb.floatingEvents) && seedDb.floatingEvents.length > 0) {
+        targetDb.floatingEvents = JSON.parse(JSON.stringify(seedDb.floatingEvents));
+        modified = true;
+        console.log('✨ Default floating event banner ditambahkan ke database');
+      }
+    }
+
 
 
     if (modified) {

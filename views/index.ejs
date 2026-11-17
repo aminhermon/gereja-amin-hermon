@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="/css/style.min.css?v=60">
+  <link rel="stylesheet" href="/css/style.min.css?v=61">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -362,7 +362,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="/js/main.min.js?v=21" defer></script>
+  <script src="/js/main.min.js?v=22" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
@@ -645,7 +645,20 @@
   <%
     var febEvents = [];
     if (typeof floatingEvents !== 'undefined' && Array.isArray(floatingEvents)) {
-      febEvents = floatingEvents.filter(function(e) { return e.enabled; });
+      febEvents = floatingEvents.filter(function(e) { return e && e.enabled; });
+    }
+    // Fallback default event if empty or not yet seeded
+    if (febEvents.length === 0 && (typeof floatingEvents === 'undefined' || !Array.isArray(floatingEvents) || floatingEvents.length === 0)) {
+      febEvents = [{
+        id: 'feb_default_1',
+        enabled: true,
+        title: 'Ibadah Raya & Doa Bersama Jemaat',
+        eventDate: 'Setiap Minggu • 09.00 WIB',
+        description: 'Mari bersekutu dan bertumbuh dalam iman bersama seluruh keluarga jemaat di Gereja AMIN Hermon. Disediakan ibadah sekolah minggu untuk anak-anak.',
+        buttonText: 'Lihat Jadwal Ibadah',
+        buttonLink: '/visit',
+        image: '/assets/images/slider_ibadah_raya.png'
+      }];
     }
   %>
   <% if (febEvents.length > 0) { %>
@@ -712,6 +725,21 @@
       <span class="feb-tab__dot"></span>
     </button>
   </div>
+
+  <script>
+    (function() {
+      function startFeb() {
+        if (typeof initFloatingEventBanner === 'function') {
+          initFloatingEventBanner();
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startFeb);
+      } else {
+        startFeb();
+      }
+    })();
+  </script>
   <% } %>
 
 </body>
