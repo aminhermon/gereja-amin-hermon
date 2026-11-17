@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="/css/style.min.css?v=62">
+  <link rel="stylesheet" href="/css/style.min.css?v=63">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -362,7 +362,70 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="/js/main.min.js?v=23" defer></script>
+  <script src="/js/main.min.js?v=24" defer></script>
+  <!-- Expanded overlay -->
+  <div class="feb-overlay" id="febOverlay"></div>
+  <div class="feb-expanded" id="febExpanded">
+    <div class="feb-expanded__card">
+      <button class="feb-expanded__close" id="febExpandedClose" aria-label="Tutup">&times;</button>
+      <% if (feb.image) { %>
+      <div class="feb-expanded__poster">
+        <img src="<%= typeof imgUrl === 'function' ? imgUrl(feb.image) : '/' + feb.image %>"
+             alt="<%= feb.title || 'Event' %>" loading="lazy">
+      </div>
+      <% } %>
+      <div class="feb-expanded__body">
+        <div class="feb-expanded__header-row">
+          <img src="/assets/images/logo-gereja-amin-feb.jpg" alt="Logo" class="feb-expanded__logo">
+          <div>
+            <span class="feb-expanded__label">AGENDA GEREJA AMIN</span>
+            <span class="feb-expanded__church">Jemaat Hermon</span>
+          </div>
+        </div>
+        <% if (feb.title) { %>
+        <h3 class="feb-expanded__title"><%= feb.title %></h3>
+        <% } %>
+        <% if (feb.description) { %>
+        <p class="feb-expanded__desc"><%= feb.description %></p>
+        <% } %>
+        <div class="feb-expanded__info">
+          <% if (febDateDisplay) { %>
+          <div class="feb-expanded__info-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span><%= febDateDisplay %></span>
+          </div>
+          <% } %>
+          <% if (febTimeDisplay) { %>
+          <div class="feb-expanded__info-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span><%= febTimeDisplay %></span>
+          </div>
+          <% } %>
+          <% if (feb.location) { %>
+          <div class="feb-expanded__info-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><%= feb.location %></span>
+          </div>
+          <% } %>
+        </div>
+        <% if (feb.start_at) { %>
+        <div class="feb-expanded__countdown" id="febExpandedCd">
+          <div class="feb__cd-unit"><span class="feb__cd-num" id="febExCdDays">00</span><span class="feb__cd-label">Hari</span></div>
+          <span class="feb__cd-sep">:</span>
+          <div class="feb__cd-unit"><span class="feb__cd-num" id="febExCdHours">00</span><span class="feb__cd-label">Jam</span></div>
+          <span class="feb__cd-sep">:</span>
+          <div class="feb__cd-unit"><span class="feb__cd-num" id="febExCdMins">00</span><span class="feb__cd-label">Menit</span></div>
+          <span class="feb__cd-sep">:</span>
+          <div class="feb__cd-unit"><span class="feb__cd-num" id="febExCdSecs">00</span><span class="feb__cd-label">Detik</span></div>
+        </div>
+        <div class="feb__cd-live" id="febExCdLive" style="display:none;">
+          <span class="feb__cd-live-dot"></span>
+          <span class="feb__cd-live-text">SEDANG BERLANGSUNG</span>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
@@ -688,11 +751,11 @@
        data-feb-id="<%= feb.id %>"
        data-feb-start="<%= febStartISO %>"
        data-feb-end="<%= febEndISO %>">
-    <div class="feb__card">
+    <div class="feb__card" id="febCard" role="button" tabindex="0" title="Klik untuk memperbesar">
 
       <!-- Header -->
       <div class="feb__header">
-        <img src="<%= typeof imgUrl === 'function' ? imgUrl((typeof general !== 'undefined' && general.logo) || '/assets/images/logo.jpg') : '/assets/images/logo.jpg' %>"
+        <img src="/assets/images/logo-gereja-amin-feb.jpg"
              alt="Logo" class="feb__header-logo" loading="lazy">
         <div class="feb__header-info">
           <span class="feb__header-label">Agenda Gereja AMIN</span>
@@ -781,18 +844,6 @@
         </div>
         <% } %>
 
-        <!-- CTA Button -->
-        <% if (feb.buttonText && feb.buttonLink) { %>
-        <a href="<%= feb.buttonLink %>" class="feb__cta">
-          <span><%= feb.buttonText %></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-        <% } else { %>
-        <a href="/visit" class="feb__cta">
-          <span>LIHAT DETAIL KEGIATAN</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-        <% } %>
       </div>
     </div>
   </div>

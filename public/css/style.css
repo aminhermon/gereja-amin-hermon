@@ -12893,6 +12893,213 @@ blockquote::before {
 }
 
 
+
+/* Card clickable cursor */
+.feb__card[role="button"] {
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.feb__card[role="button"]:hover {
+  box-shadow:
+    0 16px 48px rgba(20, 36, 61, 0.28),
+    0 0 0 1px rgba(217, 182, 111, 0.35),
+    0 0 24px rgba(217, 182, 111, 0.08);
+  transform: translateY(-2px);
+}
+
+/* ---- Expanded Overlay & Modal ---- */
+.feb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 99998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.feb-overlay.feb-overlay--active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.feb-expanded {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  z-index: 99999;
+  max-width: 480px;
+  width: calc(100% - 32px);
+  max-height: 90vh;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.feb-expanded.feb-expanded--active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.feb-expanded__card {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 20px;
+  overflow: hidden;
+  overflow-y: auto;
+  max-height: 90vh;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(217, 182, 111, 0.3);
+  border: 2px solid rgba(217, 182, 111, 0.4);
+}
+
+.feb-expanded__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 5;
+  line-height: 1;
+  padding: 0;
+  backdrop-filter: blur(4px);
+}
+.feb-expanded__close:hover {
+  background: rgba(220, 38, 38, 0.7);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.feb-expanded__poster {
+  width: 100%;
+  max-height: 280px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #14243D, #1c3254);
+}
+.feb-expanded__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.feb-expanded__body {
+  padding: 20px 24px 24px;
+}
+
+.feb-expanded__header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid rgba(217, 182, 111, 0.25);
+}
+.feb-expanded__logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(217, 182, 111, 0.5);
+  object-fit: cover;
+}
+.feb-expanded__label {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #D9B66F;
+}
+.feb-expanded__church {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.feb-expanded__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #14243D;
+  line-height: 1.3;
+  margin: 0 0 10px;
+}
+
+.feb-expanded__desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+
+.feb-expanded__info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.feb-expanded__info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: #374151;
+}
+.feb-expanded__info-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #D9B66F;
+}
+
+.feb-expanded__countdown {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.feb-expanded__countdown .feb__cd-unit {
+  min-width: 60px;
+  padding: 8px 6px;
+}
+.feb-expanded__countdown .feb__cd-num {
+  font-size: 1.3rem;
+}
+.feb-expanded__countdown .feb__cd-label {
+  font-size: 0.65rem;
+}
+
+/* Expanded responsive */
+@media (max-width: 480px) {
+  .feb-expanded {
+    max-width: none;
+    width: calc(100% - 24px);
+  }
+  .feb-expanded__card { border-radius: 16px; }
+  .feb-expanded__poster { max-height: 200px; }
+  .feb-expanded__body { padding: 16px 18px 20px; }
+  .feb-expanded__title { font-size: 1.15rem; }
+  .feb-expanded__desc { font-size: 0.82rem; }
+  .feb-expanded__logo { width: 36px; height: 36px; }
+  .feb-expanded__countdown .feb__cd-unit { min-width: 50px; }
+  .feb-expanded__countdown .feb__cd-num { font-size: 1.1rem; }
+}
+
+
 /* =========================================
    GLOBAL MOBILE RESPONSIVENESS OVERHAUL
    Comprehensive fixes for all sections

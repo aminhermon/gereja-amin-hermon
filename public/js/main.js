@@ -754,57 +754,58 @@ function initFloatingEventBanner() {
   var closeBtn = document.getElementById('febClose');
   var tab = document.getElementById('febTab');
   var tabBtn = document.getElementById('febTabBtn');
+  var card = document.getElementById('febCard');
+  var overlay = document.getElementById('febOverlay');
+  var expanded = document.getElementById('febExpanded');
+  var expandedClose = document.getElementById('febExpandedClose');
 
-  // Parse event data from data attributes
   var startAt = banner.dataset.febStart ? new Date(banner.dataset.febStart) : null;
   var endAt = banner.dataset.febEnd ? new Date(banner.dataset.febEnd) : null;
   var eventId = banner.dataset.febId || 'default';
   var dismissKey = 'feb_dismissed_' + eventId;
 
-  // Check if event has ended
   if (endAt && endAt.getTime() < Date.now()) {
     banner.style.display = 'none';
     return;
   }
 
-  // Check if previously dismissed in this session
   if (sessionStorage.getItem(dismissKey)) {
     if (tab) tab.classList.add('feb-tab--visible');
     return;
   }
 
-  // Show banner after 2 seconds
   setTimeout(function() {
     banner.classList.add('feb--visible');
   }, 2000);
 
-  // ---- Countdown Timer ----
+  // ---- Countdown ----
   var cdContainer = document.getElementById('febCountdown');
   var cdLiveContainer = document.getElementById('febCdLive');
+  var exCdContainer = document.getElementById('febExpandedCd');
+  var exCdLive = document.getElementById('febExCdLive');
   var cdInterval = null;
 
   function padZero(n) { return n < 10 ? '0' + n : '' + n; }
 
   function updateCountdown() {
-    if (!startAt || !cdContainer) return;
+    if (!startAt) return;
     var now = Date.now();
     var diff = startAt.getTime() - now;
 
-    // Event has started
     if (diff <= 0) {
-      cdContainer.style.display = 'none';
+      if (cdContainer) cdContainer.style.display = 'none';
       if (cdLiveContainer) cdLiveContainer.style.display = 'flex';
+      if (exCdContainer) exCdContainer.style.display = 'none';
+      if (exCdLive) exCdLive.style.display = 'flex';
       if (cdInterval) clearInterval(cdInterval);
-
-      // Check if event has ended
-      if (endAt && endAt.getTime() < now) {
-        closeBannerPermanent();
-      }
+      if (endAt && endAt.getTime() < now) closeBannerPermanent();
       return;
     }
 
     if (cdLiveContainer) cdLiveContainer.style.display = 'none';
-    cdContainer.style.display = 'flex';
+    if (cdContainer) cdContainer.style.display = 'flex';
+    if (exCdLive) exCdLive.style.display = 'none';
+    if (exCdContainer) exCdContainer.style.display = 'flex';
 
     var days = Math.floor(diff / 86400000);
     var hours = Math.floor((diff % 86400000) / 3600000);
@@ -815,6 +816,10 @@ function initFloatingEventBanner() {
     setUnit('febCdHours', padZero(hours));
     setUnit('febCdMins', padZero(mins));
     setUnit('febCdSecs', padZero(secs));
+    setUnit('febExCdDays', padZero(days));
+    setUnit('febExCdHours', padZero(hours));
+    setUnit('febExCdMins', padZero(mins));
+    setUnit('febExCdSecs', padZero(secs));
   }
 
   function setUnit(id, val) {
@@ -823,18 +828,47 @@ function initFloatingEventBanner() {
     if (el.textContent !== val) {
       el.textContent = val;
       el.classList.remove('feb__cd-num--tick');
-      void el.offsetWidth; // force reflow
+      void el.offsetWidth;
       el.classList.add('feb__cd-num--tick');
     }
   }
 
-  if (startAt && cdContainer) {
+  if (startAt) {
     updateCountdown();
     cdInterval = setInterval(updateCountdown, 1000);
   }
 
+  // ---- Expand / Collapse ----
+  function expandBanner() {
+    if (overlay) overlay.classList.add('feb-overlay--active');
+    if (expanded) expanded.classList.add('feb-expanded--active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function collapseBanner() {
+    if (overlay) overlay.classList.remove('feb-overlay--active');
+    if (expanded) expanded.classList.remove('feb-expanded--active');
+    document.body.style.overflow = '';
+  }
+
+  if (card) {
+    card.addEventListener('click', function(e) {
+      if (e.target === closeBtn || closeBtn.contains(e.target)) return;
+      expandBanner();
+    });
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (document.activeElement === card) expandBanner();
+      }
+    });
+  }
+  if (expandedClose) expandedClose.addEventListener('click', collapseBanner);
+  if (overlay) overlay.addEventListener('click', collapseBanner);
+
   // ---- Close / Reopen ----
   function closeBanner() {
+    collapseBanner();
     banner.classList.add('feb--closing');
     setTimeout(function() {
       banner.classList.remove('feb--visible', 'feb--closing');
@@ -845,6 +879,7 @@ function initFloatingEventBanner() {
   }
 
   function closeBannerPermanent() {
+    collapseBanner();
     banner.classList.remove('feb--visible');
     banner.style.display = 'none';
     if (tab) tab.classList.remove('feb-tab--visible');
@@ -861,14 +896,16 @@ function initFloatingEventBanner() {
     sessionStorage.removeItem(dismissKey);
   }
 
-  if (closeBtn) closeBtn.addEventListener('click', closeBanner);
+  if (closeBtn) closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeBanner(); });
   if (tabBtn) tabBtn.addEventListener('click', reopenBanner);
 
-  // Close on Escape
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && banner.classList.contains('feb--visible')) {
-      closeBanner();
+    if (e.key === 'Escape') {
+      if (expanded && expanded.classList.contains('feb-expanded--active')) {
+        collapseBanner();
+      } else if (banner.classList.contains('feb--visible')) {
+        closeBanner();
+      }
     }
   });
 }
-
