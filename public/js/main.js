@@ -917,7 +917,7 @@ function initFloatingEventBanner() {
    ========================================= */
 
 function initAdvenNatal() {
-  // ---- 1. SNOWFALL ENGINE (Canvas 60fps) ----
+  // ---- 1. SNOWFALL & PARTICLES ENGINE (Canvas 60fps) ----
   var snowCanvas = document.getElementById('anSnowCanvas');
   var snowToggle = document.getElementById('anSnowToggle');
 
@@ -934,20 +934,19 @@ function initAdvenNatal() {
     // Intensity & speed from canvas data attributes
     var intensity = snowCanvas.dataset.intensity || 'medium';
     var speedSetting = snowCanvas.dataset.speed || 'gentle';
-    var isMobile = window.innerWidth < 768;
+    var isMobile = window.innerWidth <= 768;
+    var mobilePerf = snowCanvas.dataset.mobilePerf === 'true';
 
-    var maxParticles = 32;
-    if (intensity === 'light') maxParticles = 16;
-    else if (intensity === 'heavy') maxParticles = 55;
+    var baseCount = 55;
+    if (intensity === 'low') baseCount = 28;
+    else if (intensity === 'high') baseCount = 95;
 
-    // Mobile performance mode
-    if (isMobile && snowCanvas.dataset.mobilePerf === 'true') {
-      maxParticles = Math.max(10, Math.floor(maxParticles * 0.55));
-    }
+    // Reduce particles by 50% on mobile if battery saver is enabled
+    var maxParticles = (isMobile && mobilePerf) ? Math.floor(baseCount * 0.5) : baseCount;
 
-    var speedMultiplier = 1;
-    if (speedSetting === 'gentle') speedMultiplier = 0.65;
-    else if (speedSetting === 'fast') speedMultiplier = 1.4;
+    var speedMultiplier = 1.0;
+    if (speedSetting === 'slow') speedMultiplier = 0.65;
+    else if (speedSetting === 'fast') speedMultiplier = 1.7;
 
     function resizeCanvas() {
       snowCanvas.width = window.innerWidth;
@@ -959,11 +958,10 @@ function initAdvenNatal() {
     function createParticle() {
       return {
         x: Math.random() * snowCanvas.width,
-        y: Math.random() * -snowCanvas.height,
-        r: Math.random() * 2.8 + 1,
-        d: Math.random() * maxParticles,
+        y: Math.random() * -50,
+        r: Math.random() * 2.8 + 1.2,
         speedY: (Math.random() * 1.2 + 0.6) * speedMultiplier,
-        speedX: (Math.random() * 0.8 - 0.4) * speedMultiplier,
+        speedX: (Math.random() - 0.5) * 0.6 * speedMultiplier,
         opacity: Math.random() * 0.55 + 0.4,
         swayAngle: Math.random() * Math.PI * 2,
         swaySpeed: Math.random() * 0.02 + 0.01
@@ -973,7 +971,7 @@ function initAdvenNatal() {
     // Init particles
     for (var i = 0; i < maxParticles; i++) {
       var p = createParticle();
-      p.y = Math.random() * snowCanvas.height; // scatter initially
+      p.y = Math.random() * snowCanvas.height;
       particles.push(p);
     }
 
@@ -1058,7 +1056,10 @@ function initAdvenNatal() {
     }
   }
 
-  // ---- 2. LIVE CHRISTMAS COUNTDOWN (Hero Widget) ----
+  // ---- 2. LIVE CHRISTMAS COUNTDOWN (Multi-Position Tickers) ----
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  // A. Hero Countdown Card
   var cdHero = document.getElementById('anCountdownHero');
   if (cdHero) {
     var targetDateStr = cdHero.dataset.targetDate;
@@ -1070,8 +1071,6 @@ function initAdvenNatal() {
       var secsEl = document.getElementById('anHeroCdSecs');
       var gridEl = document.getElementById('anHeroCdGrid');
       var msgEl = document.getElementById('anHeroCdCompleted');
-
-      function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
       function updateHeroCountdown() {
         var diff = targetTime - Date.now();
@@ -1094,6 +1093,64 @@ function initAdvenNatal() {
 
       updateHeroCountdown();
       setInterval(updateHeroCountdown, 1000);
+    }
+  }
+
+  // B. Sticky Bottom Bar Countdown
+  var cdBar = document.getElementById('anCountdownBar');
+  if (cdBar) {
+    var barTargetStr = cdBar.dataset.targetDate;
+    if (barTargetStr) {
+      var barTarget = new Date(barTargetStr).getTime();
+      var bD = document.getElementById('anBarDays');
+      var bH = document.getElementById('anBarHours');
+      var bM = document.getElementById('anBarMins');
+      var bS = document.getElementById('anBarSecs');
+
+      function updateBar() {
+        var diff = barTarget - Date.now();
+        if (diff <= 0) return;
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+
+        if (bD) bD.textContent = pad2(d);
+        if (bH) bH.textContent = pad2(h);
+        if (bM) bM.textContent = pad2(m);
+        if (bS) bS.textContent = pad2(s);
+      }
+      updateBar();
+      setInterval(updateBar, 1000);
+    }
+  }
+
+  // C. Floating Badge Countdown
+  var cdFloat = document.getElementById('anCountdownFloat');
+  if (cdFloat) {
+    var floatTargetStr = cdFloat.dataset.targetDate;
+    if (floatTargetStr) {
+      var floatTarget = new Date(floatTargetStr).getTime();
+      var fD = document.getElementById('anFloatDays');
+      var fH = document.getElementById('anFloatHours');
+      var fM = document.getElementById('anFloatMins');
+      var fS = document.getElementById('anFloatSecs');
+
+      function updateFloat() {
+        var diff = floatTarget - Date.now();
+        if (diff <= 0) return;
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+
+        if (fD) fD.textContent = pad2(d);
+        if (fH) fH.textContent = pad2(h);
+        if (fM) fM.textContent = pad2(m);
+        if (fS) fS.textContent = pad2(s);
+      }
+      updateFloat();
+      setInterval(updateFloat, 1000);
     }
   }
 }

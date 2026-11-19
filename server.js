@@ -492,12 +492,28 @@ function enrichMissingTopLevelKeys(targetDb) {
       }
     }
 
-    // Ensure advenNatal exists
+    // Ensure advenNatal exists and has all sub-objects
     if (!targetDb.advenNatal || typeof targetDb.advenNatal !== 'object') {
       if (seedDb.advenNatal) {
         targetDb.advenNatal = JSON.parse(JSON.stringify(seedDb.advenNatal));
         modified = true;
         console.log('✨ Modul Adven & Natal ditambahkan ke database');
+      }
+    } else if (seedDb.advenNatal) {
+      // Ensure nested sub-keys exist
+      ['theme', 'countdown', 'animation'].forEach(k => {
+        if (!targetDb.advenNatal[k] || typeof targetDb.advenNatal[k] !== 'object') {
+          targetDb.advenNatal[k] = JSON.parse(JSON.stringify(seedDb.advenNatal[k]));
+          modified = true;
+        }
+      });
+      if (targetDb.advenNatal.theme && !targetDb.advenNatal.theme.colors && seedDb.advenNatal.theme.colors) {
+        targetDb.advenNatal.theme.colors = JSON.parse(JSON.stringify(seedDb.advenNatal.theme.colors));
+        modified = true;
+      }
+      if (targetDb.advenNatal.theme && !targetDb.advenNatal.theme.banner && seedDb.advenNatal.theme.banner) {
+        targetDb.advenNatal.theme.banner = JSON.parse(JSON.stringify(seedDb.advenNatal.theme.banner));
+        modified = true;
       }
     }
 
@@ -1484,33 +1500,86 @@ app.post('/admin/adven-natal/toggle-quick', requireAuth, (req, res) => {
     db.advenNatal.theme.enabled = true;
   }
 
+  db.advenNatal.updated_at = new Date().toISOString();
+  db.advenNatal.updated_by = req.session.adminUser ? req.session.adminUser.username : 'Admin';
   saveDB(db);
   const statusLabel = db.advenNatal.theme.activeMode === 'manual_on' ? 'Aktif Sekarang (Manual)' : (db.advenNatal.theme.activeMode === 'auto' ? 'Otomatis Sesuai Tanggal' : 'Nonaktif');
   res.redirect('/admin?tab=adven-natal&msg=' + encodeURIComponent('Status tema Adven & Natal diubah ke: ' + statusLabel));
 });
 
-// Update Pengaturan Tema Website
-app.post('/admin/adven-natal/theme', requireAuth, (req, res) => {
+// Update Pengaturan Tema Website (with Multer image uploads)
+app.post('/admin/adven-natal/theme', requireAuth, upload.fields([
+  { name: 'bannerImage', maxCount: 1 },
+  { name: 'bannerMobileImage', maxCount: 1 }
+]), (req, res) => {
   const db = getDB();
   if (!db.advenNatal || typeof db.advenNatal !== 'object') db.advenNatal = {};
   if (!db.advenNatal.theme) db.advenNatal.theme = {};
 
   const activeMode = req.body.activeMode || 'auto';
+  const existingBanner = db.advenNatal.theme.banner || {};
+
+  let bannerImg = existingBanner.image || '/images/hero-1.webp';
+  if (req.files && req.files.bannerImage && req.files.bannerImage[0]) {
+    bannerImg = '/uploads/' + req.files.bannerImage[0].filename;
+  } else if (req.body.bannerExistingImage) {
+    bannerImg = req.body.bannerExistingImage.trim();
+  }
+
+  let bannerMobileImg = existingBanner.mobileImage || '';
+  if (req.files && req.files.bannerMobileImage && req.files.bannerMobileImage[0]) {
+    bannerMobileImg = '/uploads/' + req.files.bannerMobileImage[0].filename;
+  } else if (req.body.bannerExistingMobileImage) {
+    bannerMobileImg = req.body.bannerExistingMobileImage.trim();
+  }
+
+  const preset = req.body.preset || 'christmas-gold';
+  
   db.advenNatal.theme = {
     ...db.advenNatal.theme,
-    activeMode: activeMode,
     enabled: activeMode !== 'off',
+    activeMode: activeMode,
     startDate: (req.body.startDate || '2026-11-29T00:00').trim(),
     endDate: (req.body.endDate || '2027-01-06T23:59').trim(),
-    preset: req.body.preset || 'natal-klasik',
+    preset: preset,
     liturgiWeek: req.body.liturgiWeek || 'natal',
-    bannerText: (req.body.bannerText || '').trim(),
-    bannerSubtext: (req.body.bannerSubtext || '').trim(),
-    showBanner: req.body.showBanner === 'on',
-    showGarland: req.body.showGarland === 'on',
-    showLiturgiBadge: req.body.showLiturgiBadge === 'on'
+    colors: {
+      primary: (req.body.primary_color || '#D9B66F').trim(),
+      secondary: (req.body.secondary_color || '#1B2A4A').trim(),
+      accent: (req.body.accent_color || '#B91C1C').trim(),
+      background: (req.body.background_color || '#0F172A').trim(),
+      text: (req.body.text_color || '#FFFFFF').trim()
+    },
+    banner: {
+      enabled: req.body.banner_enabled === 'on',
+      image: bannerImg,
+      mobileImage: bannerMobileImg,
+      title: (req.body.banner_title || 'Selamat Menyambut Masa Adven & Hari Natal 2026').trim(),
+      subtitle: (req.body.banner_subtitle || '').trim(),
+      buttonText: (req.body.banner_button_text || '').trim(),
+      buttonUrl: (req.body.banner_button_url || '/visit').trim(),
+      textAlign: req.body.banner_text_align || 'center',
+      overlayOpacity: parseInt(req.body.banner_overlay_opacity, 10) || 50
+    },
+    ornaments: {
+      stars: req.body.ornament_stars === 'on',
+      pine: req.body.ornament_pine === 'on',
+      baubles: req.body.ornament_baubles === 'on',
+      candle: req.body.ornament_candle === 'on',
+      snow: req.body.ornament_snow === 'on',
+      goldenGlow: req.body.ornament_golden_glow === 'on',
+      cornerDecor: req.body.ornament_corner_decor === 'on'
+    },
+    // Backwards compatibility mappings
+    bannerText: (req.body.banner_title || '').trim(),
+    bannerSubtext: (req.body.banner_subtitle || '').trim(),
+    showBanner: req.body.banner_enabled === 'on',
+    showGarland: req.body.ornament_pine === 'on',
+    showLiturgiBadge: req.body.ornament_candle === 'on'
   };
 
+  db.advenNatal.updated_at = new Date().toISOString();
+  db.advenNatal.updated_by = req.session.adminUser ? req.session.adminUser.username : 'Admin';
   saveDB(db);
   res.redirect('/admin?tab=adven-natal&sub=theme&msg=' + encodeURIComponent('Pengaturan Tema Website Adven & Natal berhasil disimpan!'));
 });
@@ -1521,20 +1590,41 @@ app.post('/admin/adven-natal/countdown', requireAuth, (req, res) => {
   if (!db.advenNatal || typeof db.advenNatal !== 'object') db.advenNatal = {};
   if (!db.advenNatal.countdown) db.advenNatal.countdown = {};
 
+  const christmasDate = (req.body.christmasDate || '2026-12-25').trim();
+  const christmasTime = (req.body.christmasTime || '09:00').trim();
+  const timezone = (req.body.timezone || 'Asia/Jakarta').trim();
+  const targetDate = christmasDate + 'T' + christmasTime + ':00+07:00';
+
   db.advenNatal.countdown = {
     ...db.advenNatal.countdown,
-    enabled: req.body.enabled === 'on',
-    title: (req.body.title || '').trim(),
-    targetDate: (req.body.targetDate || '').trim(),
-    location: (req.body.location || '').trim(),
-    subtext: (req.body.subtext || '').trim(),
-    completionMessage: (req.body.completionMessage || '').trim(),
-    showHeroCountdown: req.body.showHeroCountdown === 'on',
-    showFloatingBadge: req.body.showFloatingBadge === 'on',
-    ctaText: (req.body.ctaText || '').trim(),
-    ctaLink: (req.body.ctaLink || '').trim()
+    enabled: req.body.countdown_enabled === 'on',
+    title: (req.body.countdown_title || 'Hitung Mundur Ibadah Perayaan Natal 2026').trim(),
+    subtitle: (req.body.countdown_subtitle || '').trim(),
+    christmasDate: christmasDate,
+    christmasTime: christmasTime,
+    timezone: timezone,
+    targetDate: targetDate,
+    pretext: (req.body.countdown_pretext || 'Menuju Perayaan Kelahiran Kristus:').trim(),
+    completionMessage: (req.body.countdown_completion_message || '🎉 Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!').trim(),
+    style: req.body.countdown_style || 'glassmorphism',
+    position: req.body.countdown_position || 'hero',
+    showSeconds: req.body.countdown_show_seconds === 'on',
+    cardBackground: req.body.countdown_card_bg || 'glass',
+    numberColor: (req.body.countdown_number_color || '#FFFFFF').trim(),
+    labelColor: (req.body.countdown_label_color || '#D9B66F').trim(),
+    numberSize: req.body.countdown_number_size || 'medium',
+    shadowEffect: req.body.countdown_shadow_effect || 'glow',
+    ctaText: (req.body.countdown_cta_text || '').trim(),
+    ctaLink: (req.body.countdown_cta_link || '/visit').trim(),
+    location: (req.body.countdown_location || '').trim(),
+    // Backwards compatibility mappings
+    subtext: (req.body.countdown_subtitle || '').trim(),
+    showHeroCountdown: req.body.countdown_enabled === 'on',
+    showFloatingBadge: req.body.countdown_position === 'floating-card' || req.body.countdown_position === 'bottom-bar'
   };
 
+  db.advenNatal.updated_at = new Date().toISOString();
+  db.advenNatal.updated_by = req.session.adminUser ? req.session.adminUser.username : 'Admin';
   saveDB(db);
   res.redirect('/admin?tab=adven-natal&sub=countdown&msg=' + encodeURIComponent('Pengaturan Countdown Natal berhasil disimpan!'));
 });
@@ -1545,20 +1635,95 @@ app.post('/admin/adven-natal/animation', requireAuth, (req, res) => {
   if (!db.advenNatal || typeof db.advenNatal !== 'object') db.advenNatal = {};
   if (!db.advenNatal.animation) db.advenNatal.animation = {};
 
+  const snowIntensity = req.body.snow_intensity || 'medium';
+  let particleCount = parseInt(req.body.snow_particle_count, 10);
+  if (isNaN(particleCount) || particleCount <= 0) {
+    particleCount = snowIntensity === 'high' ? 100 : (snowIntensity === 'low' ? 30 : 60);
+  }
+
   db.advenNatal.animation = {
     ...db.advenNatal.animation,
-    snowEnabled: req.body.snowEnabled === 'on',
-    snowIntensity: req.body.snowIntensity || 'medium',
-    snowSpeed: req.body.snowSpeed || 'gentle',
-    fairyLightsEnabled: req.body.fairyLightsEnabled === 'on',
-    sparklesEnabled: req.body.sparklesEnabled === 'on',
-    candleGlowEnabled: req.body.candleGlowEnabled === 'on',
-    userControlToggle: req.body.userControlToggle === 'on',
-    mobilePerformanceMode: req.body.mobilePerformanceMode === 'on'
+    enabled: req.body.animations_enabled === 'on',
+    snow: {
+      enabled: req.body.snow_enabled === 'on',
+      intensity: snowIntensity,
+      speed: req.body.snow_speed || 'gentle',
+      particleSize: req.body.snow_particle_size || 'medium',
+      particleCount: particleCount,
+      area: req.body.snow_area || 'full_page'
+    },
+    stars: {
+      enabled: req.body.stars_enabled === 'on',
+      intensity: req.body.stars_intensity || 'medium',
+      color: (req.body.stars_color || '#FFDF78').trim(),
+      area: req.body.stars_area || 'full_page'
+    },
+    lights: {
+      enabled: req.body.lights_enabled === 'on',
+      speed: req.body.lights_speed || 'normal',
+      style: req.body.lights_style || 'garland_top',
+      area: req.body.lights_area || 'header_only'
+    },
+    goldenParticles: {
+      enabled: req.body.golden_particles_enabled === 'on',
+      intensity: req.body.golden_particles_intensity || 'medium',
+      opacity: parseInt(req.body.golden_particles_opacity, 10) || 70,
+      area: req.body.golden_particles_area || 'hero_banner'
+    },
+    floatingSnowflakes: {
+      enabled: req.body.floating_snowflakes_enabled === 'on',
+      area: req.body.floating_snowflakes_area || 'hero_banner'
+    },
+    candleGlow: {
+      enabled: req.body.candle_glow_enabled === 'on',
+      intensity: req.body.candle_glow_intensity || 'gentle'
+    },
+    sparkles: {
+      enabled: req.body.sparkles_enabled === 'on',
+      color: (req.body.sparkles_color || '#D9B66F').trim()
+    },
+    effects: {
+      pageTransition: req.body.effect_page_transition === 'on',
+      softGlow: req.body.effect_soft_glow === 'on',
+      cornerDecor: req.body.effect_corner_decor === 'on'
+    },
+    visitorControl: {
+      enabled: req.body.visitor_toggle_enabled === 'on',
+      rememberPreference: req.body.remember_preference === 'on',
+      respectReducedMotion: req.body.respect_reduced_motion === 'on',
+      mobileOptimization: req.body.mobile_optimization === 'on'
+    },
+    // Backwards compatibility mappings
+    snowEnabled: req.body.snow_enabled === 'on',
+    snowIntensity: snowIntensity,
+    snowSpeed: req.body.snow_speed || 'gentle',
+    fairyLightsEnabled: req.body.lights_enabled === 'on',
+    sparklesEnabled: req.body.sparkles_enabled === 'on',
+    candleGlowEnabled: req.body.candle_glow_enabled === 'on',
+    userControlToggle: req.body.visitor_toggle_enabled === 'on',
+    mobilePerformanceMode: req.body.mobile_optimization === 'on'
   };
 
+  db.advenNatal.updated_at = new Date().toISOString();
+  db.advenNatal.updated_by = req.session.adminUser ? req.session.adminUser.username : 'Admin';
   saveDB(db);
   res.redirect('/admin?tab=adven-natal&sub=animation&msg=' + encodeURIComponent('Pengaturan Animasi Natal berhasil disimpan!'));
+});
+
+// Reset Modul Adven & Natal ke Default Seed
+app.post('/admin/adven-natal/reset', requireAuth, (req, res) => {
+  const db = getDB();
+  const seedDb = JSON.parse(fs.readFileSync(SEED_DB_FILE, 'utf8'));
+
+  if (seedDb && seedDb.advenNatal) {
+    db.advenNatal = JSON.parse(JSON.stringify(seedDb.advenNatal));
+    db.advenNatal.updated_at = new Date().toISOString();
+    db.advenNatal.updated_by = req.session.adminUser ? req.session.adminUser.username : 'Admin';
+    saveDB(db);
+    res.redirect('/admin?tab=adven-natal&msg=' + encodeURIComponent('Pengaturan Modul Adven & Natal berhasil dikembalikan ke default pabrik!'));
+  } else {
+    res.redirect('/admin?tab=adven-natal&error=' + encodeURIComponent('Gagal mereset: seed konfigurasi tidak ditemukan.'));
+  }
 });
 
 // Home hero (Image & Video)

@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="/css/style.min.css?v=65">
+  <link rel="stylesheet" href="/css/style.min.css?v=66">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -128,32 +128,52 @@
         }
       }
     }
+    var showHomeBanner = isAnActiveHome && anDataHome && anDataHome.theme && (
+      (anDataHome.theme.banner && anDataHome.theme.banner.enabled) ||
+      (anDataHome.theme.showBanner)
+    );
+    var hBanner = (anDataHome && anDataHome.theme && anDataHome.theme.banner) ? anDataHome.theme.banner : {};
+    var bannerBgImg = hBanner.image || '';
+    var bannerOverlayOpacity = typeof hBanner.overlayOpacity !== 'undefined' ? (hBanner.overlayOpacity / 100) : 0.5;
+    var bannerTextAlign = hBanner.textAlign || 'center';
   %>
-  <% if (isAnActiveHome && anDataHome && anDataHome.theme && anDataHome.theme.showBanner) { %>
-  <div class="an-holiday-banner">
-    <div class="an-holiday-banner__inner">
-      <div class="an-holiday-banner__content">
+  <% if (showHomeBanner) { %>
+  <div class="an-holiday-banner <%= bannerBgImg ? 'an-holiday-banner--custom-bg' : '' %>" style="<%= bannerBgImg ? ('background-image:url(' + bannerBgImg + '); position:relative;') : '' %>">
+    <% if (bannerBgImg) { %>
+    <div class="an-holiday-banner__overlay" style="background: rgba(15, 23, 42, <%= bannerOverlayOpacity %>);"></div>
+    <% } %>
+    <div class="an-holiday-banner__inner" style="justify-content: <%= bannerTextAlign === 'left' ? 'flex-start' : (bannerTextAlign === 'right' ? 'flex-end' : 'space-between') %>; text-align: <%= bannerTextAlign %>;">
+      <div class="an-holiday-banner__content" style="justify-content: <%= bannerTextAlign === 'left' ? 'flex-start' : (bannerTextAlign === 'right' ? 'flex-end' : 'center') %>;">
         <span class="an-holiday-banner__icon">🎄</span>
         <div>
-          <h3 class="an-holiday-banner__title"><%= anDataHome.theme.bannerText || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %></h3>
-          <% if (anDataHome.theme.bannerSubtext) { %>
-          <p class="an-holiday-banner__subtext"><%= anDataHome.theme.bannerSubtext %></p>
+          <h3 class="an-holiday-banner__title"><%= hBanner.title || anDataHome.theme.bannerText || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %></h3>
+          <% if (hBanner.subtitle || anDataHome.theme.bannerSubtext) { %>
+          <p class="an-holiday-banner__subtext"><%= hBanner.subtitle || anDataHome.theme.bannerSubtext %></p>
           <% } %>
         </div>
       </div>
-      <% if (anDataHome.theme.showLiturgiBadge) { %>
-      <div class="an-holiday-banner__badge">
-        <span class="an-liturgi-flame"></span>
-        <span>
-          <% if (anDataHome.theme.liturgiWeek === 'adven-1') { %>Adven I — Harapan
-          <% } else if (anDataHome.theme.liturgiWeek === 'adven-2') { %>Adven II — Perdamaian
-          <% } else if (anDataHome.theme.liturgiWeek === 'adven-3') { %>Adven III — Sukacita
-          <% } else if (anDataHome.theme.liturgiWeek === 'adven-4') { %>Adven IV — Kasih
-          <% } else { %>⭐ Hari Natal — Lilin Kristus
-          <% } %>
-        </span>
+
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <% if (anDataHome.theme.showLiturgiBadge || (anDataHome.theme.ornaments && anDataHome.theme.ornaments.candle)) { %>
+        <div class="an-holiday-banner__badge">
+          <span class="an-liturgi-flame"></span>
+          <span>
+            <% if (anDataHome.theme.liturgiWeek === 'adven-1') { %>Adven I — Harapan
+            <% } else if (anDataHome.theme.liturgiWeek === 'adven-2') { %>Adven II — Perdamaian
+            <% } else if (anDataHome.theme.liturgiWeek === 'adven-3') { %>Adven III — Sukacita
+            <% } else if (anDataHome.theme.liturgiWeek === 'adven-4') { %>Adven IV — Kasih
+            <% } else { %>⭐ Hari Natal — Lilin Kristus
+            <% } %>
+          </span>
+        </div>
+        <% } %>
+
+        <% if (hBanner.buttonText && hBanner.buttonUrl) { %>
+        <a href="<%= hBanner.buttonUrl %>" class="an-holiday-banner__btn">
+          <%= hBanner.buttonText %> →
+        </a>
+        <% } %>
       </div>
-      <% } %>
     </div>
   </div>
   <% } %>
@@ -212,15 +232,26 @@
   </section>
 
   <!-- ========== ADVEN & NATAL COUNTDOWN HERO CARD ========== -->
-  <% if (isAnActiveHome && anDataHome && anDataHome.countdown && anDataHome.countdown.enabled && anDataHome.countdown.showHeroCountdown) { %>
+  <%
+    var showHomeCountdown = isAnActiveHome && anDataHome && anDataHome.countdown && anDataHome.countdown.enabled && (
+      !anDataHome.countdown.position || anDataHome.countdown.position === 'hero' || anDataHome.countdown.position === 'dedicated'
+    );
+    var hCd = (anDataHome && anDataHome.countdown) ? anDataHome.countdown : {};
+    var cdStyle = hCd.style || 'glassmorphism';
+    var cdTarget = hCd.targetDate || (hCd.christmasDate ? (hCd.christmasDate + 'T' + (hCd.christmasTime || '09:00') + ':00+07:00') : '2026-12-25T09:00:00+07:00');
+    var cdShowSecs = hCd.showSeconds !== false;
+    var cdNumColor = hCd.numberColor || '#FFFFFF';
+    var cdLabelColor = hCd.labelColor || '#D9B66F';
+  %>
+  <% if (showHomeCountdown) { %>
   <section class="section" style="padding: 2.5rem 0 1rem; background: var(--off-white);" data-aos="fade-up">
     <div class="container">
-      <div class="an-countdown-hero" id="anCountdownHero" data-target-date="<%= anDataHome.countdown.targetDate || '2026-12-25T09:00:00+07:00' %>">
+      <div class="an-countdown-hero an-cd--<%= cdStyle %>" id="anCountdownHero" data-target-date="<%= cdTarget %>" style="--an-cd-num-color: <%= cdNumColor %>; --an-cd-label-color: <%= cdLabelColor %>;">
         <div class="an-countdown-hero__header">
           <span class="an-countdown-hero__tag">🎄 PERAYAAN NATAL 2026</span>
-          <h3 class="an-countdown-hero__title"><%= anDataHome.countdown.title || 'Hitung Mundur Ibadah Perayaan Natal 2026' %></h3>
-          <% if (anDataHome.countdown.subtext) { %>
-          <p class="an-countdown-hero__subtext"><%= anDataHome.countdown.subtext %></p>
+          <h3 class="an-countdown-hero__title"><%= hCd.title || 'Hitung Mundur Ibadah Perayaan Natal 2026' %></h3>
+          <% if (hCd.subtitle || hCd.subtext) { %>
+          <p class="an-countdown-hero__subtext"><%= hCd.subtitle || hCd.subtext %></p>
           <% } %>
         </div>
 
@@ -237,27 +268,29 @@
             <span class="an-cd-box__num" id="anHeroCdMins">00</span>
             <span class="an-cd-box__label">Menit</span>
           </div>
-          <div class="an-cd-box">
+          <% if (cdShowSecs) { %>
+          <div class="an-cd-box" id="anHeroCdSecsBox">
             <span class="an-cd-box__num" id="anHeroCdSecs">00</span>
             <span class="an-cd-box__label">Detik</span>
           </div>
+          <% } %>
         </div>
 
         <div id="anHeroCdCompleted" style="display:none; text-align:center; padding:15px; font-size:1.2rem; font-weight:700; color:#E8D5A0;">
-          🎉 <%= anDataHome.countdown.completionMessage || 'Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!' %>
+          <%= hCd.completionMessage || '🎉 Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!' %>
         </div>
 
         <div class="an-countdown-hero__footer">
-          <% if (anDataHome.countdown.location) { %>
+          <% if (hCd.location) { %>
           <div class="an-countdown-hero__loc">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span><%= anDataHome.countdown.location %></span>
+            <span><%= hCd.location %></span>
           </div>
           <% } %>
 
-          <% if (anDataHome.countdown.ctaText && anDataHome.countdown.ctaLink) { %>
-          <a href="<%= anDataHome.countdown.ctaLink %>" class="an-countdown-hero__btn">
-            <%= anDataHome.countdown.ctaText %> →
+          <% if (hCd.ctaText && hCd.ctaLink) { %>
+          <a href="<%= hCd.ctaLink %>" class="an-countdown-hero__btn">
+            <%= hCd.ctaText %> →
           </a>
           <% } %>
         </div>
@@ -464,7 +497,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="/js/main.min.js?v=26" defer></script>
+  <script src="/js/main.min.js?v=27" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;

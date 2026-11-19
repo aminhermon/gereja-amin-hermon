@@ -744,7 +744,34 @@
       "activeMode": "manual_on",
       "startDate": "2026-11-29T00:00",
       "endDate": "2027-01-06T23:59",
-      "preset": "natal-klasik",
+      "preset": "christmas-gold",
+      "colors": {
+        "primary": "#D9B66F",
+        "secondary": "#1B2A4A",
+        "accent": "#B91C1C",
+        "background": "#0F172A",
+        "text": "#FFFFFF"
+      },
+      "banner": {
+        "enabled": true,
+        "image": "/images/hero-1.webp",
+        "mobileImage": "",
+        "title": "Selamat Menyambut Masa Adven & Hari Natal 2026",
+        "subtitle": "Sebab seorang anak telah lahir untuk kita, seorang putera telah diberikan untuk kita; lambang pemerintahan ada di atas bahunya. (Yesaya 9:5)",
+        "buttonText": "Lihat Jadwal Ibadah",
+        "buttonUrl": "/visit",
+        "textAlign": "center",
+        "overlayOpacity": 50
+      },
+      "ornaments": {
+        "stars": true,
+        "pine": true,
+        "baubles": true,
+        "candle": true,
+        "snow": true,
+        "goldenGlow": true,
+        "cornerDecor": true
+      },
       "liturgiWeek": "natal",
       "bannerText": "Selamat Menyambut Masa Adven & Hari Natal 2026",
       "bannerSubtext": "Sebab seorang anak telah lahir untuk kita, seorang putera telah diberikan untuk kita; lambang pemerintahan ada di atas bahunya. (Yesaya 9:5)",
@@ -755,16 +782,29 @@
     "countdown": {
       "enabled": true,
       "title": "Hitung Mundur Ibadah Perayaan Natal 2026",
-      "targetDate": "2026-12-25T09:00",
-      "location": "Gedung Gereja AMIN Jemaat Hermon",
-      "subtext": "Sambutlah Sang Juru Selamat dengan sukacita dan damai sejahtera",
-      "completionMessage": "Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!",
-      "showHeroCountdown": true,
-      "showFloatingBadge": true,
+      "subtitle": "Sambutlah Sang Juru Selamat dengan sukacita dan damai sejahtera",
+      "christmasDate": "2026-12-25",
+      "christmasTime": "09:00",
+      "timezone": "Asia/Jakarta",
+      "targetDate": "2026-12-25T09:00:00+07:00",
+      "pretext": "Menuju Perayaan Kelahiran Kristus:",
+      "completionMessage": "🎉 Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!",
+      "style": "glassmorphism",
+      "position": "hero",
+      "showSeconds": true,
+      "cardBackground": "glass",
+      "numberColor": "#FFFFFF",
+      "labelColor": "#D9B66F",
+      "numberSize": "medium",
+      "shadowEffect": "glow",
       "ctaText": "Lihat Jadwal Ibadah Natal",
-      "ctaLink": "/visit"
+      "ctaLink": "/visit",
+      "location": "Gedung Gereja AMIN Jemaat Hermon",
+      "showHeroCountdown": true,
+      "showFloatingBadge": true
     },
     "animation": {
+      "enabled": true,
       "snowEnabled": true,
       "snowIntensity": "medium",
       "snowSpeed": "gentle",
@@ -772,7 +812,58 @@
       "sparklesEnabled": true,
       "candleGlowEnabled": true,
       "userControlToggle": true,
-      "mobilePerformanceMode": true
-    }
+      "mobilePerformanceMode": true,
+      "snow": {
+        "enabled": true,
+        "intensity": "medium",
+        "speed": "gentle",
+        "particleSize": "medium",
+        "particleCount": 60,
+        "area": "full_page"
+      },
+      "stars": {
+        "enabled": true,
+        "intensity": "medium",
+        "color": "#FFDF78",
+        "area": "full_page"
+      },
+      "lights": {
+        "enabled": true,
+        "speed": "normal",
+        "style": "garland_top",
+        "area": "header_only"
+      },
+      "goldenParticles": {
+        "enabled": true,
+        "intensity": "medium",
+        "opacity": 70,
+        "area": "hero_banner"
+      },
+      "floatingSnowflakes": {
+        "enabled": true,
+        "area": "hero_banner"
+      },
+      "candleGlow": {
+        "enabled": true,
+        "intensity": "gentle"
+      },
+      "sparkles": {
+        "enabled": true,
+        "color": "#D9B66F"
+      },
+      "effects": {
+        "pageTransition": true,
+        "softGlow": true,
+        "cornerDecor": true
+      },
+      "visitorControl": {
+        "enabled": true,
+        "rememberPreference": true,
+        "respectReducedMotion": true,
+        "mobileOptimization": true
+      }
+    },
+    "updated_at": "2026-11-19T14:46:47.116Z",
+    "updated_by": "Administrator"
   }
 }

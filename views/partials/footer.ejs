@@ -282,8 +282,48 @@
   }
 %>
 <% if (isAnActive && anData) { %>
+  <!-- Injected Custom Theme Colors -->
+  <% if (anData.theme && anData.theme.colors) { %>
+  <style id="anThemeCustomColors">
+    :root {
+      --an-primary: <%= anData.theme.colors.primary || '#D9B66F' %>;
+      --an-secondary: <%= anData.theme.colors.secondary || '#1B2A4A' %>;
+      --an-accent: <%= anData.theme.colors.accent || '#B91C1C' %>;
+      --an-bg: <%= anData.theme.colors.background || '#0F172A' %>;
+      --an-text: <%= anData.theme.colors.text || '#FFFFFF' %>;
+    }
+  </style>
+  <% } %>
+
+  <!-- Corner Festive Ornaments -->
+  <% if (anData.theme && anData.theme.ornaments && anData.theme.ornaments.cornerDecor) { %>
+  <div class="an-corner-decor an-corner-decor--tl" aria-hidden="true">
+    <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+      <path d="M0 0 L100 0 C70 10 50 30 40 60 C35 75 30 90 0 100 Z" fill="rgba(200,169,81,0.2)"/>
+      <circle cx="22" cy="22" r="8" fill="#B91C1C"/>
+      <circle cx="34" cy="16" r="6" fill="#D9B66F"/>
+      <circle cx="16" cy="34" r="6" fill="#047857"/>
+    </svg>
+  </div>
+  <div class="an-corner-decor an-corner-decor--tr" aria-hidden="true">
+    <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+      <path d="M100 0 L0 0 C30 10 50 30 60 60 C65 75 70 90 100 100 Z" fill="rgba(200,169,81,0.2)"/>
+      <circle cx="78" cy="22" r="8" fill="#B91C1C"/>
+      <circle cx="66" cy="16" r="6" fill="#D9B66F"/>
+      <circle cx="84" cy="34" r="6" fill="#047857"/>
+    </svg>
+  </div>
+  <% } %>
+
   <!-- Fairy Lights Garland along the top -->
-  <% if (anData.animation && anData.animation.fairyLightsEnabled) { %>
+  <%
+    var showLights = false;
+    if (anData.animation) {
+      if (anData.animation.lights && anData.animation.lights.enabled) showLights = true;
+      else if (anData.animation.fairyLightsEnabled) showLights = true;
+    }
+  %>
+  <% if (showLights) { %>
   <div class="an-fairy-lights" aria-hidden="true">
     <% for (var b = 0; b < 30; b++) { %>
       <% var bulbTypes = ['red', 'gold', 'green', 'blue', 'white']; %>
@@ -293,19 +333,97 @@
   <% } %>
 
   <!-- Fullscreen Falling Snow Engine -->
-  <% if (anData.animation && anData.animation.snowEnabled) { %>
+  <%
+    var showSnow = false;
+    var snowIntensity = 'medium';
+    var snowSpeed = 'gentle';
+    if (anData.animation) {
+      if (anData.animation.snow && anData.animation.snow.enabled) {
+        showSnow = true;
+        snowIntensity = anData.animation.snow.intensity || 'medium';
+        snowSpeed = anData.animation.snow.speed || 'gentle';
+      } else if (anData.animation.snowEnabled) {
+        showSnow = true;
+        snowIntensity = anData.animation.snowIntensity || 'medium';
+        snowSpeed = anData.animation.snowSpeed || 'gentle';
+      }
+    }
+    var mobilePerf = (anData.animation && anData.animation.visitorControl && anData.animation.visitorControl.mobileOptimization !== false) || (anData.animation && anData.animation.mobilePerformanceMode);
+  %>
+  <% if (showSnow) { %>
   <canvas id="anSnowCanvas" class="an-snow-canvas"
-          data-intensity="<%= anData.animation.snowIntensity || 'medium' %>"
-          data-speed="<%= anData.animation.snowSpeed || 'gentle' %>"
-          data-mobile-perf="<%= anData.animation.mobilePerformanceMode ? 'true' : 'false' %>"
+          data-intensity="<%= snowIntensity %>"
+          data-speed="<%= snowSpeed %>"
+          data-mobile-perf="<%= mobilePerf ? 'true' : 'false' %>"
           aria-hidden="true"></canvas>
 
   <!-- Visitor Snow Control Button -->
-  <% if (anData.animation.userControlToggle) { %>
+  <%
+    var showVisitorToggle = (anData.animation && anData.animation.visitorControl && anData.animation.visitorControl.enabled !== false) || (anData.animation && anData.animation.userControlToggle);
+  %>
+  <% if (showVisitorToggle) { %>
   <button type="button" class="an-snow-toggle" id="anSnowToggle" aria-label="Nyalakan atau matikan animasi salju" title="Klik untuk menyalakan/mematikan salju">
     <span class="an-snow-toggle__icon">❄️</span>
     <span class="an-snow-toggle__text">Salju: Nyala</span>
   </button>
   <% } %>
+  <% } %>
+
+  <!-- Sticky / Floating Countdown Widget (jika posisi diatur ke bottom-bar atau floating-card) -->
+  <% if (anData.countdown && anData.countdown.enabled && anData.countdown.position === 'bottom-bar') { %>
+  <div class="an-countdown-bar" id="anCountdownBar" data-target-date="<%= anData.countdown.targetDate || '2026-12-25T09:00:00+07:00' %>">
+    <div class="an-countdown-bar__inner">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.1rem;">🎄</span>
+        <strong style="font-size:0.85rem; color:#fff;"><%= anData.countdown.title || 'Hitung Mundur Ibadah Natal 2026' %>:</strong>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#E8D5A0; font-size:0.95rem;">
+        <span id="anBarDays">00</span>h :
+        <span id="anBarHours">00</span>j :
+        <span id="anBarMins">00</span>m
+        <% if (anData.countdown.showSeconds !== false) { %>
+        : <span id="anBarSecs">00</span>d
+        <% } %>
+      </div>
+      <% if (anData.countdown.ctaText && anData.countdown.ctaLink) { %>
+      <a href="<%= anData.countdown.ctaLink %>" class="btn btn--gold" style="padding:4px 14px; font-size:0.75rem; border-radius:14px;">
+        <%= anData.countdown.ctaText %> →
+      </a>
+      <% } %>
+    </div>
+  </div>
+  <% } else if (anData.countdown && anData.countdown.enabled && anData.countdown.position === 'floating-card') { %>
+  <div class="an-countdown-float" id="anCountdownFloat" data-target-date="<%= anData.countdown.targetDate || '2026-12-25T09:00:00+07:00' %>">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <span style="font-size:0.7rem; font-weight:700; color:var(--gold); text-transform:uppercase;">🎄 PERAYAAN NATAL</span>
+      <button type="button" onclick="document.getElementById('anCountdownFloat').style.display='none'" style="background:transparent; border:none; color:rgba(255,255,255,0.6); cursor:pointer; font-size:1rem; line-height:1;">&times;</button>
+    </div>
+    <div style="font-size:0.82rem; font-weight:700; color:#fff; margin-bottom:6px; line-height:1.2;"><%= anData.countdown.title || 'Hitung Mundur Ibadah Natal' %></div>
+    <div style="display:flex; justify-content:center; gap:6px; margin-bottom:8px;">
+      <div style="background:rgba(0,0,0,0.4); border-radius:6px; padding:4px 8px; text-align:center; min-width:40px;">
+        <span id="anFloatDays" style="font-weight:700; font-size:0.95rem; color:#fff; display:block;">00</span>
+        <span style="font-size:0.55rem; color:var(--gold); text-transform:uppercase;">Hari</span>
+      </div>
+      <div style="background:rgba(0,0,0,0.4); border-radius:6px; padding:4px 8px; text-align:center; min-width:40px;">
+        <span id="anFloatHours" style="font-weight:700; font-size:0.95rem; color:#fff; display:block;">00</span>
+        <span style="font-size:0.55rem; color:var(--gold); text-transform:uppercase;">Jam</span>
+      </div>
+      <div style="background:rgba(0,0,0,0.4); border-radius:6px; padding:4px 8px; text-align:center; min-width:40px;">
+        <span id="anFloatMins" style="font-weight:700; font-size:0.95rem; color:#fff; display:block;">00</span>
+        <span style="font-size:0.55rem; color:var(--gold); text-transform:uppercase;">Mnt</span>
+      </div>
+      <% if (anData.countdown.showSeconds !== false) { %>
+      <div style="background:rgba(0,0,0,0.4); border-radius:6px; padding:4px 8px; text-align:center; min-width:40px;">
+        <span id="anFloatSecs" style="font-weight:700; font-size:0.95rem; color:#fff; display:block;">00</span>
+        <span style="font-size:0.55rem; color:var(--gold); text-transform:uppercase;">Dtk</span>
+      </div>
+      <% } %>
+    </div>
+    <% if (anData.countdown.ctaText && anData.countdown.ctaLink) { %>
+    <a href="<%= anData.countdown.ctaLink %>" style="display:block; text-align:center; background:linear-gradient(135deg, #C8A951, #b3923d); color:#0F1D35; font-size:0.72rem; font-weight:700; padding:5px 12px; border-radius:20px; text-decoration:none;">
+      <%= anData.countdown.ctaText %> →
+    </a>
+    <% } %>
+  </div>
   <% } %>
 <% } %>
