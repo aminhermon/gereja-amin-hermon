@@ -262,3 +262,50 @@
 
     .renungan-float-btn:hover { transform: translateY(-5px); background-color: var(--gold); color: var(--navy); }
   </style>
+
+<!-- ==================== ADVEN & NATAL PREMIUM MODULE ==================== -->
+<%
+  var isAnActive = false;
+  var anData = (typeof advenNatal !== 'undefined' && advenNatal) ? advenNatal : null;
+  if (anData && anData.theme) {
+    if (typeof isAdvenNatalActive === 'function') {
+      isAnActive = isAdvenNatalActive(anData);
+    } else {
+      if (anData.theme.activeMode === 'manual_on') isAnActive = true;
+      else if (anData.theme.activeMode === 'auto') {
+        var _now = new Date();
+        var _s = anData.theme.startDate ? new Date(anData.theme.startDate) : null;
+        var _e = anData.theme.endDate ? new Date(anData.theme.endDate) : null;
+        isAnActive = (!_s || _now >= _s) && (!_e || _now <= _e) && anData.theme.enabled !== false;
+      }
+    }
+  }
+%>
+<% if (isAnActive && anData) { %>
+  <!-- Fairy Lights Garland along the top -->
+  <% if (anData.animation && anData.animation.fairyLightsEnabled) { %>
+  <div class="an-fairy-lights" aria-hidden="true">
+    <% for (var b = 0; b < 30; b++) { %>
+      <% var bulbTypes = ['red', 'gold', 'green', 'blue', 'white']; %>
+      <div class="an-bulb an-bulb--<%= bulbTypes[b % 5] %>"></div>
+    <% } %>
+  </div>
+  <% } %>
+
+  <!-- Fullscreen Falling Snow Engine -->
+  <% if (anData.animation && anData.animation.snowEnabled) { %>
+  <canvas id="anSnowCanvas" class="an-snow-canvas"
+          data-intensity="<%= anData.animation.snowIntensity || 'medium' %>"
+          data-speed="<%= anData.animation.snowSpeed || 'gentle' %>"
+          data-mobile-perf="<%= anData.animation.mobilePerformanceMode ? 'true' : 'false' %>"
+          aria-hidden="true"></canvas>
+
+  <!-- Visitor Snow Control Button -->
+  <% if (anData.animation.userControlToggle) { %>
+  <button type="button" class="an-snow-toggle" id="anSnowToggle" aria-label="Nyalakan atau matikan animasi salju" title="Klik untuk menyalakan/mematikan salju">
+    <span class="an-snow-toggle__icon">❄️</span>
+    <span class="an-snow-toggle__text">Salju: Nyala</span>
+  </button>
+  <% } %>
+  <% } %>
+<% } %>

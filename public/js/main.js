@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackToTop();
   initDailyVerse();
   initFloatingEventBanner();
+  initAdvenNatal();
 });
 
 /* ---------- Navbar Dropdowns (Mobile & Desktop toggle) ---------- */
@@ -908,4 +909,191 @@ function initFloatingEventBanner() {
       }
     }
   });
+}
+
+
+/* =========================================
+   MODUL ADVEN & NATAL PREMIUM — SCRIPT ENGINE
+   ========================================= */
+
+function initAdvenNatal() {
+  // ---- 1. SNOWFALL ENGINE (Canvas 60fps) ----
+  var snowCanvas = document.getElementById('anSnowCanvas');
+  var snowToggle = document.getElementById('anSnowToggle');
+
+  if (snowCanvas) {
+    var ctx = snowCanvas.getContext('2d');
+    var particles = [];
+    var animFrameId = null;
+    var isRunning = true;
+
+    // Check user preference from localStorage or OS reduced motion
+    var userPrefDisabled = localStorage.getItem('hermon_snow_disabled') === '1';
+    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Intensity & speed from canvas data attributes
+    var intensity = snowCanvas.dataset.intensity || 'medium';
+    var speedSetting = snowCanvas.dataset.speed || 'gentle';
+    var isMobile = window.innerWidth < 768;
+
+    var maxParticles = 32;
+    if (intensity === 'light') maxParticles = 16;
+    else if (intensity === 'heavy') maxParticles = 55;
+
+    // Mobile performance mode
+    if (isMobile && snowCanvas.dataset.mobilePerf === 'true') {
+      maxParticles = Math.max(10, Math.floor(maxParticles * 0.55));
+    }
+
+    var speedMultiplier = 1;
+    if (speedSetting === 'gentle') speedMultiplier = 0.65;
+    else if (speedSetting === 'fast') speedMultiplier = 1.4;
+
+    function resizeCanvas() {
+      snowCanvas.width = window.innerWidth;
+      snowCanvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function createParticle() {
+      return {
+        x: Math.random() * snowCanvas.width,
+        y: Math.random() * -snowCanvas.height,
+        r: Math.random() * 2.8 + 1,
+        d: Math.random() * maxParticles,
+        speedY: (Math.random() * 1.2 + 0.6) * speedMultiplier,
+        speedX: (Math.random() * 0.8 - 0.4) * speedMultiplier,
+        opacity: Math.random() * 0.55 + 0.4,
+        swayAngle: Math.random() * Math.PI * 2,
+        swaySpeed: Math.random() * 0.02 + 0.01
+      };
+    }
+
+    // Init particles
+    for (var i = 0; i < maxParticles; i++) {
+      var p = createParticle();
+      p.y = Math.random() * snowCanvas.height; // scatter initially
+      particles.push(p);
+    }
+
+    function renderSnow() {
+      if (!isRunning) return;
+      ctx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+
+      ctx.fillStyle = '#FFFFFF';
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.swayAngle += p.swaySpeed;
+        p.y += p.speedY;
+        p.x += Math.sin(p.swayAngle) * 0.6 + p.speedX;
+
+        // Wrap around
+        if (p.y > snowCanvas.height) {
+          particles[i] = createParticle();
+          particles[i].y = -10;
+        }
+        if (p.x > snowCanvas.width + 10) p.x = -10;
+        else if (p.x < -10) p.x = snowCanvas.width + 10;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, false);
+        ctx.globalAlpha = p.opacity;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      animFrameId = requestAnimationFrame(renderSnow);
+    }
+
+    function startSnow() {
+      if (isRunning) return;
+      isRunning = true;
+      renderSnow();
+      if (snowToggle) {
+        snowToggle.classList.remove('is-paused');
+        var textSpan = snowToggle.querySelector('.an-snow-toggle__text');
+        if (textSpan) textSpan.textContent = 'Salju: Nyala';
+      }
+    }
+
+    function pauseSnow() {
+      isRunning = false;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      ctx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+      if (snowToggle) {
+        snowToggle.classList.add('is-paused');
+        var textSpan = snowToggle.querySelector('.an-snow-toggle__text');
+        if (textSpan) textSpan.textContent = 'Salju: Mati';
+      }
+    }
+
+    // Tab visibility change (battery saver)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+      } else {
+        if (isRunning) renderSnow();
+      }
+    });
+
+    // Toggle button handler
+    if (snowToggle) {
+      snowToggle.addEventListener('click', function() {
+        if (isRunning) {
+          pauseSnow();
+          localStorage.setItem('hermon_snow_disabled', '1');
+        } else {
+          startSnow();
+          localStorage.removeItem('hermon_snow_disabled');
+        }
+      });
+    }
+
+    // Auto start or respect preference
+    if (userPrefDisabled || prefersReduced) {
+      pauseSnow();
+    } else {
+      startSnow();
+    }
+  }
+
+  // ---- 2. LIVE CHRISTMAS COUNTDOWN (Hero Widget) ----
+  var cdHero = document.getElementById('anCountdownHero');
+  if (cdHero) {
+    var targetDateStr = cdHero.dataset.targetDate;
+    if (targetDateStr) {
+      var targetTime = new Date(targetDateStr).getTime();
+      var daysEl = document.getElementById('anHeroCdDays');
+      var hoursEl = document.getElementById('anHeroCdHours');
+      var minsEl = document.getElementById('anHeroCdMins');
+      var secsEl = document.getElementById('anHeroCdSecs');
+      var gridEl = document.getElementById('anHeroCdGrid');
+      var msgEl = document.getElementById('anHeroCdCompleted');
+
+      function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+      function updateHeroCountdown() {
+        var diff = targetTime - Date.now();
+        if (diff <= 0) {
+          if (gridEl) gridEl.style.display = 'none';
+          if (msgEl) msgEl.style.display = 'block';
+          return;
+        }
+
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+
+        if (daysEl) daysEl.textContent = pad2(d);
+        if (hoursEl) hoursEl.textContent = pad2(h);
+        if (minsEl) minsEl.textContent = pad2(m);
+        if (secsEl) secsEl.textContent = pad2(s);
+      }
+
+      updateHeroCountdown();
+      setInterval(updateHeroCountdown, 1000);
+    }
+  }
 }

@@ -137,6 +137,13 @@
     </div>
     <ul class="sidebar-nav">
       <li><a href="/admin?tab=beranda" class="<%= tab === 'beranda' ? 'active' : '' %>"><span class="emoji">🏠</span> Beranda</a></li>
+      <li>
+        <a href="/admin?tab=adven-natal" class="<%= tab === 'adven-natal' ? 'active' : '' %>" style="position:relative; <%= tab === 'adven-natal' ? 'background:linear-gradient(90deg, rgba(185,28,28,0.22), rgba(200,169,81,0.22)); border-left-color:#E11D48; color:#fff;' : 'border-left-color:transparent;' %>">
+          <span class="emoji" style="font-size:1.15rem; filter:drop-shadow(0 0 4px rgba(200,169,81,0.6));">🎄</span>
+          <span style="font-weight:700; letter-spacing:0.4px;">ADVEN & NATAL</span>
+          <span style="margin-left:auto; font-size:0.58rem; background:linear-gradient(135deg, #B91C1C, #E11D48); color:#fff; padding:2px 6px; border-radius:6px; font-weight:700; box-shadow:0 0 8px rgba(225,29,72,0.4);">SPECIAL</span>
+        </a>
+      </li>
       <li><a href="/admin?tab=visit" class="<%= tab === 'visit' ? 'active' : '' %>"><span class="emoji">🆕</span> Baru di Sini?</a></li>
       <li><a href="/admin?tab=about" class="<%= tab === 'about' ? 'active' : '' %>"><span class="emoji">⛪</span> Tentang Gereja</a></li>
       <li><a href="/admin?tab=pelayanan" class="<%= tab === 'pelayanan' ? 'active' : '' %>"><span class="emoji">📋</span> Pelayanan</a></li>
@@ -164,6 +171,7 @@
     <div class="topbar">
       <h1>
         <% if (tab === 'beranda') { %>🏠 Kelola Beranda
+        <% } else if (tab === 'adven-natal') { %>🎄 Modul Khusus Adven & Natal Premium
         <% } else if (tab === 'visit') { %>🆕 Kelola Baru di Sini?
         <% } else if (tab === 'about') { %>⛪ Kelola Tentang Gereja
         <% } else if (tab === 'pelayanan') { %>📋 Kelola Pelayanan
@@ -1974,6 +1982,569 @@
       </div>
 
     </div>
+      <!-- ============================== TAB: ADVEN & NATAL PREMIUM ============================== -->
+      <div class="tab-content <%= tab === 'adven-natal' ? 'active' : '' %>">
+        <%
+          var an = (db && db.advenNatal) ? db.advenNatal : {};
+          var anTheme = an.theme || {};
+          var anCountdown = an.countdown || {};
+          var anAnim = an.animation || {};
+
+          // Calculate Live Status
+          var isLiveActive = false;
+          var now = new Date();
+          var startD = anTheme.startDate ? new Date(anTheme.startDate) : null;
+          var endD = anTheme.endDate ? new Date(anTheme.endDate) : null;
+          if (anTheme.activeMode === 'manual_on') {
+            isLiveActive = true;
+          } else if (anTheme.activeMode === 'auto') {
+            isLiveActive = (!startD || now >= startD) && (!endD || now <= endD) && anTheme.enabled !== false;
+          }
+
+          // Format Dates for Summary
+          var periodStatus = 'Nonaktif';
+          var periodBadge = '#EF4444';
+          if (anTheme.activeMode === 'manual_on') {
+            periodStatus = 'Aktif Manual (Paksa Aktif)';
+            periodBadge = '#10B981';
+          } else if (anTheme.activeMode === 'auto') {
+            if (startD && now < startD) {
+              var daysToStart = Math.ceil((startD - now) / (1000 * 60 * 60 * 24));
+              periodStatus = 'Akan Datang (' + daysToStart + ' hari lagi)';
+              periodBadge = '#F59E0B';
+            } else if (endD && now > endD) {
+              periodStatus = 'Telah Berakhir';
+              periodBadge = '#6B7280';
+            } else {
+              periodStatus = 'Sedang Berjalan (Aktif)';
+              periodBadge = '#10B981';
+            }
+          }
+
+          // Target Christmas Date Display
+          var targetDateDisplay = '25 Des 2026, 09:00 WIB';
+          if (anCountdown.targetDate) {
+            try {
+              var td = new Date(anCountdown.targetDate);
+              targetDateDisplay = td.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' +
+                td.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            } catch(e) {}
+          }
+        %>
+
+        <!-- 1. Header Banner & Quick Action Card -->
+        <div class="card" style="background: linear-gradient(135deg, #0F172A 0%, #1B2A4A 60%, #1E1B4B 100%); color: #fff; border: 1.5px solid rgba(200, 169, 81, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.18); border-radius: 14px; margin-bottom: 1.5rem; position: relative; overflow: hidden;">
+          <!-- Ornamental background garland glow -->
+          <div style="position:absolute; top:-40px; right:-40px; width:220px; height:220px; background:radial-gradient(circle, rgba(200,169,81,0.18) 0%, transparent 70%); border-radius:50%; pointer-events:none;"></div>
+          <div style="position:absolute; bottom:-30px; left:20%; width:160px; height:160px; background:radial-gradient(circle, rgba(225,29,72,0.15) 0%, transparent 70%); border-radius:50%; pointer-events:none;"></div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; position:relative; z-index:1;">
+            <div style="max-width:680px;">
+              <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(200,169,81,0.18); border:1px solid rgba(200,169,81,0.4); padding:4px 12px; border-radius:20px; font-size:0.75rem; color:#E8D5A0; margin-bottom:10px; font-weight:600;">
+                <span>✨ SPECIAL HOLIDAY EDITION</span>
+                <span>•</span>
+                <span>GEREJA AMIN HERMON</span>
+              </div>
+              <h2 style="font-size:1.45rem; font-weight:700; color:#fff; margin-bottom:6px; display:flex; align-items:center; gap:10px;">
+                <span>🎄 Modul Khusus Adven & Natal Premium</span>
+              </h2>
+              <p style="font-size:0.88rem; color:rgba(255,255,255,0.8); line-height:1.5; margin:0;">
+                Hadirkan suasana masa Adven yang kudus dan sukacita perayaan Natal yang agung pada website Gereja AMIN Hermon. Seluruh elemen tema, countdown, dan animasi dapat dikelola secara instan tanpa menyentuh kode program.
+              </p>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px; min-width:200px;">
+              <form action="/admin/adven-natal/toggle-quick" method="POST" style="margin:0;">
+                <button type="submit" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700; padding:10px 16px; border-radius:8px; font-size:0.85rem; <%= isLiveActive ? 'background:#EF4444; color:#fff; border:none;' : 'background:linear-gradient(135deg, #10B981, #059669); color:#fff; border:none;' %> box-shadow:0 4px 12px <%= isLiveActive ? 'rgba(239,68,68,0.35)' : 'rgba(16,185,129,0.35)' %>;">
+                  <span><%= isLiveActive ? '⏹️ Nonaktifkan Tema' : '▶️ Aktifkan Sekarang (Manual)' %></span>
+                </button>
+              </form>
+              <a href="/" target="_blank" class="btn btn--outline" style="text-align:center; color:#E8D5A0; border-color:rgba(200,169,81,0.5); font-size:0.8rem; padding:8px 14px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px;">
+                <span>🌐 Pratinjau Website Publik</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. DASHBOARD RINGKASAN MODUL (Summary Dashboard) -->
+        <div style="margin-bottom:1.5rem;">
+          <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin-bottom:0.8rem; display:flex; align-items:center; gap:8px;">
+            <span>📊 Ringkasan Status Modul Adven & Natal</span>
+            <span style="font-size:0.75rem; font-weight:500; color:var(--text-muted);">(Real-time Overview)</span>
+          </h3>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+            <!-- Summary 1: Status Aktivasi -->
+            <div style="background:#fff; border:1px solid <%= isLiveActive ? '#A7F3D0' : '#FECACA' %>; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid <%= isLiveActive ? '#10B981' : '#EF4444' %>;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <span style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Status Aktivasi</span>
+                <span style="font-size:1.3rem;"><%= isLiveActive ? '🟢' : '🔴' %></span>
+              </div>
+              <div style="font-size:1.2rem; font-weight:700; color:var(--navy); margin-bottom:4px;">
+                <%= isLiveActive ? 'SEDANG AKTIF' : 'NONAKTIF' %>
+              </div>
+              <div style="font-size:0.78rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+                <span>Mode:</span>
+                <strong style="color:<%= anTheme.activeMode === 'manual_on' ? '#10B981' : (anTheme.activeMode === 'auto' ? '#3B82F6' : '#EF4444') %>">
+                  <%= anTheme.activeMode === 'manual_on' ? 'Manual (Paksa Aktif)' : (anTheme.activeMode === 'auto' ? 'Otomatis by Kalender' : 'Dimatikan') %>
+                </strong>
+              </div>
+            </div>
+
+            <!-- Summary 2: Periode Tema -->
+            <div style="background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid #3B82F6;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <span style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Periode Tema</span>
+                <span style="font-size:1.3rem;">📅</span>
+              </div>
+              <div style="font-size:0.92rem; font-weight:700; color:var(--navy); margin-bottom:4px; line-height:1.3;">
+                <%= anTheme.startDate ? anTheme.startDate.substring(0,10) : '2026-11-29' %> s/d <%= anTheme.endDate ? anTheme.endDate.substring(0,10) : '2027-01-06' %>
+              </div>
+              <div style="font-size:0.78rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+                <span>Status:</span>
+                <span style="background:<%= periodBadge %>; color:#fff; padding:1px 8px; border-radius:10px; font-weight:600; font-size:0.72rem;"><%= periodStatus %></span>
+              </div>
+            </div>
+
+            <!-- Summary 3: Tanggal & Countdown Natal -->
+            <div style="background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid var(--gold);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <span style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Countdown Natal</span>
+                <span style="font-size:1.3rem;">⏱️</span>
+              </div>
+              <div style="font-size:0.95rem; font-weight:700; color:var(--navy); margin-bottom:4px;">
+                <%= targetDateDisplay %>
+              </div>
+              <div style="font-size:0.78rem; color:#B45309; font-weight:600; id='anLiveTickerSummary'">
+                <span id="anAdminSummaryCountdown">Menghitung...</span>
+              </div>
+            </div>
+
+            <!-- Summary 4: Konfigurasi Animasi -->
+            <div style="background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid #8B5CF6;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <span style="font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Konfigurasi Animasi</span>
+                <span style="font-size:1.3rem;">❄️</span>
+              </div>
+              <div style="font-size:0.85rem; font-weight:600; color:var(--navy); margin-bottom:4px; display:flex; gap:6px; flex-wrap:wrap;">
+                <span style="background:<%= anAnim.snowEnabled ? '#D1FAE5' : '#F3F4F6' %>; color:<%= anAnim.snowEnabled ? '#065F46' : '#6B7280' %>; padding:2px 8px; border-radius:6px; font-size:0.75rem;">Salju: <%= anAnim.snowEnabled ? 'Aktif (' + (anAnim.snowIntensity || 'medium') + ')' : 'Mati' %></span>
+                <span style="background:<%= anAnim.fairyLightsEnabled ? '#FEF3C7' : '#F3F4F6' %>; color:<%= anAnim.fairyLightsEnabled ? '#92400E' : '#6B7280' %>; padding:2px 8px; border-radius:6px; font-size:0.75rem;">Lampu: <%= anAnim.fairyLightsEnabled ? 'Aktif' : 'Mati' %></span>
+              </div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">
+                Kontrol Pengunjung: <strong><%= anAnim.userControlToggle ? 'Tersedia (❄️)' : 'Disembunyikan' %></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. TIGA MENU UTAMA PENGELOLAAN (Sub-Tabs) -->
+        <div style="margin-bottom:1.5rem;">
+          <div style="display:flex; gap:8px; border-bottom:2px solid #E5E7EB; padding-bottom:8px; flex-wrap:wrap;">
+            <button type="button" class="an-subtab-btn active" onclick="switchAnSubtab('theme', this)" style="padding:10px 18px; border-radius:8px 8px 0 0; border:none; cursor:pointer; font-weight:700; font-size:0.88rem; display:flex; align-items:center; gap:8px; background:#1B2A4A; color:#C8A951; transition:all 0.2s;">
+              <span>🎨 1. Pengaturan Tema Website</span>
+            </button>
+            <button type="button" class="an-subtab-btn" onclick="switchAnSubtab('countdown', this)" style="padding:10px 18px; border-radius:8px 8px 0 0; border:none; cursor:pointer; font-weight:600; font-size:0.88rem; display:flex; align-items:center; gap:8px; background:#F3F4F6; color:#4B5563; transition:all 0.2s;">
+              <span>⏱️ 2. Countdown Natal</span>
+            </button>
+            <button type="button" class="an-subtab-btn" onclick="switchAnSubtab('animation', this)" style="padding:10px 18px; border-radius:8px 8px 0 0; border:none; cursor:pointer; font-weight:600; font-size:0.88rem; display:flex; align-items:center; gap:8px; background:#F3F4F6; color:#4B5563; transition:all 0.2s;">
+              <span>✨ 3. Animasi Natal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== SUBTAB 1: PENGATURAN TEMA WEBSITE ==================== -->
+        <div id="anSubtab_theme" class="an-subtab-content">
+          <div class="card" style="border-left:4px solid #C8A951;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h2 class="card-title" style="margin:0;">🎨 Pengaturan Tema Adven & Natal Website</h2>
+                <span style="font-size:0.82rem; color:var(--text-muted);">Atur mode aktivasi, periode kalender, nuansa warna liturgis, serta banner ucapan beranda.</span>
+              </div>
+            </div>
+
+            <form action="/admin/adven-natal/theme" method="POST">
+              <!-- Mode Aktivasi Radio Cards -->
+              <div class="form-group" style="margin-bottom:1.5rem;">
+                <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin-bottom:8px; display:block;">Pilih Mode Aktivasi Tema:</label>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+                  <!-- Option 1: Auto -->
+                  <label style="border:2px solid <%= anTheme.activeMode === 'auto' ? '#3B82F6' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'auto' ? '#EFF6FF' : '#fff' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
+                    <input type="radio" name="activeMode" value="auto" <%= anTheme.activeMode === 'auto' ? 'checked' : '' %> style="margin-top:3px;">
+                    <div>
+                      <strong style="color:#1E40AF; display:block; font-size:0.9rem;">📅 Otomatis Sesuai Tanggal (Rekomendasi)</strong>
+                      <span style="font-size:0.78rem; color:#4B5563; line-height:1.4; display:block; margin-top:2px;">Tema otomatis aktif saat tanggal mencapai rentang periode di bawah, dan otomatis kembali normal saat periode berakhir.</span>
+                    </div>
+                  </label>
+
+                  <!-- Option 2: Manual ON -->
+                  <label style="border:2px solid <%= anTheme.activeMode === 'manual_on' ? '#10B981' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'manual_on' ? '#ECFDF5' : '#fff' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
+                    <input type="radio" name="activeMode" value="manual_on" <%= anTheme.activeMode === 'manual_on' ? 'checked' : '' %> style="margin-top:3px;">
+                    <div>
+                      <strong style="color:#065F46; display:block; font-size:0.9rem;">▶️ Manual Aktif Selalu (Paksa Aktif)</strong>
+                      <span style="font-size:0.78rem; color:#4B5563; line-height:1.4; display:block; margin-top:2px;">Tema Adven & Natal langsung aktif di website saat ini juga tanpa menunggu jadwal kalender (bagus untuk testing atau peluncuran awal).</span>
+                    </div>
+                  </label>
+
+                  <!-- Option 3: OFF -->
+                  <label style="border:2px solid <%= anTheme.activeMode === 'off' ? '#EF4444' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'off' ? '#FEF2F2' : '#fff' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
+                    <input type="radio" name="activeMode" value="off" <%= anTheme.activeMode === 'off' ? 'checked' : '' %> style="margin-top:3px;">
+                    <div>
+                      <strong style="color:#991B1B; display:block; font-size:0.9rem;">⏹️ Nonaktifkan Seluruh Tema</strong>
+                      <span style="font-size:0.78rem; color:#4B5563; line-height:1.4; display:block; margin-top:2px;">Matikan seluruh elemen visual Adven & Natal. Website tampil dengan desain standar seperti biasa.</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Rentang Tanggal Periode -->
+              <div class="grid-2" style="background:#F9FAFB; padding:14px; border-radius:10px; border:1px solid #E5E7EB; margin-bottom:1.5rem;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-weight:600; font-size:0.85rem;">Tanggal Mulai Periode</label>
+                  <input type="datetime-local" name="startDate" value="<%= anTheme.startDate ? anTheme.startDate.substring(0, 16) : '2026-11-29T00:00' %>" required style="width:100%;">
+                  <span class="help-text">Misal awal Masa Adven (Minggu ke-1 Adven: akhir November).</span>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-weight:600; font-size:0.85rem;">Tanggal Selesai Periode</label>
+                  <input type="datetime-local" name="endDate" value="<%= anTheme.endDate ? anTheme.endDate.substring(0, 16) : '2027-01-06T23:59' %>" required style="width:100%;">
+                  <span class="help-text">Misal hingga Hari Epifani / awal Januari tahun baru.</span>
+                </div>
+              </div>
+
+              <!-- Pilihan Nuansa Visual & Preset -->
+              <div class="form-group" style="margin-bottom:1.5rem;">
+                <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin-bottom:8px; display:block;">Pilihan Nuansa Warna Liturgis:</label>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                  <!-- Preset 1: Natal Klasik -->
+                  <label style="border:2px solid <%= (anTheme.preset === 'natal-klasik' || !anTheme.preset) ? '#D9B66F' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:<%= (anTheme.preset === 'natal-klasik' || !anTheme.preset) ? '#FFFBEB' : '#fff' %>; display:flex; gap:10px;">
+                    <input type="radio" name="preset" value="natal-klasik" <%= (anTheme.preset === 'natal-klasik' || !anTheme.preset) ? 'checked' : '' %>>
+                    <div>
+                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+                        <span style="width:14px; height:14px; border-radius:50%; background:#B91C1C; display:inline-block;"></span>
+                        <span style="width:14px; height:14px; border-radius:50%; background:#047857; display:inline-block;"></span>
+                        <span style="width:14px; height:14px; border-radius:50%; background:#D9B66F; display:inline-block;"></span>
+                        <strong style="font-size:0.85rem; color:#92400E;">🔴 Natal Klasik</strong>
+                      </div>
+                      <span style="font-size:0.75rem; color:#4B5563;">Merah crimson, hijau cemara, dan kilau emas tradisional.</span>
+                    </div>
+                  </label>
+
+                  <!-- Preset 2: Adven Suci -->
+                  <label style="border:2px solid <%= anTheme.preset === 'adven-suci' ? '#A855F7' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:<%= anTheme.preset === 'adven-suci' ? '#FAF5FF' : '#fff' %>; display:flex; gap:10px;">
+                    <input type="radio" name="preset" value="adven-suci" <%= anTheme.preset === 'adven-suci' ? 'checked' : '' %>>
+                    <div>
+                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+                        <span style="width:14px; height:14px; border-radius:50%; background:#6B21A8; display:inline-block;"></span>
+                        <span style="width:14px; height:14px; border-radius:50%; background:#D9B66F; display:inline-block;"></span>
+                        <span style="width:14px; height:14px; border-radius:50%; background:#F3E8FF; display:inline-block;"></span>
+                        <strong style="font-size:0.85rem; color:#6B21A8;">🟣 Adven Suci (Liturgis)</strong>
+                      </div>
+                      <span style="font-size:0.75rem; color:#4B5563;">Ungu liturgis dan emas hangat simbol perenungan dan pengharapan.</span>
+                    </div>
+                  </label>
+
+                  <!-- Preset 3: Malam Kudus -->
+                  <label style="border:2px solid <%= anTheme.preset === 'malam-kudus' ? '#0284C7' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:<%= anTheme.preset === 'malam-kudus' ? '#F0F9FF' : '#fff' %>; display:flex; gap:10px;">
+                    <input type="radio" name="preset" value="malam-kudus" <%= anTheme.preset === 'malam-kudus' ? 'checked' : '' %>>
+                    <div>
+                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+                        <span style="width:14px; height:14px; border-radius:50%; background:#0F172A; display:inline-block;"></span>
+                        <span style="width:14px; height:14px; border-radius:50%; background:#E2E8F0; display:inline-block;"></span>
+                        <span style="width:14px; height:14px; border-radius:50%; background:#F59E0B; display:inline-block;"></span>
+                        <strong style="font-size:0.85rem; color:#0369A1;">🌌 Malam Kudus</strong>
+                      </div>
+                      <span style="font-size:0.75rem; color:#4B5563;">Midnight navy berpadu sinar bintang perak dan kehangatan malam Natal.</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Pilihan Minggu Adven & Lilin -->
+              <div class="form-group" style="margin-bottom:1.5rem;">
+                <label style="font-weight:600; font-size:0.85rem;">Pilihan Lilin Adven & Liturgi Aktif:</label>
+                <select name="liturgiWeek" class="form-select" style="width:100%; padding:8px 12px; border:1px solid #D1D5DB; border-radius:8px;">
+                  <option value="adven-1" <%= anTheme.liturgiWeek === 'adven-1' ? 'selected' : '' %>>🕯️ Minggu Adven I — Lilin Nubuat / Pengharapan (Ungu)</option>
+                  <option value="adven-2" <%= anTheme.liturgiWeek === 'adven-2' ? 'selected' : '' %>>🕯️🕯️ Minggu Adven II — Lilin Betlehem / Perdamaian (Ungu)</option>
+                  <option value="adven-3" <%= anTheme.liturgiWeek === 'adven-3' ? 'selected' : '' %>>🕯️🕯️🕯️ Minggu Adven III — Lilin Gembala / Sukacita / Gaudete (Merah Muda)</option>
+                  <option value="adven-4" <%= anTheme.liturgiWeek === 'adven-4' ? 'selected' : '' %>>🕯️🕯️🕯️🕯️ Minggu Adven IV — Lilin Malaikat / Kasih (Ungu)</option>
+                  <option value="natal" <%= (anTheme.liturgiWeek === 'natal' || !anTheme.liturgiWeek) ? 'selected' : '' %>>⭐ Perayaan Hari Natal — Lilin Kristus / Terang Dunia (Putih & Emas)</option>
+                </select>
+                <span class="help-text">Pilihan lilin akan tampil pada ornamen liturgi sudut halaman.</span>
+              </div>
+
+              <!-- Dekorasi Tampilan Website -->
+              <div style="border-top:1px solid #E5E7EB; padding-top:1.2rem; margin-bottom:1.5rem;">
+                <h4 style="font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:12px;">Dekorasi Sambutan di Beranda:</h4>
+
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" name="showBanner" <%= anTheme.showBanner ? 'checked' : '' %> style="width:17px; height:17px;">
+                    <strong style="font-size:0.85rem;">Tampilkan Banner Sambutan Adven & Natal di Bagian Atas Beranda</strong>
+                  </label>
+                </div>
+
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label class="form-label" style="font-size:0.82rem;">Judul Banner Sambutan</label>
+                  <input type="text" name="bannerText" value="<%= anTheme.bannerText || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %>" class="form-input" placeholder="Selamat Menyambut Masa Adven & Hari Natal 2026">
+                </div>
+
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label class="form-label" style="font-size:0.82rem;">Ayat Alkitab / Renungan Sambutan</label>
+                  <textarea name="bannerSubtext" rows="2" class="form-input" placeholder="Kutipan ayat Yesaya 9:5 atau Lukas 2:14..."><%= anTheme.bannerSubtext || 'Sebab seorang anak telah lahir untuk kita, seorang putera telah diberikan untuk kita; lambang pemerintahan ada di atas bahunya. (Yesaya 9:5)' %></textarea>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#F9FAFB; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
+                    <input type="checkbox" name="showGarland" <%= anTheme.showGarland ? 'checked' : '' %> style="width:16px; height:16px;">
+                    <span style="font-size:0.82rem;"><strong>🌿 Garland Natal di Navbar</strong><br><small style="color:var(--text-muted);">Hiasan daun cemara di header</small></span>
+                  </label>
+
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#F9FAFB; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
+                    <input type="checkbox" name="showLiturgiBadge" <%= anTheme.showLiturgiBadge ? 'checked' : '' %> style="width:16px; height:16px;">
+                    <span style="font-size:0.82rem;"><strong>🕯️ Badge Lilin Liturgi Sudut</strong><br><small style="color:var(--text-muted);">Menampilkan lilin mingguan Adven</small></span>
+                  </label>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px;">
+                <button type="submit" class="btn btn--gold" style="font-weight:700; padding:10px 24px;">💾 Simpan Pengaturan Tema</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ==================== SUBTAB 2: COUNTDOWN NATAL ==================== -->
+        <div id="anSubtab_countdown" class="an-subtab-content" style="display:none;">
+          <div class="card" style="border-left:4px solid var(--gold);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h2 class="card-title" style="margin:0;">⏱️ Pengaturan Countdown Perayaan Natal</h2>
+                <span style="font-size:0.82rem; color:var(--text-muted);">Kelola waktu hitung mundur menuju Ibadah Natal 25 Desember beserta lokasi dan tombol aksi.</span>
+              </div>
+            </div>
+
+            <form action="/admin/adven-natal/countdown" method="POST">
+              <div class="form-group" style="margin-bottom:1.2rem; background:#EFF6FF; padding:12px; border-radius:8px; border:1px solid #BFDBFE;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" name="enabled" <%= anCountdown.enabled ? 'checked' : '' %> style="width:18px; height:18px;">
+                  <span style="font-size:0.9rem; color:#1E40AF;"><strong>Aktifkan Fitur Hitung Mundur Natal (Live Countdown)</strong></span>
+                </label>
+              </div>
+
+              <div class="grid-2" style="margin-bottom:1rem;">
+                <div class="form-group">
+                  <label class="form-label">Judul Countdown</label>
+                  <input type="text" name="title" value="<%= anCountdown.title || 'Hitung Mundur Ibadah Perayaan Natal 2026' %>" class="form-input" placeholder="Hitung Mundur Ibadah Perayaan Natal 2026" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Target Tanggal & Jam Natal</label>
+                  <input type="datetime-local" name="targetDate" value="<%= anCountdown.targetDate ? anCountdown.targetDate.substring(0, 16) : '2026-12-25T09:00' %>" class="form-input" required>
+                  <span class="help-text">Waktu pelaksanaan ibadah puncak Natal (misal: 25 Des pukul 09:00 WIB).</span>
+                </div>
+              </div>
+
+              <div class="grid-2" style="margin-bottom:1rem;">
+                <div class="form-group">
+                  <label class="form-label">Lokasi Ibadah / Acara</label>
+                  <input type="text" name="location" value="<%= anCountdown.location || 'Gedung Gereja AMIN Jemaat Hermon' %>" class="form-input" placeholder="Gedung Gereja AMIN Jemaat Hermon">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Pesan Ketika Hari H Tiba (Waktu = 0)</label>
+                  <input type="text" name="completionMessage" value="<%= anCountdown.completionMessage || 'Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!' %>" class="form-input" placeholder="Pesan saat countdown mencapai 0">
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:1.2rem;">
+                <label class="form-label">Sub-Teks / Ajakan Singkat</label>
+                <textarea name="subtext" rows="2" class="form-input" placeholder="Mari persiapkan hati menyambut kelahiran Sang Juru Selamat..."><%= anCountdown.subtext || 'Sambutlah Sang Juru Selamat dengan sukacita dan damai sejahtera bersama keluarga jemaat.' %></textarea>
+              </div>
+
+              <div class="grid-2" style="background:#F9FAFB; padding:12px; border-radius:8px; border:1px solid #E5E7EB; margin-bottom:1.2rem;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Teks Tombol Aksi (CTA)</label>
+                  <input type="text" name="ctaText" value="<%= anCountdown.ctaText || 'Lihat Jadwal Ibadah Natal' %>" class="form-input" placeholder="Lihat Jadwal Ibadah Natal">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Link Tombol Aksi</label>
+                  <input type="text" name="ctaLink" value="<%= anCountdown.ctaLink || '/visit' %>" class="form-input" placeholder="/visit atau /about">
+                </div>
+              </div>
+
+              <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:1.5rem;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" name="showHeroCountdown" <%= anCountdown.showHeroCountdown ? 'checked' : '' %> style="width:16px; height:16px;">
+                  <span style="font-size:0.85rem;"><strong>Tampilkan Card Countdown Mewah di Beranda</strong></span>
+                </label>
+
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" name="showFloatingBadge" <%= anCountdown.showFloatingBadge ? 'checked' : '' %> style="width:16px; height:16px;">
+                  <span style="font-size:0.85rem;"><strong>Tampilkan Floating Mini-Pill Countdown di Pojok Layar</strong></span>
+                </label>
+              </div>
+
+              <div style="display:flex; gap:10px;">
+                <button type="submit" class="btn btn--gold" style="font-weight:700; padding:10px 24px;">💾 Simpan Pengaturan Countdown</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ==================== SUBTAB 3: ANIMASI NATAL ==================== -->
+        <div id="anSubtab_animation" class="an-subtab-content" style="display:none;">
+          <div class="card" style="border-left:4px solid #8B5CF6;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h2 class="card-title" style="margin:0;">✨ Pengaturan Animasi & Efek Visual Natal</h2>
+                <span style="font-size:0.82rem; color:var(--text-muted);">Kelola efek hujan salju 60fps, lampu kelap-kelip, kilauan bintang, dan tombol kontrol pengunjung.</span>
+              </div>
+            </div>
+
+            <form action="/admin/adven-natal/animation" method="POST">
+              <!-- Snow Effect Engine Box -->
+              <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:1.2rem; margin-bottom:1.5rem;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                  <input type="checkbox" name="snowEnabled" id="chkSnowEnabled" <%= anAnim.snowEnabled ? 'checked' : '' %> style="width:18px; height:18px;">
+                  <label for="chkSnowEnabled" style="font-size:0.95rem; font-weight:700; color:#166534; cursor:pointer; margin:0;">
+                    ❄️ Aktifkan Efek Hujan Salju Halus (Falling Snow Engine)
+                  </label>
+                </div>
+                <p style="font-size:0.8rem; color:#15803D; margin-bottom:14px; line-height:1.4;">
+                  Menggunakan HTML5 Canvas partikel ultra-ringan dengan kedalaman 3D natural, tidak membebani perangkat, dan otomatis jeda saat tab browser tidak aktif.
+                </p>
+
+                <div class="grid-2">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:600; font-size:0.85rem; color:#166534;">Intensitas / Jumlah Salju</label>
+                    <select name="snowIntensity" class="form-select" style="width:100%; padding:8px 12px; border:1px solid #86EFAC; border-radius:8px;">
+                      <option value="light" <%= anAnim.snowIntensity === 'light' ? 'selected' : '' %>>❄️ Ringan (15 Partikel — Halus & Sangat Hemat Daya)</option>
+                      <option value="medium" <%= (anAnim.snowIntensity === 'medium' || !anAnim.snowIntensity) ? 'selected' : '' %>>❄️❄️ Sedang (32 Partikel — Natural & Menenangkan)</option>
+                      <option value="heavy" <%= anAnim.snowIntensity === 'heavy' ? 'selected' : '' %>>❄️❄️❄️ Lebat (55 Partikel — Semarak Pesta Natal)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:600; font-size:0.85rem; color:#166534;">Kecepatan Jatuh Salju</label>
+                    <select name="snowSpeed" class="form-select" style="width:100%; padding:8px 12px; border:1px solid #86EFAC; border-radius:8px;">
+                      <option value="gentle" <%= (anAnim.snowSpeed === 'gentle' || !anAnim.snowSpeed) ? 'selected' : '' %>>🍃 Lembut & Melayang Tenang (Rekomendasi)</option>
+                      <option value="normal" <%= anAnim.snowSpeed === 'normal' ? 'selected' : '' %>>🌨️ Standar Sejuk</option>
+                      <option value="fast" <%= anAnim.snowSpeed === 'fast' ? 'selected' : '' %>>💨 Cepat & Dinamis</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Other Festive Animations -->
+              <div style="margin-bottom:1.5rem;">
+                <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin-bottom:10px; display:block;">Efek Tambahan:</label>
+
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+                  <label style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
+                    <input type="checkbox" name="fairyLightsEnabled" <%= anAnim.fairyLightsEnabled ? 'checked' : '' %> style="margin-top:3px;">
+                    <div>
+                      <strong style="color:var(--navy); font-size:0.85rem;">💡 Lampu Natal Gantung (Fairy Lights)</strong>
+                      <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:2px;">Deretan lampu warna-warni yang berkedip lembut di bagian paling atas halaman.</span>
+                    </div>
+                  </label>
+
+                  <label style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
+                    <input type="checkbox" name="sparklesEnabled" <%= anAnim.sparklesEnabled ? 'checked' : '' %> style="margin-top:3px;">
+                    <div>
+                      <strong style="color:var(--navy); font-size:0.85rem;">✨ Kilauan Bintang & Cahaya Emas</strong>
+                      <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:2px;">Kilauan partikel cahaya emas lembut pada banner sambutan dan countdown.</span>
+                    </div>
+                  </label>
+
+                  <label style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
+                    <input type="checkbox" name="candleGlowEnabled" <%= anAnim.candleGlowEnabled ? 'checked' : '' %> style="margin-top:3px;">
+                    <div>
+                      <strong style="color:var(--navy); font-size:0.85rem;">🕯️ Cahaya Lilin Berpendar Hangat</strong>
+                      <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:2px;">Efek api lilin liturgi yang bergoyang tenang dengan pendaran keemasan.</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Accessibility & User Control -->
+              <div style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:10px; padding:14px; margin-bottom:1.5rem;">
+                <label style="font-weight:700; font-size:0.88rem; color:var(--navy); margin-bottom:8px; display:block;">♿ Kenyamanan Pengunjung & Kinerja Perangkat:</label>
+
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" name="userControlToggle" <%= anAnim.userControlToggle ? 'checked' : '' %> style="width:16px; height:16px;">
+                    <span style="font-size:0.85rem;"><strong>Sediakan Tombol Kontrol Salju ❄️ di Layar Pengunjung</strong> (Memungkinkan pengunjung mematikan/menyalakan salju sendiri sesuai selera mereka).</span>
+                  </label>
+
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" name="mobilePerformanceMode" <%= anAnim.mobilePerformanceMode ? 'checked' : '' %> style="width:16px; height:16px;">
+                    <span style="font-size:0.85rem;"><strong>Mode Hemat Daya Smartphone (Otomatis)</strong> (Mengurangi 50% partikel di HP dan menonaktifkan salju jika baterai lemah atau low power mode).</span>
+                  </label>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px;">
+                <button type="submit" class="btn btn--gold" style="font-weight:700; padding:10px 24px;">💾 Simpan Pengaturan Animasi</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Client script for tab switching & live admin countdown ticker -->
+        <script>
+          function switchAnSubtab(name, btn) {
+            document.querySelectorAll('.an-subtab-content').forEach(function(el) { el.style.display = 'none'; });
+            document.querySelectorAll('.an-subtab-btn').forEach(function(b) {
+              b.style.background = '#F3F4F6';
+              b.style.color = '#4B5563';
+              b.classList.remove('active');
+            });
+            var target = document.getElementById('anSubtab_' + name);
+            if (target) target.style.display = 'block';
+            if (btn) {
+              btn.style.background = '#1B2A4A';
+              btn.style.color = '#C8A951';
+              btn.classList.add('active');
+            }
+            if (history.replaceState) {
+              history.replaceState(null, null, '/admin?tab=adven-natal&sub=' + name);
+            }
+          }
+
+          // Read sub-tab from query or hash
+          (function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var sub = urlParams.get('sub');
+            if (sub && document.getElementById('anSubtab_' + sub)) {
+              var btns = document.querySelectorAll('.an-subtab-btn');
+              if (sub === 'theme' && btns[0]) switchAnSubtab('theme', btns[0]);
+              else if (sub === 'countdown' && btns[1]) switchAnSubtab('countdown', btns[1]);
+              else if (sub === 'animation' && btns[2]) switchAnSubtab('animation', btns[2]);
+            }
+
+            // Live Christmas Countdown Ticker in Admin Summary
+            var targetTime = <%= anCountdown.targetDate ? new Date(anCountdown.targetDate).getTime() : new Date('2026-12-25T09:00:00+07:00').getTime() %>;
+            var summaryEl = document.getElementById('anAdminSummaryCountdown');
+
+            function updateAdminTicker() {
+              if (!summaryEl) return;
+              var diff = targetTime - Date.now();
+              if (diff <= 0) {
+                summaryEl.textContent = '🎉 Selamat Hari Natal!';
+                summaryEl.style.color = '#10B981';
+                return;
+              }
+              var d = Math.floor(diff / 86400000);
+              var h = Math.floor((diff % 86400000) / 3600000);
+              var m = Math.floor((diff % 3600000) / 60000);
+              var s = Math.floor((diff % 60000) / 1000);
+              summaryEl.textContent = d + ' Hari ' + h + ' Jam ' + m + ' Mnt ' + s + ' Dtk';
+            }
+            updateAdminTicker();
+            setInterval(updateAdminTicker, 1000);
+          })();
+        </script>
+      </div>
+
   </main>
 
   <script>

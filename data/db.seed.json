@@ -737,5 +737,42 @@
       "buttonText": "LIHAT DETAIL KEGIATAN",
       "buttonLink": "/visit"
     }
-  ]
+  ],
+  "advenNatal": {
+    "theme": {
+      "enabled": true,
+      "activeMode": "manual_on",
+      "startDate": "2026-11-29T00:00",
+      "endDate": "2027-01-06T23:59",
+      "preset": "natal-klasik",
+      "liturgiWeek": "natal",
+      "bannerText": "Selamat Menyambut Masa Adven & Hari Natal 2026",
+      "bannerSubtext": "Sebab seorang anak telah lahir untuk kita, seorang putera telah diberikan untuk kita; lambang pemerintahan ada di atas bahunya. (Yesaya 9:5)",
+      "showBanner": true,
+      "showGarland": true,
+      "showLiturgiBadge": true
+    },
+    "countdown": {
+      "enabled": true,
+      "title": "Hitung Mundur Ibadah Perayaan Natal 2026",
+      "targetDate": "2026-12-25T09:00",
+      "location": "Gedung Gereja AMIN Jemaat Hermon",
+      "subtext": "Sambutlah Sang Juru Selamat dengan sukacita dan damai sejahtera",
+      "completionMessage": "Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!",
+      "showHeroCountdown": true,
+      "showFloatingBadge": true,
+      "ctaText": "Lihat Jadwal Ibadah Natal",
+      "ctaLink": "/visit"
+    },
+    "animation": {
+      "snowEnabled": true,
+      "snowIntensity": "medium",
+      "snowSpeed": "gentle",
+      "fairyLightsEnabled": true,
+      "sparklesEnabled": true,
+      "candleGlowEnabled": true,
+      "userControlToggle": true,
+      "mobilePerformanceMode": true
+    }
+  }
 }

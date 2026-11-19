@@ -121,6 +121,21 @@ app.use((req, res, next) => {
     if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
     return '/' + clean.replace(/^\/+/, '');
   };
+
+  res.locals.isAdvenNatalActive = function(an) {
+    if (!an || !an.theme) return false;
+    if (an.theme.activeMode === 'manual_on') return true;
+    if (an.theme.activeMode === 'off') return false;
+    if (an.theme.activeMode === 'auto') {
+      const now = new Date();
+      const start = an.theme.startDate ? new Date(an.theme.startDate) : null;
+      const end = an.theme.endDate ? new Date(an.theme.endDate) : null;
+      if (start && now < start) return false;
+      if (end && now > end) return false;
+      return an.theme.enabled !== false;
+    }
+    return an.theme.enabled === true;
+  };
   next();
 });
 
@@ -474,6 +489,15 @@ function enrichMissingTopLevelKeys(targetDb) {
         targetDb.floatingEvents = JSON.parse(JSON.stringify(seedDb.floatingEvents));
         modified = true;
         console.log('✨ Default floating event banner ditambahkan ke database');
+      }
+    }
+
+    // Ensure advenNatal exists
+    if (!targetDb.advenNatal || typeof targetDb.advenNatal !== 'object') {
+      if (seedDb.advenNatal) {
+        targetDb.advenNatal = JSON.parse(JSON.stringify(seedDb.advenNatal));
+        modified = true;
+        console.log('✨ Modul Adven & Natal ditambahkan ke database');
       }
     }
 
@@ -1439,6 +1463,102 @@ app.post('/admin/floating-event/delete/:id', requireAuth, (req, res) => {
     saveDB(db);
   }
   res.redirect('/admin?tab=beranda&msg=' + encodeURIComponent('Kegiatan floating banner berhasil dihapus!'));
+});
+
+// ===== MODUL KHUSUS ADVEN & NATAL PREMIUM =====
+// Quick Toggle Status
+app.post('/admin/adven-natal/toggle-quick', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.advenNatal || typeof db.advenNatal !== 'object') db.advenNatal = {};
+  if (!db.advenNatal.theme) db.advenNatal.theme = {};
+
+  const currentMode = db.advenNatal.theme.activeMode || 'auto';
+  if (currentMode === 'manual_on') {
+    db.advenNatal.theme.activeMode = 'off';
+    db.advenNatal.theme.enabled = false;
+  } else if (currentMode === 'off') {
+    db.advenNatal.theme.activeMode = 'manual_on';
+    db.advenNatal.theme.enabled = true;
+  } else {
+    db.advenNatal.theme.activeMode = 'manual_on';
+    db.advenNatal.theme.enabled = true;
+  }
+
+  saveDB(db);
+  const statusLabel = db.advenNatal.theme.activeMode === 'manual_on' ? 'Aktif Sekarang (Manual)' : (db.advenNatal.theme.activeMode === 'auto' ? 'Otomatis Sesuai Tanggal' : 'Nonaktif');
+  res.redirect('/admin?tab=adven-natal&msg=' + encodeURIComponent('Status tema Adven & Natal diubah ke: ' + statusLabel));
+});
+
+// Update Pengaturan Tema Website
+app.post('/admin/adven-natal/theme', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.advenNatal || typeof db.advenNatal !== 'object') db.advenNatal = {};
+  if (!db.advenNatal.theme) db.advenNatal.theme = {};
+
+  const activeMode = req.body.activeMode || 'auto';
+  db.advenNatal.theme = {
+    ...db.advenNatal.theme,
+    activeMode: activeMode,
+    enabled: activeMode !== 'off',
+    startDate: (req.body.startDate || '2026-11-29T00:00').trim(),
+    endDate: (req.body.endDate || '2027-01-06T23:59').trim(),
+    preset: req.body.preset || 'natal-klasik',
+    liturgiWeek: req.body.liturgiWeek || 'natal',
+    bannerText: (req.body.bannerText || '').trim(),
+    bannerSubtext: (req.body.bannerSubtext || '').trim(),
+    showBanner: req.body.showBanner === 'on',
+    showGarland: req.body.showGarland === 'on',
+    showLiturgiBadge: req.body.showLiturgiBadge === 'on'
+  };
+
+  saveDB(db);
+  res.redirect('/admin?tab=adven-natal&sub=theme&msg=' + encodeURIComponent('Pengaturan Tema Website Adven & Natal berhasil disimpan!'));
+});
+
+// Update Pengaturan Countdown Natal
+app.post('/admin/adven-natal/countdown', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.advenNatal || typeof db.advenNatal !== 'object') db.advenNatal = {};
+  if (!db.advenNatal.countdown) db.advenNatal.countdown = {};
+
+  db.advenNatal.countdown = {
+    ...db.advenNatal.countdown,
+    enabled: req.body.enabled === 'on',
+    title: (req.body.title || '').trim(),
+    targetDate: (req.body.targetDate || '').trim(),
+    location: (req.body.location || '').trim(),
+    subtext: (req.body.subtext || '').trim(),
+    completionMessage: (req.body.completionMessage || '').trim(),
+    showHeroCountdown: req.body.showHeroCountdown === 'on',
+    showFloatingBadge: req.body.showFloatingBadge === 'on',
+    ctaText: (req.body.ctaText || '').trim(),
+    ctaLink: (req.body.ctaLink || '').trim()
+  };
+
+  saveDB(db);
+  res.redirect('/admin?tab=adven-natal&sub=countdown&msg=' + encodeURIComponent('Pengaturan Countdown Natal berhasil disimpan!'));
+});
+
+// Update Pengaturan Animasi Natal
+app.post('/admin/adven-natal/animation', requireAuth, (req, res) => {
+  const db = getDB();
+  if (!db.advenNatal || typeof db.advenNatal !== 'object') db.advenNatal = {};
+  if (!db.advenNatal.animation) db.advenNatal.animation = {};
+
+  db.advenNatal.animation = {
+    ...db.advenNatal.animation,
+    snowEnabled: req.body.snowEnabled === 'on',
+    snowIntensity: req.body.snowIntensity || 'medium',
+    snowSpeed: req.body.snowSpeed || 'gentle',
+    fairyLightsEnabled: req.body.fairyLightsEnabled === 'on',
+    sparklesEnabled: req.body.sparklesEnabled === 'on',
+    candleGlowEnabled: req.body.candleGlowEnabled === 'on',
+    userControlToggle: req.body.userControlToggle === 'on',
+    mobilePerformanceMode: req.body.mobilePerformanceMode === 'on'
+  };
+
+  saveDB(db);
+  res.redirect('/admin?tab=adven-natal&sub=animation&msg=' + encodeURIComponent('Pengaturan Animasi Natal berhasil disimpan!'));
 });
 
 // Home hero (Image & Video)

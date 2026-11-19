@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="/css/style.min.css?v=64">
+  <link rel="stylesheet" href="/css/style.min.css?v=65">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -111,6 +111,53 @@
     </div>
   </nav>
 
+  <!-- ========== ADVEN & NATAL GREETING BANNER ========== -->
+  <%
+    var isAnActiveHome = false;
+    var anDataHome = (typeof advenNatal !== 'undefined' && advenNatal) ? advenNatal : null;
+    if (anDataHome && anDataHome.theme) {
+      if (typeof isAdvenNatalActive === 'function') {
+        isAnActiveHome = isAdvenNatalActive(anDataHome);
+      } else {
+        if (anDataHome.theme.activeMode === 'manual_on') isAnActiveHome = true;
+        else if (anDataHome.theme.activeMode === 'auto') {
+          var _now = new Date();
+          var _s = anDataHome.theme.startDate ? new Date(anDataHome.theme.startDate) : null;
+          var _e = anDataHome.theme.endDate ? new Date(anDataHome.theme.endDate) : null;
+          isAnActiveHome = (!_s || _now >= _s) && (!_e || _now <= _e) && anDataHome.theme.enabled !== false;
+        }
+      }
+    }
+  %>
+  <% if (isAnActiveHome && anDataHome && anDataHome.theme && anDataHome.theme.showBanner) { %>
+  <div class="an-holiday-banner">
+    <div class="an-holiday-banner__inner">
+      <div class="an-holiday-banner__content">
+        <span class="an-holiday-banner__icon">🎄</span>
+        <div>
+          <h3 class="an-holiday-banner__title"><%= anDataHome.theme.bannerText || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %></h3>
+          <% if (anDataHome.theme.bannerSubtext) { %>
+          <p class="an-holiday-banner__subtext"><%= anDataHome.theme.bannerSubtext %></p>
+          <% } %>
+        </div>
+      </div>
+      <% if (anDataHome.theme.showLiturgiBadge) { %>
+      <div class="an-holiday-banner__badge">
+        <span class="an-liturgi-flame"></span>
+        <span>
+          <% if (anDataHome.theme.liturgiWeek === 'adven-1') { %>Adven I — Harapan
+          <% } else if (anDataHome.theme.liturgiWeek === 'adven-2') { %>Adven II — Perdamaian
+          <% } else if (anDataHome.theme.liturgiWeek === 'adven-3') { %>Adven III — Sukacita
+          <% } else if (anDataHome.theme.liturgiWeek === 'adven-4') { %>Adven IV — Kasih
+          <% } else { %>⭐ Hari Natal — Lilin Kristus
+          <% } %>
+        </span>
+      </div>
+      <% } %>
+    </div>
+  </div>
+  <% } %>
+
   <!-- ========== HERO SECTION (Full Screen) ========== -->
   <section class="hero hero--full" id="hero">
     <div class="hero__bg">
@@ -163,6 +210,61 @@
       </div>
     </div>
   </section>
+
+  <!-- ========== ADVEN & NATAL COUNTDOWN HERO CARD ========== -->
+  <% if (isAnActiveHome && anDataHome && anDataHome.countdown && anDataHome.countdown.enabled && anDataHome.countdown.showHeroCountdown) { %>
+  <section class="section" style="padding: 2.5rem 0 1rem; background: var(--off-white);" data-aos="fade-up">
+    <div class="container">
+      <div class="an-countdown-hero" id="anCountdownHero" data-target-date="<%= anDataHome.countdown.targetDate || '2026-12-25T09:00:00+07:00' %>">
+        <div class="an-countdown-hero__header">
+          <span class="an-countdown-hero__tag">🎄 PERAYAAN NATAL 2026</span>
+          <h3 class="an-countdown-hero__title"><%= anDataHome.countdown.title || 'Hitung Mundur Ibadah Perayaan Natal 2026' %></h3>
+          <% if (anDataHome.countdown.subtext) { %>
+          <p class="an-countdown-hero__subtext"><%= anDataHome.countdown.subtext %></p>
+          <% } %>
+        </div>
+
+        <div class="an-countdown-hero__grid" id="anHeroCdGrid">
+          <div class="an-cd-box">
+            <span class="an-cd-box__num" id="anHeroCdDays">00</span>
+            <span class="an-cd-box__label">Hari</span>
+          </div>
+          <div class="an-cd-box">
+            <span class="an-cd-box__num" id="anHeroCdHours">00</span>
+            <span class="an-cd-box__label">Jam</span>
+          </div>
+          <div class="an-cd-box">
+            <span class="an-cd-box__num" id="anHeroCdMins">00</span>
+            <span class="an-cd-box__label">Menit</span>
+          </div>
+          <div class="an-cd-box">
+            <span class="an-cd-box__num" id="anHeroCdSecs">00</span>
+            <span class="an-cd-box__label">Detik</span>
+          </div>
+        </div>
+
+        <div id="anHeroCdCompleted" style="display:none; text-align:center; padding:15px; font-size:1.2rem; font-weight:700; color:#E8D5A0;">
+          🎉 <%= anDataHome.countdown.completionMessage || 'Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!' %>
+        </div>
+
+        <div class="an-countdown-hero__footer">
+          <% if (anDataHome.countdown.location) { %>
+          <div class="an-countdown-hero__loc">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><%= anDataHome.countdown.location %></span>
+          </div>
+          <% } %>
+
+          <% if (anDataHome.countdown.ctaText && anDataHome.countdown.ctaLink) { %>
+          <a href="<%= anDataHome.countdown.ctaLink %>" class="an-countdown-hero__btn">
+            <%= anDataHome.countdown.ctaText %> →
+          </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </section>
+  <% } %>
 
   <!-- ========== NEWS & EVENTS (Lundev Carousel) ========== -->
   <section class="carousel" id="news">
@@ -362,7 +464,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="/js/main.min.js?v=25" defer></script>
+  <script src="/js/main.min.js?v=26" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
