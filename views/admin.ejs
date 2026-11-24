@@ -1991,11 +1991,9 @@
     var anAnim = an.animation || {};
     var anColors = anTheme.colors || { primary: '#D9B66F', secondary: '#1B2A4A', accent: '#B91C1C', background: '#0F172A', text: '#FFFFFF' };
     var anBanner = anTheme.banner || { enabled: true, image: '/images/hero-1.webp', mobileImage: '', title: 'Selamat Menyambut Masa Adven & Hari Natal 2026', subtitle: 'Sebab seorang anak telah lahir untuk kita, seorang putera telah diberikan untuk kita; lambang pemerintahan ada di atas bahunya. (Yesaya 9:5)', buttonText: 'Lihat Jadwal Ibadah', buttonUrl: '/visit', textAlign: 'center', overlayOpacity: 50 };
-    var anOrnaments = anTheme.ornaments || { stars: true, pine: true, baubles: true, candle: true, snow: true, goldenGlow: true, cornerDecor: true };
+    var anOrnaments = anTheme.ornaments || { pine: true, baubles: true, candle: true, snow: true, cornerDecor: true };
     var anSnow = (anAnim.snow) ? anAnim.snow : { enabled: anAnim.snowEnabled !== false, intensity: anAnim.snowIntensity || 'medium', speed: anAnim.snowSpeed || 'gentle', particleSize: 'medium', particleCount: 60, area: 'full_page' };
-    var anStars = (anAnim.stars) ? anAnim.stars : { enabled: true, intensity: 'medium', color: '#FFDF78', area: 'full_page' };
     var anLights = (anAnim.lights) ? anAnim.lights : { enabled: anAnim.fairyLightsEnabled !== false, speed: 'normal', style: 'garland_top', area: 'header_only' };
-    var anGolden = (anAnim.goldenParticles) ? anAnim.goldenParticles : { enabled: true, intensity: 'medium', opacity: 70, area: 'hero_banner' };
     var anEffects = (anAnim.effects) ? anAnim.effects : { pageTransition: true, softGlow: true, cornerDecor: true };
     var anVisitor = (anAnim.visitorControl) ? anAnim.visitorControl : { enabled: anAnim.userControlToggle !== false, rememberPreference: true, respectReducedMotion: true, mobileOptimization: anAnim.mobilePerformanceMode !== false };
 
@@ -2047,12 +2045,8 @@
     // Count active animations
     var activeAnimCount = 0;
     if (anSnow.enabled) activeAnimCount++;
-    if (anStars.enabled) activeAnimCount++;
     if (anLights.enabled) activeAnimCount++;
-    if (anGolden.enabled) activeAnimCount++;
-    if (anAnim.floatingSnowflakes && anAnim.floatingSnowflakes.enabled) activeAnimCount++;
     if (anAnim.candleGlow && anAnim.candleGlow.enabled) activeAnimCount++;
-    if (anAnim.sparkles && anAnim.sparkles.enabled) activeAnimCount++;
   %>
 
   <!-- ═══════════════ HEADER CARD ═══════════════ -->
@@ -2329,9 +2323,7 @@
       <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
         <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0 0 12px; display:flex; align-items:center; gap:8px;">🎀 Ornamen & Liturgi</h3>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px; margin-bottom:14px;">
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
-            <input type="checkbox" name="ornament_stars" <%= anOrnaments.stars ? 'checked' : '' %>> ⭐ Bintang
-          </label>
+
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
             <input type="checkbox" name="ornament_pine" <%= anOrnaments.pine ? 'checked' : '' %>> 🌲 Garland Pinus
           </label>
@@ -2344,9 +2336,7 @@
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
             <input type="checkbox" name="ornament_snow" <%= anOrnaments.snow ? 'checked' : '' %>> ❄️ Salju
           </label>
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
-            <input type="checkbox" name="ornament_golden_glow" <%= anOrnaments.goldenGlow ? 'checked' : '' %>> ✨ Cahaya Emas
-          </label>
+
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
             <input type="checkbox" name="ornament_corner_decor" <%= anOrnaments.cornerDecor ? 'checked' : '' %>> 🎀 Dekorasi Sudut
           </label>
@@ -2602,35 +2592,6 @@
             </div>
           </div>
 
-          <!-- 2. Twinkling Stars -->
-          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">⭐ Bintang</strong>
-              <input type="checkbox" name="stars_enabled" <%= anStars.enabled ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <div>
-                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Intensitas</label>
-                <select name="stars_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
-                  <option value="low" <%= anStars.intensity === 'low' ? 'selected' : '' %>>Sedikit</option>
-                  <option value="medium" <%= (!anStars.intensity || anStars.intensity === 'medium') ? 'selected' : '' %>>Sedang</option>
-                  <option value="high" <%= anStars.intensity === 'high' ? 'selected' : '' %>>Banyak</option>
-                </select>
-              </div>
-              <div>
-                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Warna</label>
-                <input type="color" name="stars_color" value="<%= anStars.color || '#FFDF78' %>" style="width:100%; height:28px; padding:0; border:1px solid #ccc; border-radius:4px; cursor:pointer;">
-              </div>
-            </div>
-            <div style="margin-top:8px;">
-              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
-              <select name="stars_area" style="width:100%; font-size:0.78rem; padding:4px;">
-                <option value="full_page" <%= (!anStars.area || anStars.area === 'full_page') ? 'selected' : '' %>>Seluruh Halaman</option>
-                <option value="hero_banner" <%= anStars.area === 'hero_banner' ? 'selected' : '' %>>Hero</option>
-              </select>
-            </div>
-          </div>
-
           <!-- 3. Christmas Lights -->
           <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -2663,72 +2624,20 @@
             </div>
           </div>
 
-          <!-- 4. Golden Particles -->
-          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">✨ Partikel Emas</strong>
-              <input type="checkbox" name="golden_particles_enabled" <%= anGolden.enabled ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <div>
-                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Intensitas</label>
-                <select name="golden_particles_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
-                  <option value="low" <%= anGolden.intensity === 'low' ? 'selected' : '' %>>Sedikit</option>
-                  <option value="medium" <%= (!anGolden.intensity || anGolden.intensity === 'medium') ? 'selected' : '' %>>Sedang</option>
-                  <option value="high" <%= anGolden.intensity === 'high' ? 'selected' : '' %>>Padat</option>
-                </select>
-              </div>
-              <div>
-                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Transparansi</label>
-                <input type="range" name="golden_particles_opacity" min="20" max="100" value="<%= anGolden.opacity || 70 %>" style="width:100%;">
-              </div>
-            </div>
-            <div style="margin-top:8px;">
-              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
-              <select name="golden_particles_area" style="width:100%; font-size:0.78rem; padding:4px;">
-                <option value="hero_banner" <%= (!anGolden.area || anGolden.area === 'hero_banner') ? 'selected' : '' %>>Hero Banner</option>
-                <option value="full_page" <%= anGolden.area === 'full_page' ? 'selected' : '' %>>Seluruh Halaman</option>
-              </select>
-            </div>
-          </div>
 
-          <!-- 5. Floating Snowflakes -->
-          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">🌨️ Kepingan Salju</strong>
-              <input type="checkbox" name="floating_snowflakes_enabled" <%= (anAnim.floatingSnowflakes && anAnim.floatingSnowflakes.enabled) ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
-            </div>
-            <p style="font-size:0.72rem; color:#64748B; margin:0 0 8px;">Ornamen salju kristal melayang lembut.</p>
-            <div>
-              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
-              <select name="floating_snowflakes_area" style="width:100%; font-size:0.78rem; padding:4px;">
-                <option value="hero_banner">Banner Natal</option>
-                <option value="full_page">Seluruh Halaman</option>
-              </select>
-            </div>
-          </div>
 
-          <!-- 6. Candle Glow & Sparkles -->
+          <!-- 3. Candle Glow -->
           <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">🕯️ Lilin & Kilauan</strong>
+              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">🕯️ Pendar Lilin</strong>
               <input type="checkbox" name="candle_glow_enabled" <%= (anAnim.candleGlow && anAnim.candleGlow.enabled) ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <div>
-                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Pendar Lilin</label>
-                <select name="candle_glow_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
-                  <option value="gentle">Syahdu</option>
-                  <option value="bright">Terang</option>
-                </select>
-              </div>
-              <div>
-                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Sparkle</label>
-                <label style="display:flex; align-items:center; gap:4px; margin-top:4px; font-size:0.75rem; cursor:pointer;">
-                  <input type="checkbox" name="sparkles_enabled" <%= (anAnim.sparkles && anAnim.sparkles.enabled) ? 'checked' : '' %>>
-                  Aktifkan
-                </label>
-              </div>
+            <div>
+              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Intensitas Pendar</label>
+              <select name="candle_glow_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
+                <option value="gentle" <%= (!anAnim.candleGlow || anAnim.candleGlow.intensity !== 'bright') ? 'selected' : '' %>>Syahdu</option>
+                <option value="bright" <%= (anAnim.candleGlow && anAnim.candleGlow.intensity === 'bright') ? 'selected' : '' %>>Terang</option>
+              </select>
             </div>
           </div>
         </div>

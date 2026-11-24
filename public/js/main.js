@@ -925,11 +925,13 @@ function initAdvenNatal() {
     var ctx = snowCanvas.getContext('2d');
     var particles = [];
     var animFrameId = null;
-    var isRunning = true;
+    var isRunning = false;
 
     // Check user preference from localStorage or OS reduced motion
-    var userPrefDisabled = localStorage.getItem('hermon_snow_disabled') === '1';
-    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var rememberPref = snowCanvas.dataset.rememberPref !== 'false';
+    var respectReduced = snowCanvas.dataset.respectReduced !== 'false';
+    var userPrefDisabled = rememberPref && localStorage.getItem('hermon_snow_disabled') === '1';
+    var prefersReduced = respectReduced && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Intensity & speed from canvas data attributes
     var intensity = snowCanvas.dataset.intensity || 'medium';
@@ -1040,10 +1042,10 @@ function initAdvenNatal() {
       snowToggle.addEventListener('click', function() {
         if (isRunning) {
           pauseSnow();
-          localStorage.setItem('hermon_snow_disabled', '1');
+          if (rememberPref) localStorage.setItem('hermon_snow_disabled', '1');
         } else {
           startSnow();
-          localStorage.removeItem('hermon_snow_disabled');
+          if (rememberPref) localStorage.removeItem('hermon_snow_disabled');
         }
       });
     }

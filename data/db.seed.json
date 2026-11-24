@@ -764,12 +764,12 @@
         "overlayOpacity": 50
       },
       "ornaments": {
-        "stars": true,
+        "stars": false,
         "pine": true,
         "baubles": true,
         "candle": true,
         "snow": true,
-        "goldenGlow": true,
+        "goldenGlow": false,
         "cornerDecor": true
       },
       "liturgiWeek": "natal",
@@ -809,7 +809,7 @@
       "snowIntensity": "medium",
       "snowSpeed": "gentle",
       "fairyLightsEnabled": true,
-      "sparklesEnabled": true,
+      "sparklesEnabled": false,
       "candleGlowEnabled": true,
       "userControlToggle": true,
       "mobilePerformanceMode": true,
@@ -822,7 +822,7 @@
         "area": "full_page"
       },
       "stars": {
-        "enabled": true,
+        "enabled": false,
         "intensity": "medium",
         "color": "#FFDF78",
         "area": "full_page"
@@ -834,13 +834,13 @@
         "area": "header_only"
       },
       "goldenParticles": {
-        "enabled": true,
+        "enabled": false,
         "intensity": "medium",
         "opacity": 70,
         "area": "hero_banner"
       },
       "floatingSnowflakes": {
-        "enabled": true,
+        "enabled": false,
         "area": "hero_banner"
       },
       "candleGlow": {
@@ -848,7 +848,7 @@
         "intensity": "gentle"
       },
       "sparkles": {
-        "enabled": true,
+        "enabled": false,
         "color": "#D9B66F"
       },
       "effects": {

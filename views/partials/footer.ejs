@@ -318,13 +318,18 @@
   <!-- Fairy Lights Garland along the top -->
   <%
     var showLights = false;
+    var lightsSpeed = 'normal';
     if (anData.animation) {
-      if (anData.animation.lights && anData.animation.lights.enabled) showLights = true;
-      else if (anData.animation.fairyLightsEnabled) showLights = true;
+      if (anData.animation.lights && anData.animation.lights.enabled) {
+        showLights = true;
+        lightsSpeed = anData.animation.lights.speed || 'normal';
+      } else if (anData.animation.fairyLightsEnabled) {
+        showLights = true;
+      }
     }
   %>
   <% if (showLights) { %>
-  <div class="an-fairy-lights" aria-hidden="true">
+  <div class="an-fairy-lights an-fairy-lights--<%= lightsSpeed %>" aria-hidden="true">
     <% for (var b = 0; b < 30; b++) { %>
       <% var bulbTypes = ['red', 'gold', 'green', 'blue', 'white']; %>
       <div class="an-bulb an-bulb--<%= bulbTypes[b % 5] %>"></div>
@@ -348,18 +353,25 @@
         snowSpeed = anData.animation.snowSpeed || 'gentle';
       }
     }
-    var mobilePerf = (anData.animation && anData.animation.visitorControl && anData.animation.visitorControl.mobileOptimization !== false) || (anData.animation && anData.animation.mobilePerformanceMode);
+    var visitorCtrl = (anData.animation && anData.animation.visitorControl) ? anData.animation.visitorControl : {};
+    var mobilePerf = (visitorCtrl && typeof visitorCtrl.mobileOptimization !== 'undefined') ? visitorCtrl.mobileOptimization : (anData.animation && anData.animation.mobilePerformanceMode);
+    var rememberPref = (visitorCtrl && typeof visitorCtrl.rememberPreference !== 'undefined') ? visitorCtrl.rememberPreference : true;
+    var respectReduced = (visitorCtrl && typeof visitorCtrl.respectReducedMotion !== 'undefined') ? visitorCtrl.respectReducedMotion : true;
   %>
   <% if (showSnow) { %>
   <canvas id="anSnowCanvas" class="an-snow-canvas"
           data-intensity="<%= snowIntensity %>"
           data-speed="<%= snowSpeed %>"
           data-mobile-perf="<%= mobilePerf ? 'true' : 'false' %>"
+          data-remember-pref="<%= rememberPref ? 'true' : 'false' %>"
+          data-respect-reduced="<%= respectReduced ? 'true' : 'false' %>"
           aria-hidden="true"></canvas>
 
   <!-- Visitor Snow Control Button -->
   <%
-    var showVisitorToggle = (anData.animation && anData.animation.visitorControl && anData.animation.visitorControl.enabled !== false) || (anData.animation && anData.animation.userControlToggle);
+    var showVisitorToggle = (anData.animation && anData.animation.visitorControl)
+      ? (anData.animation.visitorControl.enabled !== false)
+      : (anData.animation && anData.animation.userControlToggle !== false);
   %>
   <% if (showVisitorToggle) { %>
   <button type="button" class="an-snow-toggle" id="anSnowToggle" aria-label="Nyalakan atau matikan animasi salju" title="Klik untuk menyalakan/mematikan salju">

@@ -1562,12 +1562,12 @@ app.post('/admin/adven-natal/theme', requireAuth, upload.fields([
       overlayOpacity: parseInt(req.body.banner_overlay_opacity, 10) || 50
     },
     ornaments: {
-      stars: req.body.ornament_stars === 'on',
+      stars: false,
       pine: req.body.ornament_pine === 'on',
       baubles: req.body.ornament_baubles === 'on',
       candle: req.body.ornament_candle === 'on',
       snow: req.body.ornament_snow === 'on',
-      goldenGlow: req.body.ornament_golden_glow === 'on',
+      goldenGlow: false,
       cornerDecor: req.body.ornament_corner_decor === 'on'
     },
     // Backwards compatibility mappings
@@ -1653,10 +1653,10 @@ app.post('/admin/adven-natal/animation', requireAuth, (req, res) => {
       area: req.body.snow_area || 'full_page'
     },
     stars: {
-      enabled: req.body.stars_enabled === 'on',
-      intensity: req.body.stars_intensity || 'medium',
-      color: (req.body.stars_color || '#FFDF78').trim(),
-      area: req.body.stars_area || 'full_page'
+      enabled: false,
+      intensity: 'medium',
+      color: '#FFDF78',
+      area: 'full_page'
     },
     lights: {
       enabled: req.body.lights_enabled === 'on',
@@ -1665,22 +1665,22 @@ app.post('/admin/adven-natal/animation', requireAuth, (req, res) => {
       area: req.body.lights_area || 'header_only'
     },
     goldenParticles: {
-      enabled: req.body.golden_particles_enabled === 'on',
-      intensity: req.body.golden_particles_intensity || 'medium',
-      opacity: parseInt(req.body.golden_particles_opacity, 10) || 70,
-      area: req.body.golden_particles_area || 'hero_banner'
+      enabled: false,
+      intensity: 'medium',
+      opacity: 70,
+      area: 'hero_banner'
     },
     floatingSnowflakes: {
-      enabled: req.body.floating_snowflakes_enabled === 'on',
-      area: req.body.floating_snowflakes_area || 'hero_banner'
+      enabled: false,
+      area: 'hero_banner'
     },
     candleGlow: {
       enabled: req.body.candle_glow_enabled === 'on',
       intensity: req.body.candle_glow_intensity || 'gentle'
     },
     sparkles: {
-      enabled: req.body.sparkles_enabled === 'on',
-      color: (req.body.sparkles_color || '#D9B66F').trim()
+      enabled: false,
+      color: '#D9B66F'
     },
     effects: {
       pageTransition: req.body.effect_page_transition === 'on',
@@ -1698,7 +1698,7 @@ app.post('/admin/adven-natal/animation', requireAuth, (req, res) => {
     snowIntensity: snowIntensity,
     snowSpeed: req.body.snow_speed || 'gentle',
     fairyLightsEnabled: req.body.lights_enabled === 'on',
-    sparklesEnabled: req.body.sparkles_enabled === 'on',
+    sparklesEnabled: false,
     candleGlowEnabled: req.body.candle_glow_enabled === 'on',
     userControlToggle: req.body.visitor_toggle_enabled === 'on',
     mobilePerformanceMode: req.body.mobile_optimization === 'on'
