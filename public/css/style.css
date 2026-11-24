@@ -14464,7 +14464,7 @@ img, video, iframe {
   left: 0;
   right: 0;
   height: 24px;
-  z-index: 1005;
+  z-index: 998;
   pointer-events: none;
   display: flex;
   justify-content: space-around;
@@ -14562,8 +14562,8 @@ img, video, iframe {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 1001;
-  opacity: 0.95;
+  z-index: 997;
+  opacity: 0.9;
 }
 
 /* ---- 3. Visitor Snow Control Button ---- */
@@ -14571,7 +14571,7 @@ img, video, iframe {
   position: fixed;
   bottom: 24px;
   left: 24px;
-  z-index: 9999;
+  z-index: 1001;
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -14628,7 +14628,7 @@ img, video, iframe {
   color: #fff;
   padding: 12px 20px;
   position: relative;
-  z-index: 1002;
+  z-index: 10;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   background-size: cover;
   background-position: center;
@@ -14920,7 +14920,7 @@ img, video, iframe {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 999;
   background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(12px);
   border-top: 2px solid var(--gold);
@@ -14944,7 +14944,7 @@ img, video, iframe {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 1000;
+  z-index: 999;
   max-width: 320px;
   background: rgba(15, 23, 42, 0.94);
   backdrop-filter: blur(14px);
@@ -14978,7 +14978,7 @@ img, video, iframe {
 .an-corner-decor {
   position: fixed;
   top: 0;
-  z-index: 1004;
+  z-index: 996;
   pointer-events: none;
   opacity: 0.85;
 }
@@ -15014,5 +15014,55 @@ img, video, iframe {
   }
   .an-holiday-banner__content {
     justify-content: center;
+  }
+}
+
+
+/* Snow toggle position when floating banner coexists */
+.an-snow-toggle {
+  transition: bottom 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .an-snow-toggle {
+    bottom: 80px;
+    left: 12px;
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+  .an-countdown-float {
+    bottom: 16px;
+    right: 12px;
+    max-width: 280px;
+    padding: 10px 12px;
+  }
+  .an-countdown-bar__inner {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .an-holiday-banner__title {
+    font-size: 0.9rem;
+  }
+  .an-holiday-banner__badge {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+  .an-countdown-hero__grid {
+    gap: 8px;
+  }
+  .an-cd-box {
+    min-width: 50px;
+    padding: 6px 8px;
+  }
+  .an-cd-box__num {
+    font-size: 1.2rem;
+  }
+  .an-corner-decor svg {
+    width: 40px;
+    height: 40px;
   }
 }

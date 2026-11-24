@@ -378,11 +378,11 @@
         <strong style="font-size:0.85rem; color:#fff;"><%= anData.countdown.title || 'Hitung Mundur Ibadah Natal 2026' %>:</strong>
       </div>
       <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#E8D5A0; font-size:0.95rem;">
-        <span id="anBarDays">00</span>h :
-        <span id="anBarHours">00</span>j :
-        <span id="anBarMins">00</span>m
+        <span id="anBarDays">00</span><small>h</small> :
+        <span id="anBarHours">00</span><small>j</small> :
+        <span id="anBarMins">00</span><small>m</small>
         <% if (anData.countdown.showSeconds !== false) { %>
-        : <span id="anBarSecs">00</span>d
+        : <span id="anBarSecs">00</span><small>d</small>
         <% } %>
       </div>
       <% if (anData.countdown.ctaText && anData.countdown.ctaLink) { %>

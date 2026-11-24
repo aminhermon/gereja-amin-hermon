@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="/css/style.min.css?v=69">
+  <link rel="stylesheet" href="/css/style.min.css?v=70">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -144,7 +144,7 @@
     var bannerTextAlign = hBanner.textAlign || 'center';
   %>
   <% if (showHomeBanner) { %>
-  <div class="an-holiday-banner <%= bannerBgImg ? 'an-holiday-banner--custom-bg' : '' %>" style="<%= bannerBgImg ? ('background-image:url(' + bannerBgImg + '); position:relative;') : '' %>">
+  <div style="margin-top: var(--nav-height);" class="an-holiday-banner <%= bannerBgImg ? 'an-holiday-banner--custom-bg' : '' %>" style="<%= bannerBgImg ? ('background-image:url(' + bannerBgImg + '); position:relative;') : '' %>">
     <% if (bannerBgImg) { %>
     <div class="an-holiday-banner__overlay" style="background: rgba(15, 23, 42, <%= bannerOverlayOpacity %>);"></div>
     <% } %>
@@ -250,7 +250,7 @@
     var cdLabelColor = hCd.labelColor || '#D9B66F';
   %>
   <% if (showHomeCountdown) { %>
-  <section class="section" style="padding: 2.5rem 0 1rem; background: var(--off-white);" data-aos="fade-up">
+  <section class="section" style="padding: 2.5rem 0 1rem; background: linear-gradient(180deg, var(--off-white) 0%, #e8e4dc 100%);" data-aos="fade-up">
     <div class="container">
       <div class="an-countdown-hero an-cd--<%= cdStyle %>" id="anCountdownHero" data-target-date="<%= cdTarget %>" style="--an-cd-num-color: <%= cdNumColor %>; --an-cd-label-color: <%= cdLabelColor %>;">
         <div class="an-countdown-hero__header">
@@ -503,7 +503,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="/js/main.min.js?v=30" defer></script>
+  <script src="/js/main.min.js?v=31" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;

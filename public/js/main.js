@@ -1057,7 +1057,7 @@ function initAdvenNatal() {
   }
 
   // ---- 2. LIVE CHRISTMAS COUNTDOWN (Multi-Position Tickers) ----
-  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+  function pad2(n) { return n < 10 ? '0' + n : String(n); }
 
   // A. Hero Countdown Card
   var cdHero = document.getElementById('anCountdownHero');
@@ -1109,7 +1109,10 @@ function initAdvenNatal() {
 
       function updateBar() {
         var diff = barTarget - Date.now();
-        if (diff <= 0) return;
+        if (diff <= 0) {
+          cdBar.style.display = 'none';
+          return;
+        }
         var d = Math.floor(diff / 86400000);
         var h = Math.floor((diff % 86400000) / 3600000);
         var m = Math.floor((diff % 3600000) / 60000);
@@ -1138,7 +1141,10 @@ function initAdvenNatal() {
 
       function updateFloat() {
         var diff = floatTarget - Date.now();
-        if (diff <= 0) return;
+        if (diff <= 0) {
+          cdFloat.style.display = 'none';
+          return;
+        }
         var d = Math.floor(diff / 86400000);
         var h = Math.floor((diff % 86400000) / 3600000);
         var m = Math.floor((diff % 3600000) / 60000);
