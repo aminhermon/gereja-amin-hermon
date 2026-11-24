@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="/css/style.min.css?v=66">
+  <link rel="stylesheet" href="/css/style.min.css?v=67">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
 <body>
@@ -67,6 +67,8 @@
   <nav class="navbar" id="navbar" aria-label="Main navigation">
     <div class="navbar__inner">
       <a href="/" class="navbar__logo" aria-label="<%= general.churchName %> - Home">
+        <img src="/assets/images/logo-gereja-amin-3d.png?v=10" alt="Logo <%= general.churchName %>" class="navbar__logo-img">
+        <span class="navbar__logo-name"><%= general.churchName %></span>
       </a>
       <div class="navbar__menu" id="nav-menu">
         <a href="/" class="navbar__link active">Beranda</a>
@@ -497,7 +499,7 @@
   <%- include('partials/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="/js/main.min.js?v=27" defer></script>
+  <script src="/js/main.min.js?v=28" defer></script>
   <script>
     // News data for modal
     const newsData = <%- JSON.stringify(home.news || []) %>;
