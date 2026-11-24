@@ -1999,7 +1999,6 @@
     var anEffects = (anAnim.effects) ? anAnim.effects : { pageTransition: true, softGlow: true, cornerDecor: true };
     var anVisitor = (anAnim.visitorControl) ? anAnim.visitorControl : { enabled: anAnim.userControlToggle !== false, rememberPreference: true, respectReducedMotion: true, mobileOptimization: anAnim.mobilePerformanceMode !== false };
 
-    // Calculate Live Status
     var isLiveActive = false;
     var now = new Date();
     var startD = anTheme.startDate ? new Date(anTheme.startDate) : null;
@@ -2010,27 +2009,25 @@
       isLiveActive = (!startD || now >= startD) && (!endD || now <= endD) && anTheme.enabled !== false;
     }
 
-    // Format Dates for Summary
     var periodStatus = 'Nonaktif';
     var periodBadge = '#EF4444';
     if (anTheme.activeMode === 'manual_on') {
-      periodStatus = 'Aktif Manual (Paksa Aktif)';
+      periodStatus = 'Aktif Manual';
       periodBadge = '#10B981';
     } else if (anTheme.activeMode === 'auto') {
       if (startD && now < startD) {
         var daysToStart = Math.ceil((startD - now) / (1000 * 60 * 60 * 24));
-        periodStatus = 'Akan Datang (' + daysToStart + ' hari lagi)';
+        periodStatus = daysToStart + ' hari lagi';
         periodBadge = '#F59E0B';
       } else if (endD && now > endD) {
-        periodStatus = 'Telah Berakhir';
+        periodStatus = 'Berakhir';
         periodBadge = '#6B7280';
       } else {
-        periodStatus = 'Sedang Berjalan (Aktif)';
+        periodStatus = 'Sedang Aktif';
         periodBadge = '#10B981';
       }
     }
 
-    // Target Christmas Date Display
     var targetDateDisplay = '25 Des 2026, 09:00 WIB';
     var targetIso = anCountdown.targetDate || (anCountdown.christmasDate ? (anCountdown.christmasDate + 'T' + (anCountdown.christmasTime || '09:00') + ':00+07:00') : '2026-12-25T09:00:00+07:00');
     try {
@@ -2039,631 +2036,489 @@
         td.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
     } catch(e) {}
 
-    // Preset Label Map
     var presetNames = {
-      'advent-purple': '🟣 Advent Purple',
-      'christmas-gold': '🟡 Christmas Gold',
-      'christmas-red': '🔴 Christmas Red',
-      'midnight-christmas': '🌌 Midnight Christmas'
+      'advent-purple': 'Advent Purple',
+      'christmas-gold': 'Christmas Gold',
+      'christmas-red': 'Christmas Red',
+      'midnight-christmas': 'Midnight Christmas'
     };
-    var currentPresetName = presetNames[anTheme.preset] || '🟡 Christmas Gold';
+    var currentPresetName = presetNames[anTheme.preset] || 'Christmas Gold';
+
+    // Count active animations
+    var activeAnimCount = 0;
+    if (anSnow.enabled) activeAnimCount++;
+    if (anStars.enabled) activeAnimCount++;
+    if (anLights.enabled) activeAnimCount++;
+    if (anGolden.enabled) activeAnimCount++;
+    if (anAnim.floatingSnowflakes && anAnim.floatingSnowflakes.enabled) activeAnimCount++;
+    if (anAnim.candleGlow && anAnim.candleGlow.enabled) activeAnimCount++;
+    if (anAnim.sparkles && anAnim.sparkles.enabled) activeAnimCount++;
   %>
 
-  <!-- 1. Header Banner & Quick Action Card -->
-  <div class="card" style="background: linear-gradient(135deg, #0F172A 0%, #1B2A4A 60%, #1E1B4B 100%); color: #fff; border: 1.5px solid rgba(200, 169, 81, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.18); border-radius: 14px; margin-bottom: 1.5rem; position: relative; overflow: hidden;">
-    <div style="position:absolute; top:-40px; right:-40px; width:220px; height:220px; background:radial-gradient(circle, rgba(200,169,81,0.2) 0%, transparent 70%); border-radius:50%; pointer-events:none;"></div>
-    <div style="position:absolute; bottom:-30px; left:20%; width:160px; height:160px; background:radial-gradient(circle, rgba(225,29,72,0.18) 0%, transparent 70%); border-radius:50%; pointer-events:none;"></div>
+  <!-- ═══════════════ HEADER CARD ═══════════════ -->
+  <div style="background:linear-gradient(135deg, #0B132B 0%, #1B2A4A 50%, #1E1B4B 100%); color:#fff; border-radius:16px; padding:24px; margin-bottom:20px; position:relative; overflow:hidden; border:1px solid rgba(200,169,81,0.3); box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <div style="position:absolute; top:-60px; right:-60px; width:200px; height:200px; background:radial-gradient(circle, rgba(200,169,81,0.15) 0%, transparent 70%); border-radius:50%; pointer-events:none;"></div>
+    <div style="position:absolute; bottom:-40px; left:10%; width:140px; height:140px; background:radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%); border-radius:50%; pointer-events:none;"></div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; position:relative; z-index:1;">
-      <div style="max-width:680px;">
-        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(200,169,81,0.18); border:1px solid rgba(200,169,81,0.4); padding:4px 12px; border-radius:20px; font-size:0.75rem; color:#E8D5A0; margin-bottom:10px; font-weight:600;">
-          <span>✨ SPECIAL HOLIDAY EDITION</span>
-          <span>•</span>
-          <span>GEREJA AMIN HERMON</span>
-        </div>
-        <h2 style="font-size:1.45rem; font-weight:700; color:#fff; margin-bottom:6px; display:flex; align-items:center; gap:10px;">
-          <span>🎄 Modul Khusus Adven & Natal Premium</span>
-        </h2>
-        <p style="font-size:0.88rem; color:rgba(255,255,255,0.85); line-height:1.5; margin:0;">
-          Kelola suasana perayaan Adven dan Natal secara dinamis. Seluruh konfigurasi tema, countdown perayaan, dan animasi tersimpan di database dan langsung terhubung ke website publik.
-        </p>
+    <div style="position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+      <div>
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(200,169,81,0.15); border:1px solid rgba(200,169,81,0.3); padding:3px 10px; border-radius:16px; font-size:0.7rem; color:#E8D5A0; font-weight:600; margin-bottom:8px;">✨ MODUL KHUSUS NATAL</div>
+        <h2 style="font-size:1.3rem; font-weight:700; margin:0 0 4px; display:flex; align-items:center; gap:8px;">🎄 Adven & Natal</h2>
+        <p style="font-size:0.82rem; color:rgba(255,255,255,0.7); margin:0;">Kelola tema, countdown, dan animasi perayaan Natal.</p>
       </div>
-
-      <div style="display:flex; flex-direction:column; gap:8px; min-width:210px;">
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         <form action="/admin/adven-natal/toggle-quick" method="POST" style="margin:0;">
-          <button type="submit" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700; padding:10px 16px; border-radius:8px; font-size:0.85rem; <%= isLiveActive ? 'background:#EF4444; color:#fff; border:none;' : 'background:linear-gradient(135deg, #10B981, #059669); color:#fff; border:none;' %> box-shadow:0 4px 12px <%= isLiveActive ? 'rgba(239,68,68,0.35)' : 'rgba(16,185,129,0.35)' %>;">
-            <span><%= isLiveActive ? '⏹️ Nonaktifkan Tema' : '▶️ Aktifkan Sekarang (Manual)' %></span>
+          <button type="submit" style="padding:9px 20px; border-radius:10px; border:none; cursor:pointer; font-weight:700; font-size:0.82rem; display:flex; align-items:center; gap:6px; <%= isLiveActive ? 'background:#EF4444; color:#fff;' : 'background:linear-gradient(135deg,#10B981,#059669); color:#fff;' %> box-shadow:0 4px 12px <%= isLiveActive ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)' %>;">
+            <%= isLiveActive ? '⏹ Nonaktifkan' : '▶ Aktifkan' %>
           </button>
         </form>
-        <div style="display:flex; gap:6px;">
-          <button type="button" onclick="openAnPreviewModal('all')" class="btn btn--outline" style="flex:1; text-align:center; color:#E8D5A0; border-color:rgba(200,169,81,0.5); font-size:0.8rem; padding:8px 10px; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
-            <span>👁️ Preview Live</span>
-          </button>
-          <a href="/" target="_blank" class="btn btn--outline" style="flex:1; text-align:center; color:#fff; border-color:rgba(255,255,255,0.3); font-size:0.8rem; padding:8px 10px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px;">
-            <span>🌐 Buka Web</span>
-          </a>
-        </div>
+        <a href="/" target="_blank" style="padding:9px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:0.82rem; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:6px;">🌐 Web</a>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div style="margin-top:16px; display:flex; gap:16px; flex-wrap:wrap; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1);">
+      <div style="display:flex; align-items:center; gap:6px; font-size:0.78rem;">
+        <span style="width:8px; height:8px; border-radius:50%; background:<%= isLiveActive ? '#10B981' : '#EF4444' %>; display:inline-block;"></span>
+        <span style="color:rgba(255,255,255,0.6);">Status:</span>
+        <strong style="color:<%= isLiveActive ? '#6EE7B7' : '#FCA5A5' %>;"><%= isLiveActive ? 'AKTIF' : 'NONAKTIF' %></strong>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:0.78rem;">
+        <span style="color:rgba(255,255,255,0.6);">📅 Periode:</span>
+        <span style="background:<%= periodBadge %>; color:#fff; padding:1px 8px; border-radius:10px; font-size:0.7rem; font-weight:600;"><%= periodStatus %></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:0.78rem;">
+        <span style="color:rgba(255,255,255,0.6);">⏱ Natal:</span>
+        <strong style="color:#E8D5A0;" id="anAdminSummaryCountdown">Menghitung...</strong>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:0.78rem;">
+        <span style="color:rgba(255,255,255,0.6);">🎨 Tema:</span>
+        <strong style="color:#C4B5FD;"><%= currentPresetName %></strong>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:0.78rem;">
+        <span style="color:rgba(255,255,255,0.6);">✨ Animasi:</span>
+        <strong style="color:#93C5FD;"><%= activeAnimCount %>/7 aktif</strong>
       </div>
     </div>
   </div>
 
-  <!-- 2. DASHBOARD RINGKASAN MODUL (5-Card Overview) -->
-  <div style="margin-bottom:1.5rem;">
-    <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin-bottom:0.8rem; display:flex; align-items:center; gap:8px;">
-      <span>📊 Ringkasan Status Modul Adven & Natal</span>
-      <span style="font-size:0.75rem; font-weight:500; color:var(--text-muted);">(Real-time Overview)</span>
-    </h3>
-
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
-      <!-- Summary 1: Status Aktivasi -->
-      <div style="background:#fff; border:1px solid <%= isLiveActive ? '#A7F3D0' : '#FECACA' %>; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid <%= isLiveActive ? '#10B981' : '#EF4444' %>;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-          <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Status Aktivasi</span>
-          <span style="font-size:1.2rem;"><%= isLiveActive ? '🟢' : '🔴' %></span>
-        </div>
-        <div style="font-size:1.15rem; font-weight:700; color:var(--navy); margin-bottom:4px;">
-          <%= isLiveActive ? 'SEDANG AKTIF' : 'NONAKTIF' %>
-        </div>
-        <div style="font-size:0.75rem; color:var(--text-muted);">
-          Mode: <strong style="color:<%= anTheme.activeMode === 'manual_on' ? '#10B981' : (anTheme.activeMode === 'auto' ? '#3B82F6' : '#EF4444') %>"><%= anTheme.activeMode === 'manual_on' ? 'Manual (Aktif)' : (anTheme.activeMode === 'auto' ? 'Otomatis' : 'Dimatikan') %></strong>
-        </div>
-      </div>
-
-      <!-- Summary 2: Periode Tema -->
-      <div style="background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid #3B82F6;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-          <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Periode Tema</span>
-          <span style="font-size:1.2rem;">📅</span>
-        </div>
-        <div style="font-size:0.88rem; font-weight:700; color:var(--navy); margin-bottom:4px; line-height:1.3;">
-          <%= anTheme.startDate ? anTheme.startDate.substring(0,10) : '2026-11-29' %> s/d <%= anTheme.endDate ? anTheme.endDate.substring(0,10) : '2027-01-06' %>
-        </div>
-        <div style="font-size:0.75rem; color:var(--text-muted);">
-          <span style="background:<%= periodBadge %>; color:#fff; padding:1px 6px; border-radius:10px; font-weight:600; font-size:0.7rem;"><%= periodStatus %></span>
-        </div>
-      </div>
-
-      <!-- Summary 3: Tanggal & Countdown Natal -->
-      <div style="background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid var(--gold);">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-          <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Countdown Natal</span>
-          <span style="font-size:1.2rem;">⏱️</span>
-        </div>
-        <div style="font-size:0.92rem; font-weight:700; color:var(--navy); margin-bottom:4px;">
-          <%= targetDateDisplay %>
-        </div>
-        <div style="font-size:0.75rem; color:#B45309; font-weight:600;">
-          <span id="anAdminSummaryCountdown">Menghitung...</span>
-        </div>
-      </div>
-
-      <!-- Summary 4: Konfigurasi Animasi -->
-      <div style="background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid #8B5CF6;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-          <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Konfigurasi Animasi</span>
-          <span style="font-size:1.2rem;">❄️</span>
-        </div>
-        <div style="font-size:0.8rem; font-weight:600; color:var(--navy); margin-bottom:4px; display:flex; gap:4px; flex-wrap:wrap;">
-          <span style="background:<%= anSnow.enabled ? '#D1FAE5' : '#F3F4F6' %>; color:<%= anSnow.enabled ? '#065F46' : '#6B7280' %>; padding:1px 6px; border-radius:4px; font-size:0.72rem;">Salju: <%= anSnow.enabled ? 'Nyala' : 'Mati' %></span>
-          <span style="background:<%= anLights.enabled ? '#FEF3C7' : '#F3F4F6' %>; color:<%= anLights.enabled ? '#92400E' : '#6B7280' %>; padding:1px 6px; border-radius:4px; font-size:0.72rem;">Lampu: <%= anLights.enabled ? 'Nyala' : 'Mati' %></span>
-        </div>
-        <div style="font-size:0.72rem; color:var(--text-muted);">
-          Kontrol Pengunjung: <strong><%= anVisitor.enabled ? 'Tersedia' : 'Nonaktif' %></strong>
-        </div>
-      </div>
-
-      <!-- Summary 5: Tema Visual Terpilih -->
-      <div style="background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1.1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04); border-left:4px solid #EC4899;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-          <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Tema Visual Terpilih</span>
-          <span style="font-size:1.2rem;">🎨</span>
-        </div>
-        <div style="font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:6px;">
-          <%= currentPresetName %>
-        </div>
-        <div style="display:flex; gap:5px; align-items:center;">
-          <span title="Primary" style="width:16px; height:16px; border-radius:50%; background:<%= anColors.primary %>; border:1px solid #ccc; display:inline-block;"></span>
-          <span title="Secondary" style="width:16px; height:16px; border-radius:50%; background:<%= anColors.secondary %>; border:1px solid #ccc; display:inline-block;"></span>
-          <span title="Accent" style="width:16px; height:16px; border-radius:50%; background:<%= anColors.accent %>; border:1px solid #ccc; display:inline-block;"></span>
-          <span title="Background" style="width:16px; height:16px; border-radius:50%; background:<%= anColors.background %>; border:1px solid #ccc; display:inline-block;"></span>
-          <span style="font-size:0.7rem; color:var(--text-muted); margin-left:4px;">5 Warna</span>
-        </div>
-      </div>
-    </div>
+  <!-- ═══════════════ SUB-TAB NAVIGATION ═══════════════ -->
+  <div style="display:flex; gap:4px; margin-bottom:20px; background:#F1F5F9; padding:4px; border-radius:12px;">
+    <button type="button" class="an-subtab-btn active" onclick="switchAnSubtab('theme', this)" style="flex:1; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:700; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:6px; background:#1B2A4A; color:#C8A951; transition:all 0.25s ease;">
+      🎨 Tema
+    </button>
+    <button type="button" class="an-subtab-btn" onclick="switchAnSubtab('countdown', this)" style="flex:1; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:6px; background:transparent; color:#64748B; transition:all 0.25s ease;">
+      ⏱️ Countdown
+    </button>
+    <button type="button" class="an-subtab-btn" onclick="switchAnSubtab('animation', this)" style="flex:1; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:6px; background:transparent; color:#64748B; transition:all 0.25s ease;">
+      ✨ Animasi
+    </button>
   </div>
 
-  <!-- 3. TIGA MENU UTAMA PENGELOLAAN (Sub-Tabs) -->
-  <div style="margin-bottom:1.5rem;">
-    <div style="display:flex; gap:8px; border-bottom:2px solid #E5E7EB; padding-bottom:8px; flex-wrap:wrap;">
-      <button type="button" class="an-subtab-btn active" onclick="switchAnSubtab('theme', this)" style="padding:10px 18px; border-radius:8px 8px 0 0; border:none; cursor:pointer; font-weight:700; font-size:0.88rem; display:flex; align-items:center; gap:8px; background:#1B2A4A; color:#C8A951; transition:all 0.2s;">
-        <span>🎨 1. Pengaturan Tema Website</span>
-      </button>
-      <button type="button" class="an-subtab-btn" onclick="switchAnSubtab('countdown', this)" style="padding:10px 18px; border-radius:8px 8px 0 0; border:none; cursor:pointer; font-weight:600; font-size:0.88rem; display:flex; align-items:center; gap:8px; background:#F3F4F6; color:#4B5563; transition:all 0.2s;">
-        <span>⏱️ 2. Countdown Natal</span>
-      </button>
-      <button type="button" class="an-subtab-btn" onclick="switchAnSubtab('animation', this)" style="padding:10px 18px; border-radius:8px 8px 0 0; border:none; cursor:pointer; font-weight:600; font-size:0.88rem; display:flex; align-items:center; gap:8px; background:#F3F4F6; color:#4B5563; transition:all 0.2s;">
-        <span>✨ 3. Animasi Natal</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ==================== SUBTAB 1: PENGATURAN TEMA WEBSITE ==================== -->
+  <!-- ═══════════════ SUBTAB 1: TEMA ═══════════════ -->
   <div id="anSubtab_theme" class="an-subtab-content">
-    <div class="card" style="border-left:4px solid #C8A951; margin-bottom:1.5rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:10px;">
-        <div>
-          <h2 class="card-title" style="margin:0;">🎨 Pengaturan Tema Adven & Natal Website</h2>
-          <span style="font-size:0.82rem; color:var(--text-muted);">Kelola aktivasi otomatis, preset palet warna, banner festival beranda, dan ornamen dekoratif.</span>
-        </div>
-      </div>
+    <form action="/admin/adven-natal/theme" method="POST" enctype="multipart/form-data">
 
-      <form action="/admin/adven-natal/theme" method="POST" enctype="multipart/form-data">
-        <!-- A. Mode Aktivasi Radio Cards -->
-        <div class="form-group" style="margin-bottom:1.5rem;">
-          <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin-bottom:8px; display:block;">A. Pengaturan Aktivasi Tema:</label>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
-            <label style="border:2px solid <%= anTheme.activeMode === 'auto' ? '#3B82F6' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'auto' ? '#EFF6FF' : '#fff' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
-              <input type="radio" name="activeMode" value="auto" <%= anTheme.activeMode === 'auto' ? 'checked' : '' %> style="margin-top:3px;">
-              <div>
-                <strong style="color:#1E40AF; display:block; font-size:0.9rem;">📅 Otomatis Berdasarkan Tanggal</strong>
-                <span style="font-size:0.78rem; color:#4B5563; line-height:1.4; display:block; margin-top:2px;">Aktif otomatis saat tanggal mencapai rentang periode di bawah, dan kembali normal saat selesai.</span>
-              </div>
-            </label>
-
-            <label style="border:2px solid <%= anTheme.activeMode === 'manual_on' ? '#10B981' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'manual_on' ? '#ECFDF5' : '#fff' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
-              <input type="radio" name="activeMode" value="manual_on" <%= anTheme.activeMode === 'manual_on' ? 'checked' : '' %> style="margin-top:3px;">
-              <div>
-                <strong style="color:#065F46; display:block; font-size:0.9rem;">▶️ Manual Aktif Selalu (Paksa Aktif)</strong>
-                <span style="font-size:0.78rem; color:#4B5563; line-height:1.4; display:block; margin-top:2px;">Langsung aktif sekarang juga tanpa memandang tanggal kalender.</span>
-              </div>
-            </label>
-
-            <label style="border:2px solid <%= anTheme.activeMode === 'off' ? '#EF4444' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'off' ? '#FEF2F2' : '#fff' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:10px; align-items:flex-start;">
-              <input type="radio" name="activeMode" value="off" <%= anTheme.activeMode === 'off' ? 'checked' : '' %> style="margin-top:3px;">
-              <div>
-                <strong style="color:#991B1B; display:block; font-size:0.9rem;">⏹️ Nonaktifkan Tema</strong>
-                <span style="font-size:0.78rem; color:#4B5563; line-height:1.4; display:block; margin-top:2px;">Matikan seluruh elemen Natal. Website kembali menggunakan desain normal.</span>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Rentang Tanggal Periode -->
-        <div class="grid-2" style="background:#F9FAFB; padding:14px; border-radius:10px; border:1px solid #E5E7EB; margin-bottom:1.5rem;">
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:600; font-size:0.85rem;">Tanggal Mulai Periode Adven</label>
-            <input type="datetime-local" name="startDate" value="<%= anTheme.startDate ? anTheme.startDate.substring(0, 16) : '2026-11-29T00:00' %>" required style="width:100%;">
-            <span class="help-text">Awal Masa Adven (Minggu ke-1 Adven).</span>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:600; font-size:0.85rem;">Tanggal Berakhir Periode Natal</label>
-            <input type="datetime-local" name="endDate" value="<%= anTheme.endDate ? anTheme.endDate.substring(0, 16) : '2027-01-06T23:59' %>" required style="width:100%;">
-            <span class="help-text">Akhir Masa Natal (Hari Epifani / awal Januari).</span>
-          </div>
-        </div>
-
-        <!-- B. Pilihan Tema Visual (Preset Cards) -->
-        <div class="form-group" style="margin-bottom:1.5rem;">
-          <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin-bottom:8px; display:block;">B. Pilihan Preset Tema Visual:</label>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
-            <!-- Preset 1: Advent Purple -->
-            <label class="an-preset-card <%= anTheme.preset === 'advent-purple' ? 'selected' : '' %>" style="border:2px solid <%= anTheme.preset === 'advent-purple' ? '#7C3AED' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:<%= anTheme.preset === 'advent-purple' ? '#FAF5FF' : '#fff' %>; display:flex; gap:10px;" onclick="applyPresetColors('advent-purple')">
-              <input type="radio" name="preset" value="advent-purple" <%= anTheme.preset === 'advent-purple' ? 'checked' : '' %>>
-              <div>
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px;">
-                  <span style="width:12px; height:12px; border-radius:50%; background:#7C3AED; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#D9B66F; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#FFFFFF; border:1px solid #ccc; display:inline-block;"></span>
-                  <strong style="font-size:0.85rem; color:#6B21A8;">Advent Purple</strong>
-                </div>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Ungu Adven, emas liturgis, dan putih suci.</span>
-              </div>
-            </label>
-
-            <!-- Preset 2: Christmas Gold -->
-            <label class="an-preset-card <%= (anTheme.preset === 'christmas-gold' || !anTheme.preset) ? 'selected' : '' %>" style="border:2px solid <%= (anTheme.preset === 'christmas-gold' || !anTheme.preset) ? '#D9B66F' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:<%= (anTheme.preset === 'christmas-gold' || !anTheme.preset) ? '#FFFBEB' : '#fff' %>; display:flex; gap:10px;" onclick="applyPresetColors('christmas-gold')">
-              <input type="radio" name="preset" value="christmas-gold" <%= (anTheme.preset === 'christmas-gold' || !anTheme.preset) ? 'checked' : '' %>>
-              <div>
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px;">
-                  <span style="width:12px; height:12px; border-radius:50%; background:#D9B66F; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#FFFFFF; border:1px solid #ccc; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#B45309; display:inline-block;"></span>
-                  <strong style="font-size:0.85rem; color:#92400E;">Christmas Gold</strong>
-                </div>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Emas champagne, putih, dan warna hangat.</span>
-              </div>
-            </label>
-
-            <!-- Preset 3: Christmas Red -->
-            <label class="an-preset-card <%= anTheme.preset === 'christmas-red' ? 'selected' : '' %>" style="border:2px solid <%= anTheme.preset === 'christmas-red' ? '#B91C1C' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:<%= anTheme.preset === 'christmas-red' ? '#FEF2F2' : '#fff' %>; display:flex; gap:10px;" onclick="applyPresetColors('christmas-red')">
-              <input type="radio" name="preset" value="christmas-red" <%= anTheme.preset === 'christmas-red' ? 'checked' : '' %>>
-              <div>
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px;">
-                  <span style="width:12px; height:12px; border-radius:50%; background:#B91C1C; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#D9B66F; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#064E3B; display:inline-block;"></span>
-                  <strong style="font-size:0.85rem; color:#991B1B;">Christmas Red</strong>
-                </div>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Merah Natal, emas, dan hijau pinus.</span>
-              </div>
-            </label>
-
-            <!-- Preset 4: Midnight Christmas -->
-            <label class="an-preset-card <%= anTheme.preset === 'midnight-christmas' ? 'selected' : '' %>" style="border:2px solid <%= anTheme.preset === 'midnight-christmas' ? '#0284C7' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:<%= anTheme.preset === 'midnight-christmas' ? '#F0F9FF' : '#fff' %>; display:flex; gap:10px;" onclick="applyPresetColors('midnight-christmas')">
-              <input type="radio" name="preset" value="midnight-christmas" <%= anTheme.preset === 'midnight-christmas' ? 'checked' : '' %>>
-              <div>
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px;">
-                  <span style="width:12px; height:12px; border-radius:50%; background:#0F172A; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#F59E0B; display:inline-block;"></span>
-                  <span style="width:12px; height:12px; border-radius:50%; background:#FFFFFF; border:1px solid #ccc; display:inline-block;"></span>
-                  <strong style="font-size:0.85rem; color:#0369A1;">Midnight Christmas</strong>
-                </div>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Biru malam, emas bintang, dan putih.</span>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <!-- C. Pengaturan Warna (Color Pickers) -->
-        <div class="form-group" style="margin-bottom:1.5rem; background:#F9FAFB; padding:14px; border-radius:10px; border:1px solid #E5E7EB;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-            <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin:0;">C. Kustomisasi Palet Warna:</label>
-            <button type="button" class="btn btn--outline" onclick="resetColorsToSelectedPreset()" style="font-size:0.75rem; padding:4px 10px; color:#4B5563; border-color:#D1D5DB; background:#fff;">
-              ↺ Kembalikan Warna ke Preset Terpilih
-            </button>
-          </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
+      <!-- Section: Aktivasi -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0 0 12px; display:flex; align-items:center; gap:8px;">⚡ Mode Aktivasi</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:14px;">
+          <label style="border:2px solid <%= anTheme.activeMode === 'auto' ? '#3B82F6' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'auto' ? '#EFF6FF' : '#FAFAFA' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:8px; align-items:center; transition:all 0.2s;">
+            <input type="radio" name="activeMode" value="auto" <%= anTheme.activeMode === 'auto' ? 'checked' : '' %>>
             <div>
-              <label style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:4px;">Warna Utama</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input type="color" id="an_primary_color" name="primary_color" value="<%= anColors.primary || '#D9B66F' %>" style="width:36px; height:34px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_primary')">
-                <input type="text" id="hex_primary" value="<%= anColors.primary || '#D9B66F' %>" style="font-size:0.78rem; width:75px; padding:4px 6px;" readonly>
-              </div>
+              <strong style="font-size:0.85rem; color:#1E40AF;">📅 Otomatis</strong>
+              <span style="font-size:0.72rem; color:#64748B; display:block;">Aktif sesuai periode tanggal.</span>
             </div>
+          </label>
+          <label style="border:2px solid <%= anTheme.activeMode === 'manual_on' ? '#10B981' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'manual_on' ? '#ECFDF5' : '#FAFAFA' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:8px; align-items:center; transition:all 0.2s;">
+            <input type="radio" name="activeMode" value="manual_on" <%= anTheme.activeMode === 'manual_on' ? 'checked' : '' %>>
             <div>
-              <label style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:4px;">Warna Sekunder</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input type="color" id="an_secondary_color" name="secondary_color" value="<%= anColors.secondary || '#1B2A4A' %>" style="width:36px; height:34px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_secondary')">
-                <input type="text" id="hex_secondary" value="<%= anColors.secondary || '#1B2A4A' %>" style="font-size:0.78rem; width:75px; padding:4px 6px;" readonly>
-              </div>
+              <strong style="font-size:0.85rem; color:#065F46;">▶️ Manual Aktif</strong>
+              <span style="font-size:0.72rem; color:#64748B; display:block;">Aktif sekarang juga.</span>
             </div>
+          </label>
+          <label style="border:2px solid <%= anTheme.activeMode === 'off' ? '#EF4444' : '#E5E7EB' %>; background:<%= anTheme.activeMode === 'off' ? '#FEF2F2' : '#FAFAFA' %>; border-radius:10px; padding:12px; cursor:pointer; display:flex; gap:8px; align-items:center; transition:all 0.2s;">
+            <input type="radio" name="activeMode" value="off" <%= anTheme.activeMode === 'off' ? 'checked' : '' %>>
             <div>
-              <label style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:4px;">Warna Aksen</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input type="color" id="an_accent_color" name="accent_color" value="<%= anColors.accent || '#B91C1C' %>" style="width:36px; height:34px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_accent')">
-                <input type="text" id="hex_accent" value="<%= anColors.accent || '#B91C1C' %>" style="font-size:0.78rem; width:75px; padding:4px 6px;" readonly>
-              </div>
+              <strong style="font-size:0.85rem; color:#991B1B;">⏹ Nonaktif</strong>
+              <span style="font-size:0.72rem; color:#64748B; display:block;">Matikan tema Natal.</span>
             </div>
-            <div>
-              <label style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:4px;">Background</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input type="color" id="an_background_color" name="background_color" value="<%= anColors.background || '#0F172A' %>" style="width:36px; height:34px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_bg')">
-                <input type="text" id="hex_bg" value="<%= anColors.background || '#0F172A' %>" style="font-size:0.78rem; width:75px; padding:4px 6px;" readonly>
-              </div>
-            </div>
-            <div>
-              <label style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:4px;">Warna Teks</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input type="color" id="an_text_color" name="text_color" value="<%= anColors.text || '#FFFFFF' %>" style="width:36px; height:34px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_text')">
-                <input type="text" id="hex_text" value="<%= anColors.text || '#FFFFFF' %>" style="font-size:0.78rem; width:75px; padding:4px 6px;" readonly>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- D. Pengaturan Banner Natal -->
-        <div class="form-group" style="margin-bottom:1.5rem; border:1px solid #E5E7EB; border-radius:10px; padding:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin:0;">D. Pengaturan Banner Natal:</label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; font-weight:600;">
-              <input type="checkbox" name="banner_enabled" <%= anBanner.enabled ? 'checked' : '' %>>
-              <span>Tampilkan Banner Natal di Halaman Utama</span>
-            </label>
-          </div>
-
-          <div class="grid-2" style="margin-bottom:12px;">
-            <div>
-              <label style="font-size:0.82rem; font-weight:600;">Gambar Banner Desktop</label>
-              <input type="file" name="bannerImage" accept="image/*" onchange="previewAdminBannerImage(this, 'bannerDesktopPreviewImg')">
-              <input type="hidden" name="bannerExistingImage" value="<%= anBanner.image || '' %>">
-              <span class="help-text">JPG, PNG, WebP (Rekomendasi: 1920x800px).</span>
-              <div style="margin-top:6px;">
-                <img id="bannerDesktopPreviewImg" src="<%= anBanner.image || '/images/hero-1.webp' %>" style="width:100%; height:90px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
-              </div>
-            </div>
-            <div>
-              <label style="font-size:0.82rem; font-weight:600;">Gambar Banner Mobile (Opsional)</label>
-              <input type="file" name="bannerMobileImage" accept="image/*" onchange="previewAdminBannerImage(this, 'bannerMobilePreviewImg')">
-              <input type="hidden" name="bannerExistingMobileImage" value="<%= anBanner.mobileImage || '' %>">
-              <span class="help-text">Rekomendasi rasio portrait: 800x1000px.</span>
-              <div style="margin-top:6px;">
-                <img id="bannerMobilePreviewImg" src="<%= anBanner.mobileImage || anBanner.image || '/images/hero-1.webp' %>" style="width:100%; height:90px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label style="font-size:0.82rem; font-weight:600;">Judul Utama Banner</label>
-            <input type="text" id="an_banner_title" name="banner_title" value="<%= anBanner.title || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %>" required style="width:100%;" oninput="updateBannerLivePreview()">
-          </div>
-
-          <div class="form-group">
-            <label style="font-size:0.82rem; font-weight:600;">Subjudul Banner / Ayat Firman</label>
-            <textarea id="an_banner_subtitle" name="banner_subtitle" rows="2" style="width:100%;" oninput="updateBannerLivePreview()"><%= anBanner.subtitle || '' %></textarea>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label style="font-size:0.82rem; font-weight:600;">Teks Tombol Aksi</label>
-              <input type="text" id="an_banner_btn_text" name="banner_button_text" value="<%= anBanner.buttonText || 'Lihat Jadwal Ibadah' %>" style="width:100%;" oninput="updateBannerLivePreview()">
-            </div>
-            <div class="form-group">
-              <label style="font-size:0.82rem; font-weight:600;">URL Tujuan Tombol</label>
-              <input type="text" name="banner_button_url" value="<%= anBanner.buttonUrl || '/visit' %>" style="width:100%;">
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label style="font-size:0.82rem; font-weight:600;">Posisi Teks Banner</label>
-              <select id="an_banner_text_align" name="banner_text_align" style="width:100%;" onchange="updateBannerLivePreview()">
-                <option value="center" <%= anBanner.textAlign === 'center' ? 'selected' : '' %>>Tengah (Center)</option>
-                <option value="left" <%= anBanner.textAlign === 'left' ? 'selected' : '' %>>Kiri (Left)</option>
-                <option value="right" <%= anBanner.textAlign === 'right' ? 'selected' : '' %>>Kanan (Right)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label style="font-size:0.82rem; font-weight:600;">Tingkat Transparansi Overlay (<span id="anOverlayVal"><%= anBanner.overlayOpacity || 50 %></span>%)</label>
-              <input type="range" id="an_banner_overlay_opacity" name="banner_overlay_opacity" min="0" max="90" value="<%= anBanner.overlayOpacity || 50 %>" style="width:100%;" oninput="document.getElementById('anOverlayVal').textContent = this.value; updateBannerLivePreview();">
-            </div>
-          </div>
-
-          <!-- Live Preview Banner Box inside Admin -->
-          <div style="margin-top:12px;">
-            <label style="font-size:0.8rem; font-weight:700; color:var(--navy); display:block; margin-bottom:6px;">Pratinjau Langsung Banner Natal:</label>
-            <div id="anAdminBannerLiveCard" style="position:relative; height:180px; border-radius:10px; overflow:hidden; display:flex; align-items:center; background-image:url('<%= anBanner.image || '/images/hero-1.webp' %>'); background-size:cover; background-position:center;">
-              <div id="anAdminBannerOverlay" style="position:absolute; inset:0; background:rgba(15, 23, 42, <%= (anBanner.overlayOpacity || 50) / 100 %>);"></div>
-              <div id="anAdminBannerInner" style="position:relative; z-index:2; width:100%; padding:20px; text-align:<%= anBanner.textAlign || 'center' %>; color:#fff;">
-                <div style="font-size:0.75rem; color:#E8D5A0; font-weight:700; letter-spacing:1px; margin-bottom:4px;">🎄 GEREJA AMIN HERMON</div>
-                <h4 id="anPrevTitle" style="font-size:1.15rem; font-weight:700; margin:0 0 4px; color:#fff;"><%= anBanner.title || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %></h4>
-                <p id="anPrevSub" style="font-size:0.78rem; opacity:0.85; margin:0 0 10px; max-width:600px; display:inline-block;"><%= anBanner.subtitle || '' %></p>
-                <div>
-                  <span id="anPrevBtn" style="background:#D9B66F; color:#0F1D35; font-size:0.75rem; font-weight:700; padding:5px 14px; border-radius:20px; display:inline-block;"><%= anBanner.buttonText || 'Lihat Jadwal Ibadah' %></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- E. Pengaturan Ornamen Website -->
-        <div class="form-group" style="margin-bottom:1.5rem; background:#F9FAFB; padding:14px; border-radius:10px; border:1px solid #E5E7EB;">
-          <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin-bottom:8px; display:block;">E. Pengaturan Ornamen Dekoratif:</label>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="ornament_stars" <%= anOrnaments.stars ? 'checked' : '' %>>
-              <span>⭐ Bintang Natal</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="ornament_pine" <%= anOrnaments.pine ? 'checked' : '' %>>
-              <span>🌲 Daun Pinus (Garland)</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="ornament_baubles" <%= anOrnaments.baubles ? 'checked' : '' %>>
-              <span>🔮 Ornamen Bola Natal</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="ornament_candle" <%= anOrnaments.candle ? 'checked' : '' %>>
-              <span>🕯️ Lilin Adven Liturgis</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="ornament_snow" <%= anOrnaments.snow ? 'checked' : '' %>>
-              <span>❄️ Salju Ornamen</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="ornament_golden_glow" <%= anOrnaments.goldenGlow ? 'checked' : '' %>>
-              <span>✨ Cahaya Keemasan</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="ornament_corner_decor" <%= anOrnaments.cornerDecor ? 'checked' : '' %>>
-              <span>🎀 Dekorasi Sudut Halaman</span>
-            </label>
-          </div>
-
-          <div style="margin-top:12px; padding-top:12px; border-top:1px solid #E5E7EB;">
-            <label style="font-weight:600; font-size:0.82rem; display:block; margin-bottom:4px;">Lilin Liturgi Mingguan yang Sedang Menyala:</label>
-            <select name="liturgiWeek" style="width:100%; max-width:400px;">
-              <option value="adven-1" <%= anTheme.liturgiWeek === 'adven-1' ? 'selected' : '' %>>Minggu Adven I — Harapan (Lilin Ungu ke-1)</option>
-              <option value="adven-2" <%= anTheme.liturgiWeek === 'adven-2' ? 'selected' : '' %>>Minggu Adven II — Perdamaian (Lilin Ungu ke-2)</option>
-              <option value="adven-3" <%= anTheme.liturgiWeek === 'adven-3' ? 'selected' : '' %>>Minggu Adven III — Sukacita / Gaudete (Lilin Merah Muda/Pink)</option>
-              <option value="adven-4" <%= anTheme.liturgiWeek === 'adven-4' ? 'selected' : '' %>>Minggu Adven IV — Kasih (Lilin Ungu ke-3)</option>
-              <option value="natal" <%= (!anTheme.liturgiWeek || anTheme.liturgiWeek === 'natal') ? 'selected' : '' %>>⭐ Hari Natal — Lilin Kristus (Lilin Putih Tengah)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Action Bar -->
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding-top:14px; border-top:1px solid #E5E7EB;">
-          <button type="submit" class="btn btn--primary" style="padding:10px 24px; font-weight:700; display:flex; align-items:center; gap:8px;">
-            <span>💾 Simpan Pengaturan Tema</span>
-          </button>
-          <button type="button" class="btn btn--outline" onclick="openAnPreviewModal('theme')" style="padding:10px 18px; display:flex; align-items:center; gap:6px;">
-            <span>👁️ Preview Tema</span>
-          </button>
-          <button type="button" class="btn btn--outline" onclick="confirmResetAdvenNatal()" style="padding:10px 18px; margin-left:auto; color:#EF4444; border-color:#FCA5A5; display:flex; align-items:center; gap:6px;">
-            <span>🔄 Reset ke Pengaturan Default</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==================== SUBTAB 2: COUNTDOWN NATAL ==================== -->
-  <div id="anSubtab_countdown" class="an-subtab-content" style="display:none;">
-    <div class="card" style="border-left:4px solid #D9B66F; margin-bottom:1.5rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:10px;">
-        <div>
-          <h2 class="card-title" style="margin:0;">⏱️ Pengaturan Countdown Natal</h2>
-          <span style="font-size:0.82rem; color:var(--text-muted);">Atur target waktu ibadah Natal, gaya visual hitung mundur, posisi tampilan, dan pesan perayaan.</span>
-        </div>
-      </div>
-
-      <form action="/admin/adven-natal/countdown" method="POST">
-        <!-- Master Toggle -->
-        <div class="form-group" style="margin-bottom:1.2rem; background:#FFFBEB; padding:12px; border-radius:8px; border:1px solid #FDE68A;">
-          <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#92400E;">
-            <input type="checkbox" name="countdown_enabled" <%= anCountdown.enabled ? 'checked' : '' %>>
-            <span>Aktifkan Fitur Countdown Natal pada Website Publik</span>
           </label>
         </div>
 
-        <!-- Info & Waktu Perayaan -->
-        <div class="grid-2">
-          <div class="form-group">
-            <label style="font-weight:600; font-size:0.85rem;">Judul Countdown</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; background:#F8FAFC; padding:12px; border-radius:10px; border:1px solid #E2E8F0;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Mulai Periode</label>
+            <input type="datetime-local" name="startDate" value="<%= anTheme.startDate ? anTheme.startDate.substring(0, 16) : '2026-11-29T00:00' %>" required style="width:100%;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Akhir Periode</label>
+            <input type="datetime-local" name="endDate" value="<%= anTheme.endDate ? anTheme.endDate.substring(0, 16) : '2027-01-06T23:59' %>" required style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Preset Tema -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0 0 12px; display:flex; align-items:center; gap:8px;">🎨 Preset Tema Visual</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:14px;">
+          <label style="border:2px solid <%= anTheme.preset === 'advent-purple' ? '#7C3AED' : '#E5E7EB' %>; border-radius:12px; padding:14px; cursor:pointer; background:<%= anTheme.preset === 'advent-purple' ? '#FAF5FF' : '#fff' %>; text-align:center; transition:all 0.2s;" onclick="applyPresetColors('advent-purple')">
+            <input type="radio" name="preset" value="advent-purple" <%= anTheme.preset === 'advent-purple' ? 'checked' : '' %> style="display:none;">
+            <div style="display:flex; gap:4px; justify-content:center; margin-bottom:8px;">
+              <span style="width:20px; height:20px; border-radius:50%; background:#7C3AED; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#D9B66F; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#1E1B4B; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+            </div>
+            <strong style="font-size:0.82rem; color:#6B21A8; display:block;">Advent Purple</strong>
+            <span style="font-size:0.7rem; color:#9CA3AF;">Ungu, Emas, Putih</span>
+          </label>
+          <label style="border:2px solid <%= (anTheme.preset === 'christmas-gold' || !anTheme.preset) ? '#D9B66F' : '#E5E7EB' %>; border-radius:12px; padding:14px; cursor:pointer; background:<%= (anTheme.preset === 'christmas-gold' || !anTheme.preset) ? '#FFFBEB' : '#fff' %>; text-align:center; transition:all 0.2s;" onclick="applyPresetColors('christmas-gold')">
+            <input type="radio" name="preset" value="christmas-gold" <%= (anTheme.preset === 'christmas-gold' || !anTheme.preset) ? 'checked' : '' %> style="display:none;">
+            <div style="display:flex; gap:4px; justify-content:center; margin-bottom:8px;">
+              <span style="width:20px; height:20px; border-radius:50%; background:#D9B66F; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#1B2A4A; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#B45309; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+            </div>
+            <strong style="font-size:0.82rem; color:#92400E; display:block;">Christmas Gold</strong>
+            <span style="font-size:0.7rem; color:#9CA3AF;">Emas, Navy, Hangat</span>
+          </label>
+          <label style="border:2px solid <%= anTheme.preset === 'christmas-red' ? '#B91C1C' : '#E5E7EB' %>; border-radius:12px; padding:14px; cursor:pointer; background:<%= anTheme.preset === 'christmas-red' ? '#FEF2F2' : '#fff' %>; text-align:center; transition:all 0.2s;" onclick="applyPresetColors('christmas-red')">
+            <input type="radio" name="preset" value="christmas-red" <%= anTheme.preset === 'christmas-red' ? 'checked' : '' %> style="display:none;">
+            <div style="display:flex; gap:4px; justify-content:center; margin-bottom:8px;">
+              <span style="width:20px; height:20px; border-radius:50%; background:#B91C1C; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#D9B66F; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#064E3B; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+            </div>
+            <strong style="font-size:0.82rem; color:#991B1B; display:block;">Christmas Red</strong>
+            <span style="font-size:0.7rem; color:#9CA3AF;">Merah, Emas, Hijau</span>
+          </label>
+          <label style="border:2px solid <%= anTheme.preset === 'midnight-christmas' ? '#0284C7' : '#E5E7EB' %>; border-radius:12px; padding:14px; cursor:pointer; background:<%= anTheme.preset === 'midnight-christmas' ? '#F0F9FF' : '#fff' %>; text-align:center; transition:all 0.2s;" onclick="applyPresetColors('midnight-christmas')">
+            <input type="radio" name="preset" value="midnight-christmas" <%= anTheme.preset === 'midnight-christmas' ? 'checked' : '' %> style="display:none;">
+            <div style="display:flex; gap:4px; justify-content:center; margin-bottom:8px;">
+              <span style="width:20px; height:20px; border-radius:50%; background:#0F172A; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#F59E0B; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+              <span style="width:20px; height:20px; border-radius:50%; background:#0284C7; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+            </div>
+            <strong style="font-size:0.82rem; color:#0369A1; display:block;">Midnight Christmas</strong>
+            <span style="font-size:0.7rem; color:#9CA3AF;">Biru Malam, Emas</span>
+          </label>
+        </div>
+
+        <!-- Color Pickers (Compact) -->
+        <details style="background:#F8FAFC; border-radius:10px; border:1px solid #E2E8F0; padding:12px;">
+          <summary style="font-weight:700; font-size:0.85rem; color:var(--navy); cursor:pointer; display:flex; align-items:center; gap:6px;">
+            🎨 Kustomisasi Warna
+            <span style="display:inline-flex; gap:3px; margin-left:auto;">
+              <span style="width:14px; height:14px; border-radius:50%; background:<%= anColors.primary %>; border:1px solid #ccc; display:inline-block;"></span>
+              <span style="width:14px; height:14px; border-radius:50%; background:<%= anColors.secondary %>; border:1px solid #ccc; display:inline-block;"></span>
+              <span style="width:14px; height:14px; border-radius:50%; background:<%= anColors.accent %>; border:1px solid #ccc; display:inline-block;"></span>
+              <span style="width:14px; height:14px; border-radius:50%; background:<%= anColors.background %>; border:1px solid #ccc; display:inline-block;"></span>
+            </span>
+          </summary>
+          <div style="margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
+            <div>
+              <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:3px;">Utama</label>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <input type="color" id="an_primary_color" name="primary_color" value="<%= anColors.primary || '#D9B66F' %>" style="width:32px; height:30px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_primary')">
+                <input type="text" id="hex_primary" value="<%= anColors.primary || '#D9B66F' %>" style="font-size:0.72rem; width:68px; padding:3px 5px;" readonly>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:3px;">Sekunder</label>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <input type="color" id="an_secondary_color" name="secondary_color" value="<%= anColors.secondary || '#1B2A4A' %>" style="width:32px; height:30px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_secondary')">
+                <input type="text" id="hex_secondary" value="<%= anColors.secondary || '#1B2A4A' %>" style="font-size:0.72rem; width:68px; padding:3px 5px;" readonly>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:3px;">Aksen</label>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <input type="color" id="an_accent_color" name="accent_color" value="<%= anColors.accent || '#B91C1C' %>" style="width:32px; height:30px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_accent')">
+                <input type="text" id="hex_accent" value="<%= anColors.accent || '#B91C1C' %>" style="font-size:0.72rem; width:68px; padding:3px 5px;" readonly>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:3px;">Background</label>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <input type="color" id="an_background_color" name="background_color" value="<%= anColors.background || '#0F172A' %>" style="width:32px; height:30px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_bg')">
+                <input type="text" id="hex_bg" value="<%= anColors.background || '#0F172A' %>" style="font-size:0.72rem; width:68px; padding:3px 5px;" readonly>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.75rem; font-weight:600; display:block; margin-bottom:3px;">Teks</label>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <input type="color" id="an_text_color" name="text_color" value="<%= anColors.text || '#FFFFFF' %>" style="width:32px; height:30px; padding:0; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onchange="updateHexLabel(this, 'hex_text')">
+                <input type="text" id="hex_text" value="<%= anColors.text || '#FFFFFF' %>" style="font-size:0.72rem; width:68px; padding:3px 5px;" readonly>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="resetColorsToSelectedPreset()" style="margin-top:10px; font-size:0.75rem; padding:4px 12px; border:1px solid #D1D5DB; background:#fff; border-radius:6px; cursor:pointer; color:#4B5563;">↺ Reset ke Preset</button>
+        </details>
+      </div>
+
+      <!-- Section: Banner Natal -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0; display:flex; align-items:center; gap:8px;">🖼️ Banner Natal</h3>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--navy);">
+            <input type="checkbox" name="banner_enabled" <%= anBanner.enabled ? 'checked' : '' %>>
+            Tampilkan
+          </label>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div>
+            <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Banner Desktop</label>
+            <input type="file" name="bannerImage" accept="image/*" onchange="previewAdminBannerImage(this, 'bannerDesktopPreviewImg')" style="font-size:0.8rem;">
+            <input type="hidden" name="bannerExistingImage" value="<%= anBanner.image || '' %>">
+            <img id="bannerDesktopPreviewImg" src="<%= anBanner.image || '/images/hero-1.webp' %>" style="width:100%; height:70px; object-fit:cover; border-radius:8px; border:1px solid #ddd; margin-top:6px;">
+          </div>
+          <div>
+            <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Banner Mobile <span style="color:#9CA3AF; font-weight:400;">(Opsional)</span></label>
+            <input type="file" name="bannerMobileImage" accept="image/*" onchange="previewAdminBannerImage(this, 'bannerMobilePreviewImg')" style="font-size:0.8rem;">
+            <input type="hidden" name="bannerExistingMobileImage" value="<%= anBanner.mobileImage || '' %>">
+            <img id="bannerMobilePreviewImg" src="<%= anBanner.mobileImage || anBanner.image || '/images/hero-1.webp' %>" style="width:100%; height:70px; object-fit:cover; border-radius:8px; border:1px solid #ddd; margin-top:6px;">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:10px;">
+          <label style="font-size:0.82rem; font-weight:600;">Judul Banner</label>
+          <input type="text" id="an_banner_title" name="banner_title" value="<%= anBanner.title || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %>" required style="width:100%;" oninput="updateBannerLivePreview()">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label style="font-size:0.82rem; font-weight:600;">Subjudul / Ayat</label>
+          <textarea id="an_banner_subtitle" name="banner_subtitle" rows="2" style="width:100%;" oninput="updateBannerLivePreview()"><%= anBanner.subtitle || '' %></textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.82rem; font-weight:600;">Teks Tombol</label>
+            <input type="text" id="an_banner_btn_text" name="banner_button_text" value="<%= anBanner.buttonText || 'Lihat Jadwal Ibadah' %>" style="width:100%;" oninput="updateBannerLivePreview()">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.82rem; font-weight:600;">URL Tombol</label>
+            <input type="text" name="banner_button_url" value="<%= anBanner.buttonUrl || '/visit' %>" style="width:100%;">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.82rem; font-weight:600;">Posisi Teks</label>
+            <select id="an_banner_text_align" name="banner_text_align" style="width:100%;" onchange="updateBannerLivePreview()">
+              <option value="center" <%= anBanner.textAlign === 'center' ? 'selected' : '' %>>Tengah</option>
+              <option value="left" <%= anBanner.textAlign === 'left' ? 'selected' : '' %>>Kiri</option>
+              <option value="right" <%= anBanner.textAlign === 'right' ? 'selected' : '' %>>Kanan</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.82rem; font-weight:600;">Overlay (<span id="anOverlayVal"><%= anBanner.overlayOpacity || 50 %></span>%)</label>
+            <input type="range" id="an_banner_overlay_opacity" name="banner_overlay_opacity" min="0" max="90" value="<%= anBanner.overlayOpacity || 50 %>" style="width:100%;" oninput="document.getElementById('anOverlayVal').textContent = this.value; updateBannerLivePreview();">
+          </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div id="anAdminBannerLiveCard" style="position:relative; height:140px; border-radius:12px; overflow:hidden; display:flex; align-items:center; background-image:url('<%= anBanner.image || '/images/hero-1.webp' %>'); background-size:cover; background-position:center;">
+          <div id="anAdminBannerOverlay" style="position:absolute; inset:0; background:rgba(15,23,42,<%= (anBanner.overlayOpacity || 50) / 100 %>);"></div>
+          <div id="anAdminBannerInner" style="position:relative; z-index:2; width:100%; padding:16px; text-align:<%= anBanner.textAlign || 'center' %>; color:#fff;">
+            <h4 id="anPrevTitle" style="font-size:1rem; font-weight:700; margin:0 0 4px; color:#fff;"><%= anBanner.title || 'Selamat Menyambut Masa Adven & Hari Natal 2026' %></h4>
+            <p id="anPrevSub" style="font-size:0.72rem; opacity:0.85; margin:0 0 8px;"><%= anBanner.subtitle || '' %></p>
+            <span id="anPrevBtn" style="background:#D9B66F; color:#0F1D35; font-size:0.7rem; font-weight:700; padding:4px 12px; border-radius:16px; display:inline-block;"><%= anBanner.buttonText || 'Lihat Jadwal Ibadah' %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Ornamen & Liturgi -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0 0 12px; display:flex; align-items:center; gap:8px;">🎀 Ornamen & Liturgi</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px; margin-bottom:14px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+            <input type="checkbox" name="ornament_stars" <%= anOrnaments.stars ? 'checked' : '' %>> ⭐ Bintang
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+            <input type="checkbox" name="ornament_pine" <%= anOrnaments.pine ? 'checked' : '' %>> 🌲 Garland Pinus
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+            <input type="checkbox" name="ornament_baubles" <%= anOrnaments.baubles ? 'checked' : '' %>> 🔮 Bola Natal
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+            <input type="checkbox" name="ornament_candle" <%= anOrnaments.candle ? 'checked' : '' %>> 🕯️ Lilin Adven
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+            <input type="checkbox" name="ornament_snow" <%= anOrnaments.snow ? 'checked' : '' %>> ❄️ Salju
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+            <input type="checkbox" name="ornament_golden_glow" <%= anOrnaments.goldenGlow ? 'checked' : '' %>> ✨ Cahaya Emas
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+            <input type="checkbox" name="ornament_corner_decor" <%= anOrnaments.cornerDecor ? 'checked' : '' %>> 🎀 Dekorasi Sudut
+          </label>
+        </div>
+
+        <div style="background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid #E2E8F0;">
+          <label style="font-weight:600; font-size:0.82rem; display:block; margin-bottom:4px;">🕯️ Lilin Liturgi Aktif</label>
+          <select name="liturgiWeek" style="width:100%;">
+            <option value="adven-1" <%= anTheme.liturgiWeek === 'adven-1' ? 'selected' : '' %>>Adven I — Harapan (Ungu)</option>
+            <option value="adven-2" <%= anTheme.liturgiWeek === 'adven-2' ? 'selected' : '' %>>Adven II — Perdamaian (Ungu)</option>
+            <option value="adven-3" <%= anTheme.liturgiWeek === 'adven-3' ? 'selected' : '' %>>Adven III — Sukacita (Pink)</option>
+            <option value="adven-4" <%= anTheme.liturgiWeek === 'adven-4' ? 'selected' : '' %>>Adven IV — Kasih (Ungu)</option>
+            <option value="natal" <%= (!anTheme.liturgiWeek || anTheme.liturgiWeek === 'natal') ? 'selected' : '' %>>⭐ Natal — Kristus (Putih)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:14px 0;">
+        <button type="submit" class="btn btn--primary" style="padding:10px 24px; font-weight:700; border-radius:10px; display:flex; align-items:center; gap:6px;">💾 Simpan Tema</button>
+        <button type="button" class="btn btn--outline" onclick="openAnPreviewModal('theme')" style="padding:10px 18px; border-radius:10px;">👁️ Preview</button>
+        <button type="button" class="btn btn--outline" onclick="confirmResetAdvenNatal()" style="padding:10px 18px; margin-left:auto; color:#EF4444; border-color:#FCA5A5; border-radius:10px;">🔄 Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══════════════ SUBTAB 2: COUNTDOWN ═══════════════ -->
+  <div id="anSubtab_countdown" class="an-subtab-content" style="display:none;">
+    <form action="/admin/adven-natal/countdown" method="POST">
+
+      <!-- Toggle + Judul -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0; display:flex; align-items:center; gap:8px;">⏱️ Countdown Natal</h3>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; background:#FFFBEB; padding:6px 12px; border-radius:8px; border:1px solid #FDE68A; font-size:0.82rem; font-weight:600; color:#92400E;">
+            <input type="checkbox" name="countdown_enabled" <%= anCountdown.enabled ? 'checked' : '' %>>
+            Aktif
+          </label>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Judul Countdown</label>
             <input type="text" id="an_cd_title" name="countdown_title" value="<%= anCountdown.title || 'Hitung Mundur Ibadah Perayaan Natal 2026' %>" required style="width:100%;" oninput="updateCdLivePreview()">
           </div>
-          <div class="form-group">
-            <label style="font-weight:600; font-size:0.85rem;">Subjudul / Lokasi</label>
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Subjudul</label>
             <input type="text" id="an_cd_sub" name="countdown_subtitle" value="<%= anCountdown.subtitle || '' %>" style="width:100%;" oninput="updateCdLivePreview()">
           </div>
         </div>
 
-        <div class="grid-3" style="background:#F9FAFB; padding:14px; border-radius:10px; border:1px solid #E5E7EB; margin-bottom:1.2rem;">
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:600; font-size:0.85rem;">Tanggal Perayaan Natal</label>
+        <!-- Waktu Perayaan -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; background:#F8FAFC; padding:12px; border-radius:10px; border:1px solid #E2E8F0; margin-bottom:12px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Tanggal</label>
             <input type="date" id="an_cd_date" name="christmasDate" value="<%= anCountdown.christmasDate || '2026-12-25' %>" required style="width:100%;" onchange="updateCdLivePreview()">
           </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:600; font-size:0.85rem;">Jam Perayaan Natal</label>
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Jam</label>
             <input type="time" id="an_cd_time" name="christmasTime" value="<%= anCountdown.christmasTime || '09:00' %>" required style="width:100%;" onchange="updateCdLivePreview()">
           </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:600; font-size:0.85rem;">Zona Waktu</label>
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Zona Waktu</label>
             <select name="timezone" style="width:100%;">
-              <option value="Asia/Jakarta" <%= (!anCountdown.timezone || anCountdown.timezone === 'Asia/Jakarta') ? 'selected' : '' %>>Asia/Jakarta (WIB)</option>
-              <option value="Asia/Makassar" <%= anCountdown.timezone === 'Asia/Makassar' ? 'selected' : '' %>>Asia/Makassar (WITA)</option>
-              <option value="Asia/Jayapura" <%= anCountdown.timezone === 'Asia/Jayapura' ? 'selected' : '' %>>Asia/Jayapura (WIT)</option>
+              <option value="Asia/Jakarta" <%= (!anCountdown.timezone || anCountdown.timezone === 'Asia/Jakarta') ? 'selected' : '' %>>WIB</option>
+              <option value="Asia/Makassar" <%= anCountdown.timezone === 'Asia/Makassar' ? 'selected' : '' %>>WITA</option>
+              <option value="Asia/Jayapura" <%= anCountdown.timezone === 'Asia/Jayapura' ? 'selected' : '' %>>WIT</option>
             </select>
           </div>
         </div>
 
-        <div class="grid-2">
-          <div class="form-group">
-            <label style="font-weight:600; font-size:0.85rem;">Teks Sebelum Countdown (Tagline)</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Teks Sebelum Countdown</label>
             <input type="text" name="countdown_pretext" value="<%= anCountdown.pretext || 'Menuju Perayaan Kelahiran Kristus:' %>" style="width:100%;">
           </div>
-          <div class="form-group">
-            <label style="font-weight:600; font-size:0.85rem;">Pesan Khusus Saat Natal Tiba (Zero Message)</label>
-            <input type="text" name="countdown_completion_message" value="<%= anCountdown.completionMessage || '🎉 Puji Tuhan! Selamat Hari Natal 25 Desember! Terpujilah Kristus Sang Juru Selamat!' %>" style="width:100%;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-weight:600; font-size:0.82rem;">Pesan Saat Natal Tiba</label>
+            <input type="text" name="countdown_completion_message" value="<%= anCountdown.completionMessage || '🎉 Puji Tuhan! Selamat Hari Natal!' %>" style="width:100%;">
           </div>
         </div>
+      </div>
 
-        <!-- Pilihan Style Countdown -->
-        <div class="form-group" style="margin-bottom:1.5rem;">
-          <label style="font-weight:700; font-size:0.9rem; color:var(--navy); margin-bottom:8px; display:block;">Pilihan Desain / Style Countdown:</label>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-            <label style="border:2px solid <%= anCountdown.style === 'minimalis' ? '#3B82F6' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:#fff; display:flex; gap:8px;" onclick="setCdStyle('minimalis')">
-              <input type="radio" name="countdown_style" value="minimalis" <%= anCountdown.style === 'minimalis' ? 'checked' : '' %>>
-              <div>
-                <strong style="font-size:0.85rem; color:#1E40AF;">Minimalis Elegan</strong>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Garis halus, tipografi bersih, elegan tanpa distraksi.</span>
-              </div>
-            </label>
+      <!-- Style & Tampilan -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0 0 12px; display:flex; align-items:center; gap:8px;">🎯 Desain & Posisi</h3>
 
-            <label style="border:2px solid <%= anCountdown.style === 'gold' ? '#D9B66F' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:#fff; display:flex; gap:8px;" onclick="setCdStyle('gold')">
-              <input type="radio" name="countdown_style" value="gold" <%= anCountdown.style === 'gold' ? 'checked' : '' %>>
-              <div>
-                <strong style="font-size:0.85rem; color:#92400E;">Premium Gold</strong>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Aksen emas mewah, garis berkilau keemasan.</span>
-              </div>
-            </label>
-
-            <label style="border:2px solid <%= anCountdown.style === 'glow' ? '#EC4899' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:#fff; display:flex; gap:8px;" onclick="setCdStyle('glow')">
-              <input type="radio" name="countdown_style" value="glow" <%= anCountdown.style === 'glow' ? 'checked' : '' %>>
-              <div>
-                <strong style="font-size:0.85rem; color:#BE185D;">Christmas Glow</strong>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Pendar cahaya neon hangat khas lilin dan bintang Natal.</span>
-              </div>
-            </label>
-
-            <label style="border:2px solid <%= (!anCountdown.style || anCountdown.style === 'glassmorphism') ? '#8B5CF6' : '#E5E7EB' %>; border-radius:10px; padding:12px; cursor:pointer; background:#fff; display:flex; gap:8px;" onclick="setCdStyle('glassmorphism')">
-              <input type="radio" name="countdown_style" value="glassmorphism" <%= (!anCountdown.style || anCountdown.style === 'glassmorphism') ? 'checked' : '' %>>
-              <div>
-                <strong style="font-size:0.85rem; color:#6D28D9;">Glassmorphism</strong>
-                <span style="font-size:0.75rem; color:#4B5563; display:block;">Efek kaca buram (frosted glass) mewah 3D.</span>
-              </div>
-            </label>
-          </div>
+        <!-- Style Cards -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px; margin-bottom:14px;">
+          <label style="border:2px solid <%= anCountdown.style === 'minimalis' ? '#3B82F6' : '#E5E7EB' %>; border-radius:10px; padding:10px; cursor:pointer; background:<%= anCountdown.style === 'minimalis' ? '#EFF6FF' : '#FAFAFA' %>; text-align:center;" onclick="setCdStyle('minimalis')">
+            <input type="radio" name="countdown_style" value="minimalis" <%= anCountdown.style === 'minimalis' ? 'checked' : '' %> style="display:none;">
+            <strong style="font-size:0.8rem; color:#1E40AF; display:block;">Minimalis</strong>
+            <span style="font-size:0.68rem; color:#64748B;">Bersih & elegan</span>
+          </label>
+          <label style="border:2px solid <%= anCountdown.style === 'gold' ? '#D9B66F' : '#E5E7EB' %>; border-radius:10px; padding:10px; cursor:pointer; background:<%= anCountdown.style === 'gold' ? '#FFFBEB' : '#FAFAFA' %>; text-align:center;" onclick="setCdStyle('gold')">
+            <input type="radio" name="countdown_style" value="gold" <%= anCountdown.style === 'gold' ? 'checked' : '' %> style="display:none;">
+            <strong style="font-size:0.8rem; color:#92400E; display:block;">Gold</strong>
+            <span style="font-size:0.68rem; color:#64748B;">Emas mewah</span>
+          </label>
+          <label style="border:2px solid <%= anCountdown.style === 'glow' ? '#EC4899' : '#E5E7EB' %>; border-radius:10px; padding:10px; cursor:pointer; background:<%= anCountdown.style === 'glow' ? '#FDF2F8' : '#FAFAFA' %>; text-align:center;" onclick="setCdStyle('glow')">
+            <input type="radio" name="countdown_style" value="glow" <%= anCountdown.style === 'glow' ? 'checked' : '' %> style="display:none;">
+            <strong style="font-size:0.8rem; color:#BE185D; display:block;">Glow</strong>
+            <span style="font-size:0.68rem; color:#64748B;">Cahaya hangat</span>
+          </label>
+          <label style="border:2px solid <%= (!anCountdown.style || anCountdown.style === 'glassmorphism') ? '#8B5CF6' : '#E5E7EB' %>; border-radius:10px; padding:10px; cursor:pointer; background:<%= (!anCountdown.style || anCountdown.style === 'glassmorphism') ? '#FAF5FF' : '#FAFAFA' %>; text-align:center;" onclick="setCdStyle('glassmorphism')">
+            <input type="radio" name="countdown_style" value="glassmorphism" <%= (!anCountdown.style || anCountdown.style === 'glassmorphism') ? 'checked' : '' %> style="display:none;">
+            <strong style="font-size:0.8rem; color:#6D28D9; display:block;">Glass</strong>
+            <span style="font-size:0.68rem; color:#64748B;">Kaca buram 3D</span>
+          </label>
         </div>
 
-        <!-- Posisi & Pengaturan Tampilan Tambahan -->
-        <div class="grid-2" style="background:#F9FAFB; padding:14px; border-radius:10px; border:1px solid #E5E7EB; margin-bottom:1.2rem;">
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:600; font-size:0.85rem;">Posisi Countdown pada Website</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.82rem; font-weight:600;">Posisi</label>
             <select name="countdown_position" style="width:100%;">
-              <option value="hero" <%= (!anCountdown.position || anCountdown.position === 'hero') ? 'selected' : '' %>>Beranda — Di Bawah Hero Banner</option>
-              <option value="dedicated" <%= anCountdown.position === 'dedicated' ? 'selected' : '' %>>Beranda — Dedicated Section Sebelum Berita</option>
-              <option value="bottom-bar" <%= anCountdown.position === 'bottom-bar' ? 'selected' : '' %>>Floating Bar — Sticky di Bawah Layar</option>
-              <option value="floating-card" <%= anCountdown.position === 'floating-card' ? 'selected' : '' %>>Floating Badge — Melayang di Sudut Layar</option>
+              <option value="hero" <%= (!anCountdown.position || anCountdown.position === 'hero') ? 'selected' : '' %>>Di Bawah Banner</option>
+              <option value="dedicated" <%= anCountdown.position === 'dedicated' ? 'selected' : '' %>>Section Khusus</option>
+              <option value="bottom-bar" <%= anCountdown.position === 'bottom-bar' ? 'selected' : '' %>>Floating Bar Bawah</option>
+              <option value="floating-card" <%= anCountdown.position === 'floating-card' ? 'selected' : '' %>>Floating Badge</option>
             </select>
           </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:600; font-size:0.85rem;">Background Kartu Angka</label>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.82rem; font-weight:600;">Background Kartu</label>
             <select name="countdown_card_bg" style="width:100%;">
-              <option value="glass" <%= (!anCountdown.cardBackground || anCountdown.cardBackground === 'glass') ? 'selected' : '' %>>Glassmorphic (Kaca Transparan)</option>
-              <option value="solid" <%= anCountdown.cardBackground === 'solid' ? 'selected' : '' %>>Solid Navy Gelap</option>
-              <option value="transparent" <%= anCountdown.cardBackground === 'transparent' ? 'selected' : '' %>>Transparan Polos</option>
+              <option value="glass" <%= (!anCountdown.cardBackground || anCountdown.cardBackground === 'glass') ? 'selected' : '' %>>Glassmorphic</option>
+              <option value="solid" <%= anCountdown.cardBackground === 'solid' ? 'selected' : '' %>>Solid Navy</option>
+              <option value="transparent" <%= anCountdown.cardBackground === 'transparent' ? 'selected' : '' %>>Transparan</option>
             </select>
           </div>
-        </div>
-
-        <div class="grid-3" style="margin-bottom:1.2rem;">
-          <div class="form-group">
-            <label style="font-size:0.82rem; font-weight:600;">Warna Angka</label>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <input type="color" name="countdown_number_color" value="<%= anCountdown.numberColor || '#FFFFFF' %>" style="width:36px; height:34px; padding:0; border:1px solid #ccc; border-radius:6px;">
-              <span style="font-size:0.75rem; color:#666;">Pilihan warna digit</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label style="font-size:0.82rem; font-weight:600;">Warna Label (Hari/Jam/Mnt/Dtk)</label>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <input type="color" name="countdown_label_color" value="<%= anCountdown.labelColor || '#D9B66F' %>" style="width:36px; height:34px; padding:0; border:1px solid #ccc; border-radius:6px;">
-              <span style="font-size:0.75rem; color:#666;">Pilihan warna label</span>
-            </div>
-          </div>
-          <div class="form-group">
+          <div class="form-group" style="margin:0;">
             <label style="font-size:0.82rem; font-weight:600;">Tampilkan Detik</label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-top:6px; font-size:0.85rem;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin-top:6px; font-size:0.82rem;">
               <input type="checkbox" id="an_cd_show_secs" name="countdown_show_seconds" <%= anCountdown.showSeconds ? 'checked' : '' %> onchange="toggleCdSecs(this)">
-              <span>Tampilkan Komponen Detik</span>
+              <span>Ya, tampilkan</span>
             </label>
           </div>
         </div>
 
-        <div class="grid-3">
-          <div class="form-group">
-            <label style="font-size:0.82rem; font-weight:600;">Lokasi Ibadah</label>
-            <input type="text" name="countdown_location" value="<%= anCountdown.location || 'Gedung Gereja AMIN Jemaat Hermon' %>" style="width:100%;">
+        <details style="background:#F8FAFC; border-radius:10px; border:1px solid #E2E8F0; padding:12px; margin-bottom:12px;">
+          <summary style="font-weight:600; font-size:0.85rem; color:var(--navy); cursor:pointer;">⚙️ Pengaturan Tambahan</summary>
+          <div style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div>
+              <label style="font-size:0.8rem; font-weight:600;">Warna Angka</label>
+              <input type="color" name="countdown_number_color" value="<%= anCountdown.numberColor || '#FFFFFF' %>" style="width:36px; height:30px; padding:0; border:1px solid #ccc; border-radius:6px;">
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:600;">Warna Label</label>
+              <input type="color" name="countdown_label_color" value="<%= anCountdown.labelColor || '#D9B66F' %>" style="width:36px; height:30px; padding:0; border:1px solid #ccc; border-radius:6px;">
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:600;">Lokasi Ibadah</label>
+              <input type="text" name="countdown_location" value="<%= anCountdown.location || 'Gedung Gereja AMIN Jemaat Hermon' %>" style="width:100%;">
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:600;">Teks Tombol CTA</label>
+              <input type="text" name="countdown_cta_text" value="<%= anCountdown.ctaText || 'Lihat Jadwal Ibadah Natal' %>" style="width:100%;">
+            </div>
+            <div style="grid-column:span 2;">
+              <label style="font-size:0.8rem; font-weight:600;">Link Tombol CTA</label>
+              <input type="text" name="countdown_cta_link" value="<%= anCountdown.ctaLink || '/visit' %>" style="width:100%;">
+            </div>
           </div>
-          <div class="form-group">
-            <label style="font-size:0.82rem; font-weight:600;">Teks Tombol Aksi (CTA)</label>
-            <input type="text" name="countdown_cta_text" value="<%= anCountdown.ctaText || 'Lihat Jadwal Ibadah Natal' %>" style="width:100%;">
-          </div>
-          <div class="form-group">
-            <label style="font-size:0.82rem; font-weight:600;">Link Tombol Aksi</label>
-            <input type="text" name="countdown_cta_link" value="<%= anCountdown.ctaLink || '/visit' %>" style="width:100%;">
-          </div>
-        </div>
+        </details>
 
-        <!-- Live Preview Countdown Box inside Admin -->
-        <div style="margin-top:12px; margin-bottom:1.5rem;">
-          <label style="font-size:0.8rem; font-weight:700; color:var(--navy); display:block; margin-bottom:6px;">Pratinjau Langsung Countdown Natal:</label>
-          <div id="anAdminCdLiveCard" class="an-countdown-hero" style="max-width:680px; margin:0 auto;">
+        <!-- Live Preview Countdown -->
+        <div style="margin-bottom:4px;">
+          <label style="font-size:0.8rem; font-weight:700; color:var(--navy); display:block; margin-bottom:6px;">Pratinjau Countdown:</label>
+          <div id="anAdminCdLiveCard" class="an-countdown-hero" style="max-width:580px; margin:0 auto;">
             <div class="an-countdown-hero__header">
               <span class="an-countdown-hero__tag">🎄 PERAYAAN NATAL 2026</span>
               <h3 class="an-countdown-hero__title" id="anPrevCdTitle"><%= anCountdown.title || 'Hitung Mundur Ibadah Perayaan Natal 2026' %></h3>
-              <p class="an-countdown-hero__subtext" id="anPrevCdSub"><%= anCountdown.subtitle || 'Sambutlah Sang Juru Selamat dengan sukacita dan damai sejahtera' %></p>
+              <p class="an-countdown-hero__subtext" id="anPrevCdSub"><%= anCountdown.subtitle || 'Sambutlah Sang Juru Selamat dengan sukacita' %></p>
             </div>
             <div class="an-countdown-hero__grid">
               <div class="an-cd-box">
@@ -2685,315 +2540,288 @@
             </div>
           </div>
         </div>
-
-        <!-- Action Bar -->
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding-top:14px; border-top:1px solid #E5E7EB;">
-          <button type="submit" class="btn btn--primary" style="padding:10px 24px; font-weight:700; display:flex; align-items:center; gap:8px;">
-            <span>💾 Simpan Pengaturan Countdown</span>
-          </button>
-          <button type="button" class="btn btn--outline" onclick="openAnPreviewModal('countdown')" style="padding:10px 18px; display:flex; align-items:center; gap:6px;">
-            <span>👁️ Preview Countdown</span>
-          </button>
-          <button type="button" class="btn btn--outline" onclick="confirmResetAdvenNatal()" style="padding:10px 18px; margin-left:auto; color:#EF4444; border-color:#FCA5A5; display:flex; align-items:center; gap:6px;">
-            <span>🔄 Reset ke Default</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==================== SUBTAB 3: ANIMASI NATAL ==================== -->
-  <div id="anSubtab_animation" class="an-subtab-content" style="display:none;">
-    <div class="card" style="border-left:4px solid #8B5CF6; margin-bottom:1.5rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:10px;">
-        <div>
-          <h2 class="card-title" style="margin:0;">✨ Sistem Animasi Natal Interaktif</h2>
-          <span style="font-size:0.82rem; color:var(--text-muted);">Kelola 7 jenis animasi elegan (salju, bintang, lampu garland, partikel emas, lilin) dengan kontrol intensitas dan optimasi performa.</span>
-        </div>
       </div>
 
-      <form action="/admin/adven-natal/animation" method="POST">
-        <!-- Master Toggle Animasi -->
-        <div class="form-group" style="margin-bottom:1.2rem; background:#F5F3FF; padding:12px; border-radius:8px; border:1px solid #DDD6FE;">
-          <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#5B21B6;">
+      <!-- Action Buttons -->
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:14px 0;">
+        <button type="submit" class="btn btn--primary" style="padding:10px 24px; font-weight:700; border-radius:10px; display:flex; align-items:center; gap:6px;">💾 Simpan Countdown</button>
+        <button type="button" class="btn btn--outline" onclick="openAnPreviewModal('countdown')" style="padding:10px 18px; border-radius:10px;">👁️ Preview</button>
+        <button type="button" class="btn btn--outline" onclick="confirmResetAdvenNatal()" style="padding:10px 18px; margin-left:auto; color:#EF4444; border-color:#FCA5A5; border-radius:10px;">🔄 Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══════════════ SUBTAB 3: ANIMASI ═══════════════ -->
+  <div id="anSubtab_animation" class="an-subtab-content" style="display:none;">
+    <form action="/admin/adven-natal/animation" method="POST">
+
+      <!-- Master Toggle -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="font-size:0.95rem; font-weight:700; color:var(--navy); margin:0; display:flex; align-items:center; gap:8px;">✨ Animasi Natal</h3>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; background:#F5F3FF; padding:6px 12px; border-radius:8px; border:1px solid #DDD6FE; font-size:0.82rem; font-weight:700; color:#5B21B6;">
             <input type="checkbox" name="animations_enabled" <%= anAnim.enabled !== false ? 'checked' : '' %>>
-            <span>Aktifkan Seluruh Sistem Efek & Animasi Natal</span>
+            Aktifkan Semua
           </label>
         </div>
 
-        <!-- 7 Panel Animasi Natal -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:14px; margin-bottom:1.5rem;">
+        <!-- Animation Cards Grid - Simplified! -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
+
           <!-- 1. Falling Snow -->
-          <div style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="color:var(--navy); font-size:0.9rem; display:flex; align-items:center; gap:6px;">❄️ 1. Falling Snow (Salju Jatuh)</strong>
-              <label style="cursor:pointer;"><input type="checkbox" name="snow_enabled" <%= anSnow.enabled ? 'checked' : '' %>></label>
+              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">❄️ Salju</strong>
+              <input type="checkbox" name="snow_enabled" <%= anSnow.enabled ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
             </div>
-            <div class="grid-2" style="gap:8px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Intensitas</label>
-                <select name="snow_intensity" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                  <option value="low" <%= anSnow.intensity === 'low' ? 'selected' : '' %>>Ringan / Halus (30)</option>
-                  <option value="medium" <%= (!anSnow.intensity || anSnow.intensity === 'medium') ? 'selected' : '' %>>Sedang (60)</option>
-                  <option value="high" <%= anSnow.intensity === 'high' ? 'selected' : '' %>>Lebat / Rapat (100)</option>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Intensitas</label>
+                <select name="snow_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
+                  <option value="low" <%= anSnow.intensity === 'low' ? 'selected' : '' %>>Ringan</option>
+                  <option value="medium" <%= (!anSnow.intensity || anSnow.intensity === 'medium') ? 'selected' : '' %>>Sedang</option>
+                  <option value="high" <%= anSnow.intensity === 'high' ? 'selected' : '' %>>Lebat</option>
                 </select>
               </div>
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Kecepatan</label>
-                <select name="snow_speed" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                  <option value="slow" <%= anSnow.speed === 'slow' ? 'selected' : '' %>>Lambat / Syahdu</option>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Kecepatan</label>
+                <select name="snow_speed" style="width:100%; font-size:0.78rem; padding:4px;">
+                  <option value="slow" <%= anSnow.speed === 'slow' ? 'selected' : '' %>>Lambat</option>
                   <option value="gentle" <%= (!anSnow.speed || anSnow.speed === 'gentle') ? 'selected' : '' %>>Normal</option>
                   <option value="fast" <%= anSnow.speed === 'fast' ? 'selected' : '' %>>Cepat</option>
                 </select>
               </div>
             </div>
             <div style="margin-top:8px;">
-              <label style="font-size:0.75rem; font-weight:600;">Area Tampilan</label>
-              <select name="snow_area" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                <option value="full_page" <%= (!anSnow.area || anSnow.area === 'full_page') ? 'selected' : '' %>>Seluruh Halaman Website</option>
-                <option value="hero_banner" <%= anSnow.area === 'hero_banner' ? 'selected' : '' %>>Area Hero & Banner Saja</option>
-                <option value="header_only" <%= anSnow.area === 'header_only' ? 'selected' : '' %>>Header & Navbar Saja</option>
+              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
+              <select name="snow_area" style="width:100%; font-size:0.78rem; padding:4px;">
+                <option value="full_page" <%= (!anSnow.area || anSnow.area === 'full_page') ? 'selected' : '' %>>Seluruh Halaman</option>
+                <option value="hero_banner" <%= anSnow.area === 'hero_banner' ? 'selected' : '' %>>Hero Banner</option>
+                <option value="header_only" <%= anSnow.area === 'header_only' ? 'selected' : '' %>>Header</option>
               </select>
             </div>
           </div>
 
           <!-- 2. Twinkling Stars -->
-          <div style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="color:var(--navy); font-size:0.9rem; display:flex; align-items:center; gap:6px;">⭐ 2. Twinkling Stars (Bintang Berkelap-Kelip)</strong>
-              <label style="cursor:pointer;"><input type="checkbox" name="stars_enabled" <%= anStars.enabled ? 'checked' : '' %>></label>
+              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">⭐ Bintang</strong>
+              <input type="checkbox" name="stars_enabled" <%= anStars.enabled ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
             </div>
-            <div class="grid-2" style="gap:8px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Intensitas Bintang</label>
-                <select name="stars_intensity" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                  <option value="low" <%= anStars.intensity === 'low' ? 'selected' : '' %>>Sedikit / Lembut</option>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Intensitas</label>
+                <select name="stars_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
+                  <option value="low" <%= anStars.intensity === 'low' ? 'selected' : '' %>>Sedikit</option>
                   <option value="medium" <%= (!anStars.intensity || anStars.intensity === 'medium') ? 'selected' : '' %>>Sedang</option>
-                  <option value="high" <%= anStars.intensity === 'high' ? 'selected' : '' %>>Banyak Bintang</option>
+                  <option value="high" <%= anStars.intensity === 'high' ? 'selected' : '' %>>Banyak</option>
                 </select>
               </div>
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Warna Bintang</label>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <input type="color" name="stars_color" value="<%= anStars.color || '#FFDF78' %>" style="width:34px; height:30px; padding:0; border:1px solid #ccc; border-radius:4px;">
-                  <span style="font-size:0.72rem; color:#666;">Kilau</span>
-                </div>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Warna</label>
+                <input type="color" name="stars_color" value="<%= anStars.color || '#FFDF78' %>" style="width:100%; height:28px; padding:0; border:1px solid #ccc; border-radius:4px; cursor:pointer;">
               </div>
             </div>
             <div style="margin-top:8px;">
-              <label style="font-size:0.75rem; font-weight:600;">Area Tampilan</label>
-              <select name="stars_area" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                <option value="full_page" <%= (!anStars.area || anStars.area === 'full_page') ? 'selected' : '' %>>Seluruh Halaman Website</option>
-                <option value="hero_banner" <%= anStars.area === 'hero_banner' ? 'selected' : '' %>>Area Hero Saja</option>
+              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
+              <select name="stars_area" style="width:100%; font-size:0.78rem; padding:4px;">
+                <option value="full_page" <%= (!anStars.area || anStars.area === 'full_page') ? 'selected' : '' %>>Seluruh Halaman</option>
+                <option value="hero_banner" <%= anStars.area === 'hero_banner' ? 'selected' : '' %>>Hero</option>
               </select>
             </div>
           </div>
 
           <!-- 3. Christmas Lights -->
-          <div style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="color:var(--navy); font-size:0.9rem; display:flex; align-items:center; gap:6px;">💡 3. Christmas Lights (Lampu Warna-Warni)</strong>
-              <label style="cursor:pointer;"><input type="checkbox" name="lights_enabled" <%= anLights.enabled ? 'checked' : '' %>></label>
+              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">💡 Lampu Natal</strong>
+              <input type="checkbox" name="lights_enabled" <%= anLights.enabled ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
             </div>
-            <div class="grid-2" style="gap:8px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Kecepatan Kedip</label>
-                <select name="lights_speed" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                  <option value="slow" <%= anLights.speed === 'slow' ? 'selected' : '' %>>Halus & Lembut</option>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Kecepatan</label>
+                <select name="lights_speed" style="width:100%; font-size:0.78rem; padding:4px;">
+                  <option value="slow" <%= anLights.speed === 'slow' ? 'selected' : '' %>>Halus</option>
                   <option value="normal" <%= (!anLights.speed || anLights.speed === 'normal') ? 'selected' : '' %>>Normal</option>
                   <option value="fast" <%= anLights.speed === 'fast' ? 'selected' : '' %>>Lincah</option>
                 </select>
               </div>
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Gaya Lampu</label>
-                <select name="lights_style" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                  <option value="garland_top" <%= (!anLights.style || anLights.style === 'garland_top') ? 'selected' : '' %>>Untaian Atas (Garland)</option>
-                  <option value="border_glow" <%= anLights.style === 'border_glow' ? 'selected' : '' %>>Pendar Border</option>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Gaya</label>
+                <select name="lights_style" style="width:100%; font-size:0.78rem; padding:4px;">
+                  <option value="garland_top" <%= (!anLights.style || anLights.style === 'garland_top') ? 'selected' : '' %>>Garland Atas</option>
+                  <option value="border_glow" <%= anLights.style === 'border_glow' ? 'selected' : '' %>>Border Glow</option>
                 </select>
               </div>
             </div>
             <div style="margin-top:8px;">
-              <label style="font-size:0.75rem; font-weight:600;">Area Tampilan</label>
-              <select name="lights_area" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                <option value="header_only" <%= (!anLights.area || anLights.area === 'header_only') ? 'selected' : '' %>>Header & Navbar (Rekomendasi)</option>
-                <option value="full_page" <%= anLights.area === 'full_page' ? 'selected' : '' %>>Sepanjang Tepi Halaman</option>
+              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
+              <select name="lights_area" style="width:100%; font-size:0.78rem; padding:4px;">
+                <option value="header_only" <%= (!anLights.area || anLights.area === 'header_only') ? 'selected' : '' %>>Header & Navbar</option>
+                <option value="full_page" <%= anLights.area === 'full_page' ? 'selected' : '' %>>Tepi Halaman</option>
               </select>
             </div>
           </div>
 
           <!-- 4. Golden Particles -->
-          <div style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="color:var(--navy); font-size:0.9rem; display:flex; align-items:center; gap:6px;">✨ 4. Golden Particles (Partikel Emas)</strong>
-              <label style="cursor:pointer;"><input type="checkbox" name="golden_particles_enabled" <%= anGolden.enabled ? 'checked' : '' %>></label>
+              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">✨ Partikel Emas</strong>
+              <input type="checkbox" name="golden_particles_enabled" <%= anGolden.enabled ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
             </div>
-            <div class="grid-2" style="gap:8px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Intensitas Partikel</label>
-                <select name="golden_particles_intensity" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                  <option value="low" <%= anGolden.intensity === 'low' ? 'selected' : '' %>>Halus (Sedikit)</option>
-                  <option value="medium" <%= (!anGolden.intensity || anGolden.intensity === 'medium') ? 'selected' : '' %>>Sedang (Elegan)</option>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Intensitas</label>
+                <select name="golden_particles_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
+                  <option value="low" <%= anGolden.intensity === 'low' ? 'selected' : '' %>>Sedikit</option>
+                  <option value="medium" <%= (!anGolden.intensity || anGolden.intensity === 'medium') ? 'selected' : '' %>>Sedang</option>
                   <option value="high" <%= anGolden.intensity === 'high' ? 'selected' : '' %>>Padat</option>
                 </select>
               </div>
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Opacity Transparansi</label>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Transparansi</label>
                 <input type="range" name="golden_particles_opacity" min="20" max="100" value="<%= anGolden.opacity || 70 %>" style="width:100%;">
               </div>
             </div>
             <div style="margin-top:8px;">
-              <label style="font-size:0.75rem; font-weight:600;">Area Tampilan</label>
-              <select name="golden_particles_area" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                <option value="hero_banner" <%= (!anGolden.area || anGolden.area === 'hero_banner') ? 'selected' : '' %>>Area Hero & Kartu Utama</option>
+              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
+              <select name="golden_particles_area" style="width:100%; font-size:0.78rem; padding:4px;">
+                <option value="hero_banner" <%= (!anGolden.area || anGolden.area === 'hero_banner') ? 'selected' : '' %>>Hero Banner</option>
                 <option value="full_page" <%= anGolden.area === 'full_page' ? 'selected' : '' %>>Seluruh Halaman</option>
               </select>
             </div>
           </div>
 
-          <!-- 5. Floating Snowflakes & Sparkles -->
-          <div style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+          <!-- 5. Floating Snowflakes -->
+          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="color:var(--navy); font-size:0.9rem; display:flex; align-items:center; gap:6px;">🌨️ 5. Floating Snowflakes</strong>
-              <label style="cursor:pointer;"><input type="checkbox" name="floating_snowflakes_enabled" <%= (anAnim.floatingSnowflakes && anAnim.floatingSnowflakes.enabled) ? 'checked' : '' %>></label>
+              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">🌨️ Kepingan Salju</strong>
+              <input type="checkbox" name="floating_snowflakes_enabled" <%= (anAnim.floatingSnowflakes && anAnim.floatingSnowflakes.enabled) ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
             </div>
-            <p style="font-size:0.75rem; color:#6B7280; margin:0 0 10px;">Ornamen kepingan salju kristal melayang lembut pada area banner.</p>
+            <p style="font-size:0.72rem; color:#64748B; margin:0 0 8px;">Ornamen salju kristal melayang lembut.</p>
             <div>
-              <label style="font-size:0.75rem; font-weight:600;">Area Tampilan</label>
-              <select name="floating_snowflakes_area" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                <option value="hero_banner">Area Banner Natal</option>
+              <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Area</label>
+              <select name="floating_snowflakes_area" style="width:100%; font-size:0.78rem; padding:4px;">
+                <option value="hero_banner">Banner Natal</option>
                 <option value="full_page">Seluruh Halaman</option>
               </select>
             </div>
           </div>
 
-          <!-- 6. Advent Candle Glow & Sparkles -->
-          <div style="background:#fff; border:1px solid #E5E7EB; border-radius:10px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+          <!-- 6. Candle Glow & Sparkles -->
+          <div style="background:#FAFAFA; border:1px solid #E5E7EB; border-radius:12px; padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <strong style="color:var(--navy); font-size:0.9rem; display:flex; align-items:center; gap:6px;">🕯️ 6. Advent Candle Glow & Sparkles</strong>
-              <label style="cursor:pointer;"><input type="checkbox" name="candle_glow_enabled" <%= (anAnim.candleGlow && anAnim.candleGlow.enabled) ? 'checked' : '' %>></label>
+              <strong style="font-size:0.88rem; color:var(--navy); display:flex; align-items:center; gap:6px;">🕯️ Lilin & Kilauan</strong>
+              <input type="checkbox" name="candle_glow_enabled" <%= (anAnim.candleGlow && anAnim.candleGlow.enabled) ? 'checked' : '' %> style="width:18px; height:18px; cursor:pointer;">
             </div>
-            <div class="grid-2" style="gap:8px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Pendar Lilin</label>
-                <select name="candle_glow_intensity" style="width:100%; font-size:0.8rem; padding:4px 6px;">
-                  <option value="gentle">Syahdu & Hangat</option>
-                  <option value="bright">Terang Berkilau</option>
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Pendar Lilin</label>
+                <select name="candle_glow_intensity" style="width:100%; font-size:0.78rem; padding:4px;">
+                  <option value="gentle">Syahdu</option>
+                  <option value="bright">Terang</option>
                 </select>
               </div>
               <div>
-                <label style="font-size:0.75rem; font-weight:600;">Kilauan Sparkle</label>
-                <label style="display:flex; align-items:center; gap:6px; margin-top:4px; font-size:0.78rem; cursor:pointer;">
+                <label style="font-size:0.72rem; font-weight:600; display:block; margin-bottom:2px;">Sparkle</label>
+                <label style="display:flex; align-items:center; gap:4px; margin-top:4px; font-size:0.75rem; cursor:pointer;">
                   <input type="checkbox" name="sparkles_enabled" <%= (anAnim.sparkles && anAnim.sparkles.enabled) ? 'checked' : '' %>>
-                  <span>Aktifkan Sparkle</span>
+                  Aktifkan
                 </label>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- C & D. Kontrol Pengunjung & Aksesibilitas -->
-        <div style="background:#F9FAFB; padding:14px; border-radius:10px; border:1px solid #E5E7EB; margin-bottom:1.5rem;">
-          <strong style="color:var(--navy); font-size:0.9rem; display:block; margin-bottom:8px;">D. Kontrol Pengunjung & Optimasi Performa:</strong>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px;">
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="visitor_toggle_enabled" <%= anVisitor.enabled ? 'checked' : '' %>>
-              <span>Tombol On/Off Salju di Layar Publik (❄️)</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="remember_preference" <%= anVisitor.rememberPreference ? 'checked' : '' %>>
-              <span>Ingat Pilihan Pengunjung (localStorage)</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="respect_reduced_motion" <%= anVisitor.respectReducedMotion ? 'checked' : '' %>>
-              <span>Hormati Mode Reduced-Motion OS</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; background:#fff; padding:10px; border-radius:8px; border:1px solid #E5E7EB;">
-              <input type="checkbox" name="mobile_optimization" <%= anVisitor.mobileOptimization ? 'checked' : '' %>>
-              <span>Mode Hemat Baterai di Smartphone (50% partikel)</span>
-            </label>
+      <!-- Efek Khusus (collapsed) -->
+      <div class="card" style="border-radius:14px; margin-bottom:16px; border:1px solid #E2E8F0;">
+        <details>
+          <summary style="font-weight:700; font-size:0.95rem; color:var(--navy); cursor:pointer; display:flex; align-items:center; gap:8px;">🎭 Efek Khusus & Kontrol Pengunjung</summary>
+          <div style="margin-top:14px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:8px; margin-bottom:14px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+                <input type="checkbox" name="effect_page_transition" <%= anEffects.pageTransition ? 'checked' : '' %>>
+                🌟 Transisi Masuk Halaman
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+                <input type="checkbox" name="effect_soft_glow" <%= anEffects.softGlow ? 'checked' : '' %>>
+                💫 Cahaya Lembut
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+                <input type="checkbox" name="effect_corner_decor" <%= anEffects.cornerDecor ? 'checked' : '' %>>
+                🎀 Dekorasi Sudut
+              </label>
+            </div>
+
+            <h4 style="font-size:0.88rem; font-weight:700; color:var(--navy); margin:0 0 8px;">👤 Kontrol Pengunjung</h4>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:8px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+                <input type="checkbox" name="visitor_toggle_enabled" <%= anVisitor.enabled ? 'checked' : '' %>>
+                ❄️ Tombol On/Off di Web
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+                <input type="checkbox" name="remember_preference" <%= anVisitor.rememberPreference ? 'checked' : '' %>>
+                💾 Ingat Preferensi
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+                <input type="checkbox" name="respect_reduced_motion" <%= anVisitor.respectReducedMotion ? 'checked' : '' %>>
+                ♿ Reduced Motion
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; background:#FAFAFA; padding:8px 10px; border-radius:8px; border:1px solid #E5E7EB;">
+                <input type="checkbox" name="mobile_optimization" <%= anVisitor.mobileOptimization ? 'checked' : '' %>>
+                📱 Hemat Baterai Mobile
+              </label>
+            </div>
           </div>
-        </div>
+        </details>
+      </div>
 
-        <!-- Action Bar -->
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding-top:14px; border-top:1px solid #E5E7EB;">
-          <button type="submit" class="btn btn--primary" style="padding:10px 24px; font-weight:700; display:flex; align-items:center; gap:8px;">
-            <span>💾 Simpan Pengaturan Animasi</span>
-          </button>
-          <button type="button" class="btn btn--outline" onclick="openAnPreviewModal('animation')" style="padding:10px 18px; display:flex; align-items:center; gap:6px;">
-            <span>👁️ Preview Animasi</span>
-          </button>
-          <button type="button" class="btn btn--outline" onclick="confirmResetAdvenNatal()" style="padding:10px 18px; margin-left:auto; color:#EF4444; border-color:#FCA5A5; display:flex; align-items:center; gap:6px;">
-            <span>🔄 Reset ke Default</span>
-          </button>
-        </div>
-      </form>
-    </div>
+      <!-- Action Buttons -->
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:14px 0;">
+        <button type="submit" class="btn btn--primary" style="padding:10px 24px; font-weight:700; border-radius:10px; display:flex; align-items:center; gap:6px;">💾 Simpan Animasi</button>
+        <button type="button" class="btn btn--outline" onclick="openAnPreviewModal('animation')" style="padding:10px 18px; border-radius:10px;">👁️ Preview</button>
+        <button type="button" class="btn btn--outline" onclick="confirmResetAdvenNatal()" style="padding:10px 18px; margin-left:auto; color:#EF4444; border-color:#FCA5A5; border-radius:10px;">🔄 Reset</button>
+      </div>
+    </form>
   </div>
+
 </div>
 
 <!-- ==================== MODAL PREVIEW ADVEN & NATAL ==================== -->
 <div id="anPreviewModal" style="display:none; position:fixed; inset:0; background:rgba(10,15,28,0.85); backdrop-filter:blur(8px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
   <div style="background:#0F1D35; border:1.5px solid rgba(200,169,81,0.5); border-radius:16px; width:100%; max-width:850px; max-height:90vh; overflow-y:auto; color:#fff; box-shadow:0 20px 50px rgba(0,0,0,0.5); position:relative;">
-    <div style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, #1B2A4A, #14243D);">
+    <div style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, #1B2A4A, #14243D);">
       <div style="display:flex; align-items:center; gap:8px;">
-        <span style="font-size:1.3rem;">🎄</span>
-        <strong style="font-size:1.1rem; color:#E8D5A0;">Pratinjau Langsung Modul Adven & Natal</strong>
+        <span style="font-size:1.2rem;">🎄</span>
+        <strong style="font-size:1rem; color:#E8D5A0;">Pratinjau Live</strong>
       </div>
-      <button type="button" onclick="closeAnPreviewModal()" style="background:transparent; border:none; color:#fff; font-size:1.4rem; cursor:pointer; line-height:1;">&times;</button>
+      <button type="button" onclick="closeAnPreviewModal()" style="background:transparent; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">&times;</button>
     </div>
 
     <div style="padding:20px;">
-      <!-- Canvas simulation container for animations -->
       <div style="position:relative; min-height:300px; border-radius:12px; overflow:hidden; background:#0B132B; border:1px solid rgba(200,169,81,0.3); padding:24px; text-align:center;">
-        <!-- Simulated Fairy Lights at Top -->
         <div class="an-fairy-lights" style="position:absolute; top:0; left:0; right:0; z-index:3;">
           <% for (var b = 0; b < 24; b++) { %>
             <div class="an-bulb an-bulb--<%= ['red','gold','green','blue','white'][b % 5] %>"></div>
           <% } %>
         </div>
-
-        <!-- Simulated Falling Snow Canvas -->
         <canvas id="anModalSnowCanvas" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2;"></canvas>
-
-        <!-- Simulated Banner & Countdown Card Content -->
         <div style="position:relative; z-index:4; max-width:620px; margin:20px auto 0;">
-          <div style="display:inline-block; background:rgba(200,169,81,0.2); border:1px solid rgba(200,169,81,0.4); padding:3px 12px; border-radius:20px; font-size:0.75rem; color:#E8D5A0; margin-bottom:8px; font-weight:700;">
-            ⭐ SIMULASI TAMPILAN LIVE WEBSITE
-          </div>
-          <h3 id="anModalTitle" style="font-size:1.4rem; font-weight:700; color:#fff; margin:0 0 6px;">Selamat Menyambut Masa Adven & Hari Natal 2026</h3>
-          <p id="anModalSubtitle" style="font-size:0.85rem; color:rgba(255,255,255,0.8); margin:0 0 16px;">Sebab seorang anak telah lahir untuk kita, seorang putera telah diberikan untuk kita.</p>
-
-          <!-- Simulated Countdown Digits -->
+          <div style="display:inline-block; background:rgba(200,169,81,0.2); border:1px solid rgba(200,169,81,0.4); padding:3px 12px; border-radius:20px; font-size:0.72rem; color:#E8D5A0; margin-bottom:8px; font-weight:700;">⭐ SIMULASI LIVE</div>
+          <h3 id="anModalTitle" style="font-size:1.3rem; font-weight:700; color:#fff; margin:0 0 6px;">Selamat Menyambut Masa Adven & Hari Natal 2026</h3>
+          <p id="anModalSubtitle" style="font-size:0.82rem; color:rgba(255,255,255,0.8); margin:0 0 16px;">Sebab seorang anak telah lahir untuk kita, seorang putera telah diberikan untuk kita.</p>
           <div style="display:flex; justify-content:center; gap:10px; margin-bottom:18px;">
-            <div class="an-cd-box">
-              <span class="an-cd-box__num" id="anModalDays">35</span>
-              <span class="an-cd-box__label">Hari</span>
-            </div>
-            <div class="an-cd-box">
-              <span class="an-cd-box__num" id="anModalHours">11</span>
-              <span class="an-cd-box__label">Jam</span>
-            </div>
-            <div class="an-cd-box">
-              <span class="an-cd-box__num" id="anModalMins">28</span>
-              <span class="an-cd-box__label">Menit</span>
-            </div>
-            <div class="an-cd-box">
-              <span class="an-cd-box__num" id="anModalSecs">44</span>
-              <span class="an-cd-box__label">Detik</span>
-            </div>
+            <div class="an-cd-box"><span class="an-cd-box__num" id="anModalDays">35</span><span class="an-cd-box__label">Hari</span></div>
+            <div class="an-cd-box"><span class="an-cd-box__num" id="anModalHours">11</span><span class="an-cd-box__label">Jam</span></div>
+            <div class="an-cd-box"><span class="an-cd-box__num" id="anModalMins">28</span><span class="an-cd-box__label">Menit</span></div>
+            <div class="an-cd-box"><span class="an-cd-box__num" id="anModalSecs">44</span><span class="an-cd-box__label">Detik</span></div>
           </div>
-
-          <a href="/visit" target="_blank" style="display:inline-block; background:linear-gradient(135deg, #C8A951, #b3923d); color:#0F1D35; font-weight:700; font-size:0.82rem; padding:8px 24px; border-radius:20px; text-decoration:none;">
-            Lihat Jadwal Ibadah Natal →
-          </a>
+          <a href="/visit" target="_blank" style="display:inline-block; background:linear-gradient(135deg, #C8A951, #b3923d); color:#0F1D35; font-weight:700; font-size:0.82rem; padding:8px 24px; border-radius:20px; text-decoration:none;">Lihat Jadwal Ibadah Natal →</a>
         </div>
       </div>
-
-      <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <span style="font-size:0.78rem; color:rgba(255,255,255,0.6);">Animasi salju, pencahayaan garland, dan countdown aktif beroperasi di pratinjau ini.</span>
-        <button type="button" class="btn btn--outline" onclick="closeAnPreviewModal()" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:6px 16px; font-size:0.82rem;">
-          Tutup Pratinjau
-        </button>
+      <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn--outline" onclick="closeAnPreviewModal()" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:6px 16px; font-size:0.82rem;">Tutup</button>
       </div>
     </div>
   </div>
@@ -3003,28 +2831,25 @@
 <form id="formResetAdvenNatal" action="/admin/adven-natal/reset" method="POST" style="display:none;"></form>
 
 <script>
-  // Switch Subtabs (Theme, Countdown, Animation)
   function switchAnSubtab(name, btn) {
-    document.querySelectorAll('.an-subtab-content').forEach(function(el) {
-      el.style.display = 'none';
-    });
+    document.querySelectorAll('.an-subtab-content').forEach(function(el) { el.style.display = 'none'; });
     var target = document.getElementById('anSubtab_' + name);
     if (target) target.style.display = 'block';
-
     document.querySelectorAll('.an-subtab-btn').forEach(function(b) {
       b.classList.remove('active');
-      b.style.background = '#F3F4F6';
-      b.style.color = '#4B5563';
+      b.style.background = 'transparent';
+      b.style.color = '#64748B';
+      b.style.fontWeight = '600';
     });
     if (btn) {
       btn.classList.add('active');
       btn.style.background = '#1B2A4A';
       btn.style.color = '#C8A951';
+      btn.style.fontWeight = '700';
     }
     history.replaceState(null, null, '/admin?tab=adven-natal&sub=' + name);
   }
 
-  // Restore active subtab from URL
   (function() {
     var params = new URLSearchParams(window.location.search);
     var sub = params.get('sub');
@@ -3034,7 +2859,6 @@
     }
   })();
 
-  // Preset Colors Mapping
   var PRESET_PALETTES = {
     'advent-purple': { primary: '#7C3AED', secondary: '#1E1B4B', accent: '#D9B66F', background: '#0F0E17', text: '#FFFFFF' },
     'christmas-gold': { primary: '#D9B66F', secondary: '#1B2A4A', accent: '#B45309', background: '#0B132B', text: '#FFFFFF' },
@@ -3067,7 +2891,6 @@
     if (t) t.value = input.value.toUpperCase();
   }
 
-  // Live Admin Banner Preview
   function previewAdminBannerImage(input, targetImgId) {
     var img = document.getElementById(targetImgId);
     if (input.files && input.files[0]) {
@@ -3089,13 +2912,11 @@
     var b = document.getElementById('an_banner_btn_text');
     var a = document.getElementById('an_banner_text_align');
     var o = document.getElementById('an_banner_overlay_opacity');
-
     var pT = document.getElementById('anPrevTitle');
     var pS = document.getElementById('anPrevSub');
     var pB = document.getElementById('anPrevBtn');
     var pInner = document.getElementById('anAdminBannerInner');
     var pOver = document.getElementById('anAdminBannerOverlay');
-
     if (pT && t) pT.textContent = t.value || 'Selamat Menyambut Masa Adven & Hari Natal 2026';
     if (pS && s) pS.textContent = s.value;
     if (pB && b) pB.textContent = b.value || 'Lihat Jadwal Ibadah';
@@ -3103,7 +2924,6 @@
     if (pOver && o) pOver.style.background = 'rgba(15, 23, 42, ' + (parseInt(o.value, 10) / 100) + ')';
   }
 
-  // Live Admin Countdown Preview
   function updateCdLivePreview() {
     var t = document.getElementById('an_cd_title');
     var s = document.getElementById('an_cd_sub');
@@ -3125,21 +2945,17 @@
     card.classList.add('an-cd--' + style);
   }
 
-  // Confirm Reset Action
   function confirmResetAdvenNatal() {
-    if (confirm('⚠️ PERINGATAN: Apakah Anda yakin ingin mengembalikan seluruh pengaturan Modul Adven & Natal ke default pabrik?\n\nSeluruh warna, teks banner, waktu countdown, dan konfigurasi animasi akan diatur ulang.')) {
+    if (confirm('⚠️ Reset seluruh pengaturan Modul Adven & Natal ke default?\nSemua konfigurasi akan dikembalikan ke pengaturan awal.')) {
       document.getElementById('formResetAdvenNatal').submit();
     }
   }
 
-  // Preview Modal Interactive Snow Simulation
   var modalAnimId = null;
   function openAnPreviewModal(type) {
     var m = document.getElementById('anPreviewModal');
     if (!m) return;
     m.style.display = 'flex';
-
-    // Start modal snow canvas
     var canvas = document.getElementById('anModalSnowCanvas');
     if (canvas) {
       var rect = canvas.getBoundingClientRect();
@@ -3148,16 +2964,8 @@
       var ctx = canvas.getContext('2d');
       var particles = [];
       for (var i = 0; i < 45; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          r: Math.random() * 2.5 + 1,
-          speedY: Math.random() * 0.8 + 0.4,
-          speedX: (Math.random() - 0.5) * 0.4,
-          opacity: Math.random() * 0.7 + 0.3
-        });
+        particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 2.5 + 1, speedY: Math.random() * 0.8 + 0.4, speedX: (Math.random() - 0.5) * 0.4, opacity: Math.random() * 0.7 + 0.3 });
       }
-
       function drawModalSnow() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#FFFFFF';
@@ -3182,13 +2990,9 @@
   function closeAnPreviewModal() {
     var m = document.getElementById('anPreviewModal');
     if (m) m.style.display = 'none';
-    if (modalAnimId) {
-      cancelAnimationFrame(modalAnimId);
-      modalAnimId = null;
-    }
+    if (modalAnimId) { cancelAnimationFrame(modalAnimId); modalAnimId = null; }
   }
 
-  // Summary Dashboard Live Countdown
   (function() {
     var targetDateStr = '<%= targetIso %>';
     var targetTime = new Date(targetDateStr).getTime();
@@ -3201,21 +3005,18 @@
     var mHours = document.getElementById('anModalHours');
     var mMins = document.getElementById('anModalMins');
     var mSecs = document.getElementById('anModalSecs');
-
     function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-
     function updateTick() {
       var diff = targetTime - Date.now();
       if (diff <= 0) {
-        if (tickerEl) tickerEl.textContent = '🎉 Hari Natal Telah Tiba!';
+        if (tickerEl) tickerEl.textContent = '🎉 Natal Telah Tiba!';
         return;
       }
       var d = Math.floor(diff / 86400000);
       var h = Math.floor((diff % 86400000) / 3600000);
       var m = Math.floor((diff % 3600000) / 60000);
       var s = Math.floor((diff % 60000) / 1000);
-
-      var txt = d + ' hari, ' + pad2(h) + ':' + pad2(m) + ':' + pad2(s);
+      var txt = d + 'h ' + pad2(h) + ':' + pad2(m) + ':' + pad2(s);
       if (tickerEl) tickerEl.textContent = txt;
       if (dEl) dEl.textContent = pad2(d);
       if (hEl) hEl.textContent = pad2(h);
