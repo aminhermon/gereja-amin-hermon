@@ -251,7 +251,7 @@ p {
   height: var(--nav-height);
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 var(--space-xl);
+  padding: 0 var(--space-lg) 0 var(--space-md);
 }
 
 .navbar__logo {
@@ -260,11 +260,12 @@ p {
   gap: 10px;
   text-decoration: none;
   flex-shrink: 0;
+  margin-right: auto;
 }
 
 .navbar__logo-img {
-  height: 42px;
-  width: 42px;
+  height: 44px;
+  width: 44px;
   object-fit: contain;
   border-radius: 50%;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
@@ -275,19 +276,41 @@ p {
   transform: scale(1.08);
 }
 
+.navbar__logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
 .navbar__logo-name {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1.05rem;
   color: var(--white);
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   white-space: nowrap;
+  text-transform: uppercase;
   transition: color var(--transition-base);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
+.navbar__logo-sub {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--gold-light, #D9B66F);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  transition: color var(--transition-base);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 .navbar.scrolled .navbar__logo-name {
   color: var(--white);
+}
+
+.navbar.scrolled .navbar__logo-sub {
+  color: var(--gold, #C8A951);
 }
 
 .navbar__search {
@@ -6763,6 +6786,11 @@ p {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
+.navbar:not(.scrolled) .navbar__logo-sub {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
 .navbar.scrolled .navbar__logo-name {
   color: var(--gold);
 }
@@ -6773,7 +6801,10 @@ p {
     width: 36px;
   }
   .navbar__logo-name {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+  }
+  .navbar__logo-sub {
+    font-size: 0.7rem;
   }
 }
 
@@ -6801,12 +6832,12 @@ p {
 
 
 @media (max-width: 480px) {
-  .navbar__logo-name {
+  .navbar__logo-text {
     display: none;
   }
   .navbar__logo-img {
-    height: 34px;
-    width: 34px;
+    height: 36px;
+    width: 36px;
   }
 }
 
