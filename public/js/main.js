@@ -866,6 +866,11 @@ function initFloatingEventBanner() {
   }
   if (expandedClose) expandedClose.addEventListener('click', collapseBanner);
   if (overlay) overlay.addEventListener('click', collapseBanner);
+  if (expanded) {
+    expanded.addEventListener('click', function(e) {
+      if (e.target === expanded) collapseBanner();
+    });
+  }
 
   // ---- Close / Reopen ----
   function closeBanner() {
